@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="osm-tutorial-101" default="install" basedir="."
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="plugin:dpml/magic/dpml-magic-core"
+    xmlns:c="plugin:dpml/composition/dpml-composition-builder">
+
+  <transit:import uri="artifact:template:dpml/magic/standard"/>
+
+  <target name="build" depends="standard.build">
+    <c:type class="net.osm.tutorial.SimpleWidget"/>
+    <c:component type="net.osm.tutorial.SimpleWidget" name="demo"/>
+  </target>
+
+</project>

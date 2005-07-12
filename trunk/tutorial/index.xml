@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<index>
+
+  <import uri="${dpml.metro.uri}"/>
+
+  <!-- module -->
+
+  <project basedir=".">
+    <info>
+      <group>osm/tutorial</group>
+      <name>osm-tutorial</name>
+      <type>module</type>
+    </info>
+    <dependencies>
+      <include key="dpml-metro"/>
+      <include key="dpml-transit"/>
+      <include key="dpml-magic"/>
+    </dependencies>
+  </project>
+
+  <!-- 101 -->
+
+  <project basedir="101">
+    <info>
+      <group>osm/tutorial</group>
+      <name>osm-tutorial-101</name>
+      <types>
+        <type>jar</type>
+      </types>
+    </info>
+    <plugins>
+      <include key="dpml-composition-builder"/>
+    </plugins>
+  </project>
+
+</index>
