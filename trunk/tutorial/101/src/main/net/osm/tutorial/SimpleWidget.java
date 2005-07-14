@@ -21,25 +21,38 @@ package net.osm.tutorial;
 import java.util.logging.Logger;
 
 /**
- * A minimal component 
+ * A minimal component.
  * 
  * @author <a href="http://www.osm.net">Open Service Management</a>
  */
 public class SimpleWidget implements Widget
 {
     //------------------------------------------------------------------
+    // context
+    //------------------------------------------------------------------
+
+    public interface Context
+    {
+        String getActivity();
+        String getOwner();
+        String getTarget();
+    }
+
+    //------------------------------------------------------------------
     // state
     //------------------------------------------------------------------
 
     private final Logger m_logger;
+    private final Context m_context;
 
     //------------------------------------------------------------------
     // constructor
     //------------------------------------------------------------------
 
-    public SimpleWidget( Logger logger )
+    public SimpleWidget( Logger logger, Context context  )
     {
         m_logger = logger;
+        m_context = context;
     }
 
     //------------------------------------------------------------------
@@ -51,6 +64,25 @@ public class SimpleWidget implements Widget
     */
     public void process( String color )
     {
-        m_logger.info( "Painting the house " + color );
+        String message = buildMessage( color );
+        m_logger.info( message );
     }
+
+    //------------------------------------------------------------------
+    // internals
+    //------------------------------------------------------------------
+
+   /**
+    * Utility operation to construct a message.
+    * @param color the colour to use
+    */
+    public String buildMessage( String color )
+    {
+        String owner = m_context.getOwner();
+        String activity = m_context.getActivity();
+        String target = m_context.getTarget();
+
+        return activity + " " + owner + "'s " + target + " " + color + ".";
+    }
+
 }
