@@ -73,7 +73,7 @@ public class SimpleWidgetTestCase extends TestCase
    /**
     * Test the construction of the widget implementation.
     */
-    public void testWidgetProviders() throws Exception
+    public void testWidgetManagement() throws Exception
     {
         //
         // get a reference to the widget Component and from this retrieve the 
@@ -90,13 +90,14 @@ public class SimpleWidgetTestCase extends TestCase
         }
         else
         {
+            // will not happen
             final String error = 
               "I'm assuming that the component is a Consumer but it's not!";
             throw new IllegalStateException( error );
         }
 
         //
-        // validate that the message is what we are expecting
+        // validate that the new directives refect our new message 
         //
 
         SimpleWidget widget = (SimpleWidget) component.resolve( false );
