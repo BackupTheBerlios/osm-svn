@@ -21,10 +21,14 @@ package net.osm.tutorial.test;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLConnection;
 
 import junit.framework.TestCase;
 
+import net.dpml.part.Part;
 import net.dpml.part.PartContentHandlerFactory;
+import net.dpml.part.component.Component;
+import net.dpml.part.component.Consumer;
 
 import net.osm.tutorial.SimpleWidget;
 
@@ -35,9 +39,6 @@ import net.osm.tutorial.SimpleWidget;
  */
 public class SimpleWidgetTestCase extends TestCase
 {
-    private static final String PATH = "test.part";
-    private static File TEST_DIR = new File( System.getProperty( "project.test.dir" ) );
-
    /**
     * Test the construction of the widget implementation.
     */
@@ -48,22 +49,62 @@ public class SimpleWidgetTestCase extends TestCase
         //
 
         URL url = new File( TEST_DIR, PATH ).toURL();
-        url.openConnection().setContentHandlerFactory( new PartContentHandlerFactory() );
         SimpleWidget widget = (SimpleWidget) url.getContent( new Class[]{ Object.class } );
 
         //
-        // execute it just to confirm that it does not reaise any errors
-        //
-
-        widget.process( "red" );
-
-        //
-        // validate the the default message is what we are expecting
+        // validate that the default message is what we are expecting
         //
 
         String message = widget.buildMessage( "red" );
         String user = System.getProperty( "user.name" );
         String expected = "Painting " + user + "'s house red.";
         assertEquals( "message content", expected, message );
+
+        //
+        // execute it just for fun
+        //
+
+        widget.process( "red" );
     }
+
+   /**
+    * Test the construction of the widget implementation.
+    */
+    public void testWidgetProviders() throws Exception
+    {
+        //
+        // get a reference to the widget Component
+        //
+
+        URL url = new File( TEST_DIR, PATH ).toURL();
+        Component component = (Component) url.getContent( new Class[]{ Component.class } );
+        Part part = component.getDefinition();
+        System.out.println( "# Component: " + component.getURI() );
+        System.out.println( "#   Defintion Class: " + part.getClass().getName() );
+
+        /*
+        if( component instanceof Consumer )
+        {
+            Consumer consumer = (Consumer) component;
+            Component[] providers = consumer.getProviders();
+            for( int i=0; i<providers.length; i++ )
+            {
+                Component provider = providers[i];
+                System.out.println( "# provider: " + provider.getURI() );
+            }
+        }
+
+        Component provider = component.getProvider( "target" );
+        Part part = provider.getDefinition();
+        */
+    }
+
+    static
+    {
+        URLConnection.setContentHandlerFactory( new PartContentHandlerFactory() );
+    }
+
+    private static final String PATH = "test.part";
+    private static File TEST_DIR = new File( System.getProperty( "project.test.dir" ) );
+
 }

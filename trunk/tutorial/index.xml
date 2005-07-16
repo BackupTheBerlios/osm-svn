@@ -48,7 +48,7 @@
       </types>
     </info>
     <dependencies>
-      <include key="dpml-part-api"/>
+      <include key="dpml-composition-model" runtime="false"/> <!-- testing -->
     </dependencies>
     <plugins>
       <include key="dpml-composition-builder"/>

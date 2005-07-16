@@ -38,9 +38,6 @@
     <x:property name="module.uri" feature="uri" type="module"/>
     <property name="link" value="target/deliverables/modules/${project.name}.module.link"/>
     <echo file="${link}">${module.uri}</echo>
-    <x:javadoc>
-      <link href="http://java.sun.com/j2se/1.4/docs/api"/>
-    </x:javadoc>
   </target>
 
 </project>
