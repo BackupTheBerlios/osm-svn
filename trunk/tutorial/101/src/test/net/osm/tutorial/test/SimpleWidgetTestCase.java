@@ -27,8 +27,11 @@ import junit.framework.TestCase;
 
 import net.dpml.part.Part;
 import net.dpml.part.PartContentHandlerFactory;
+import net.dpml.part.PartReference;
 import net.dpml.part.component.Component;
 import net.dpml.part.component.Consumer;
+
+import net.dpml.composition.data.ValueDirective;
 
 import net.osm.tutorial.SimpleWidget;
 
@@ -73,30 +76,41 @@ public class SimpleWidgetTestCase extends TestCase
     public void testWidgetProviders() throws Exception
     {
         //
-        // get a reference to the widget Component
+        // get a reference to the widget Component and from this retrieve the 
+        // definition of the component. 
         //
 
         URL url = new File( TEST_DIR, PATH ).toURL();
         Component component = (Component) url.getContent( new Class[]{ Component.class } );
-        Part part = component.getDefinition();
-        System.out.println( "# Component: " + component.getURI() );
-        System.out.println( "#   Defintion Class: " + part.getClass().getName() );
-
-        /*
         if( component instanceof Consumer )
         {
             Consumer consumer = (Consumer) component;
-            Component[] providers = consumer.getProviders();
-            for( int i=0; i<providers.length; i++ )
-            {
-                Component provider = providers[i];
-                System.out.println( "# provider: " + provider.getURI() );
-            }
+            ValueDirective value = new ValueDirective( "my-car-part", "car" );
+            consumer.setProvider( "target", value );
+        }
+        else
+        {
+            final String error = 
+              "I'm assuming that the component is a Consumer but it's not!";
+            throw new IllegalStateException( error );
         }
 
-        Component provider = component.getProvider( "target" );
-        Part part = provider.getDefinition();
-        */
+        //
+        // validate that the message is what we are expecting
+        //
+
+        SimpleWidget widget = (SimpleWidget) component.resolve( false );
+        String message = widget.buildMessage( "blue" );
+        String user = System.getProperty( "user.name" );
+        String expected = "Painting " + user + "'s car blue.";
+        assertEquals( "message content", expected, message );
+
+        //
+        // execute it just for fun
+        //
+
+        widget.process( "blue" );
+
     }
 
     static
