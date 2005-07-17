@@ -84,20 +84,24 @@ public class SimpleWidgetTestCase extends TestCase
         Component component = (Component) url.getContent( new Class[]{ Component.class } );
         if( component instanceof Consumer )
         {
+            //
+            // update the component's 'target' dependency with a new solution
+            //
+
             Consumer consumer = (Consumer) component;
             ValueDirective value = new ValueDirective( "my-car-part", "car" );
             consumer.setProvider( "target", value );
         }
         else
         {
-            // will not happen
+            // will not happen becaue this component is a Consumer
             final String error = 
-              "I'm assuming that the component is a Consumer but it's not!";
+              "It's not a consumer!";
             throw new IllegalStateException( error );
         }
 
         //
-        // validate that the new directives refect our new message 
+        // validate that the new directives refects our new solution 
         //
 
         SimpleWidget widget = (SimpleWidget) component.resolve( false );
@@ -111,7 +115,6 @@ public class SimpleWidgetTestCase extends TestCase
         //
 
         widget.process( "blue" );
-
     }
 
     static
