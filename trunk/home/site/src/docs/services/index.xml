@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="DPML Support">
+
+      <p>
+      The DPML provides a dedicated support list listed under their 
+      <a href="http://www.dpml.net/about/resources/lists.html">Mailing Lists</a>
+      page that is actively monitored by the DPML community.
+      </p>
+    
+    </section>
+
+    <section name="Professional Services">
+
+      <p>
+      OSM provides professional services related to Java based component 
+      management solutions.  These services include:
+      </p>
+
+      <ul>
+        <li>dedicated product support</li>
+        <li>consulting services related to product architecture and planning</li>
+        <li>migration strategy development and operational support</li>
+        <li>branch management and maintenance</li>
+        <li>project mentoring</li>
+      </ul>
+
+      <p>
+      For additional infromation you can reach OSM on <a href="info@osm.net">info@osm.net</a>.
+      </p>
+ 
+    </section>
+
+  </body>
+</document>
+

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Depot Application Management">
+
+      <p>
+      The Depot product is an application management system that 
+      we will be using in the OSM tutorials.  Depot comes preconfigured with 
+      the Transit resource managment system and a set of services that will 
+      handle the automatic installation of the Magic build system (used extensivly
+      throught the tutorials), and the Metro component management platform.  The 
+      core set of products we will be dealing with include the following 
+      <a href="http://www.dpml.net">DPML</a> solution.
+      </p>
+
+      <table>
+        <tr><th>System</th><th>Description</th></tr>
+        <tr>
+          <td>Depot @DEPOT-PRODUCT-VERSION@</td>
+          <td>
+        Depot is a utility used in the management of applications.  It provides
+        support for product installation, Transit preference management, application
+        deployment and server activation.
+          </td>
+        </tr>
+        <tr>
+          <td>Transit @TRANSIT-PRODUCT-VERSION@</td>
+          <td>
+        Transit is a small resource managmenet system based on the JVM URL
+        Handler architecture.  It provides support for the retrieval and caching 
+        of resources and service supporting plugin deployment.  Transit is 
+        included as a part of the Depot distribution.
+          </td>
+        </tr>
+        <tr>
+          <td>Magic @MAGIC-PRODUCT-VERSION@</td>
+          <td>
+        Magic is an antlib that provides support for transitive dependencies
+        across projects.  Magic is used daily in the management of 100s of 
+        interdependent projects within DPML and is a foundation tool in dealing with
+        highly complexity applications and the automation of component meta data 
+        generation.  Installation of Magic can be executed via Depot as required.
+          </td>
+        </tr>
+        <tr>
+          <td>Metro @METRO-PRODUCT-VERSION@</td>
+          <td>
+        Metro is a state-of-the-art component management platform that delivers
+        complete support for Inversion of Control, componet assembly, dynamic
+        component management, and complete plug-and-play semantics.  Installation 
+        of Magic can be executed via Depot as required.
+          </td>
+        </tr>
+      </table>
+
+
+    </section >
+
+    <section name="Binary Downloads">
+
+      <subsection name="License">
+
+      <p>
+        All products listed here are developed under open-source by the <a href="http://www.dpml.net">
+        Digital Product Meta Library</a> (DPML) and licenced under the commercially friendly 
+        <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software Licence V2.0.</a>
+        You may not use these distributions except in compliance with the License.
+        Unless required by applicable law or agreed to in writing, software distributed 
+        under the  License is distributed on an "AS IS" BASIS, WITHOUT  WARRANTIES OR CONDITIONS 
+        OF ANY KIND, either  express  or implied. See the License for the specific language 
+        governing permissions and limitations under the License.
+      </p>
+
+      </subsection>
+
+      <table>
+        <tr><th>Platform</th><th>Product</th><th>Binary</th><th>MD5</th><!--<th>ASC</th>--></tr>
+        <tr>
+          <td>Windows</td>
+          <td>Depot</td>
+          <td>
+            <a href="http://download.dpml.net/milestones/depot/@DEPOT-PRODUCT-VERSION@/dpml-depot-win32-@DEPOT-PRODUCT-VERSION@.zip">
+              dpml-depot-win32-@DEPOT-PRODUCT-VERSION@.zip</a>
+          </td>
+          <td>
+            <a href="http://download.dpml.net/milestones/depot/@DEPOT-PRODUCT-VERSION@/dpml-depot-win32-@DEPOT-PRODUCT-VERSION@.md5">MD5</a>
+          </td>
+        </tr>
+        <tr>
+          <td>Linux</td>
+          <td>Depot</td>
+          <td>
+            <a href="http://download.dpml.net/milestones/depot/@DEPOT-PRODUCT-VERSION@/dpml-depot-linux-@DEPOT-PRODUCT-VERSION@.zip">
+              dpml-depot-win32-@DEPOT-PRODUCT-VERSION@.tar.gz</a>
+          </td>
+          <td>
+            <a href="http://download.dpml.net/milestones/depot/@DEPOT-PRODUCT-VERSION@/dpml-depot-linux-@DEPOT-PRODUCT-VERSION@.md5">MD5</a>
+          </td>
+        </tr>
+      </table>
+
+    </section>
+
+
+    <section name="Prerequisite Products">
+
+      <subsection name="Java JDK @JAVA-PRODUCT-VERSION@">
+
+        <p>
+        Products and tutorials included under this site require the installation of 
+        Java @JAVA-PRODUCT-VERSION@.  General speaking this means you need to install
+        the <a href="@JAVA-DOWNLOAD-URL@">Java @JAVA-PRODUCT-VERSION@ SDK</a> for development 
+        purposes.  If your needs are limited to runtime solutions you may want to install 
+        just the Java @JAVA-PRODUCT-VERSION@ JRE (also included within the JDK).
+        </p>
+      </subsection>
+
+      <subsection name="Ant @ANT-PRODUCT-VERSION@">
+
+        <p>
+        Magic is an Ant extension library (antlib).  To fucntion correctly
+        you need to install the Ant @ANT-PRODUCT-VERSION@" binary distribution.
+        </p>
+
+      </subsection>
+
+    </section>
+
+  </body>
+
+</document>
+

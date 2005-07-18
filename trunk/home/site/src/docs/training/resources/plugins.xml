@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Resource Management</title>
+  </properties>
+
+  <body>
+
+    <section name="Transit Plugin Management">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The aim of this tutorial is to establish a good understanding 
+        of the term "plugin" and how plugin management can help you 
+        to build flexible and adaptive runtime system by leaveraging
+        Transit's cassloader construction services.
+        </p>
+
+      </subsection>
+
+      <subsection name="Definition of a Plugin">
+
+        <p>
+        A <code>plugin</code> is an artifact type that is used to describe 
+        a classloader chain.  The plugin resource is a property file that 
+        declares the contents of an API classloader, SPI classloader, 
+        and an implementation classloader. Each classloader defintion is 
+        expressed as a series of jar artifact uris.  Transit provides 
+        support for the construction of classloader chains based on the 
+        information contained within the plugin resource.  A chain is 
+        constructed by creating an API classloader a child of a supplied 
+        parent classloader, an SPI classloader as a child of the API classloader, 
+        and an implementation classloader as a child of the SPI classloader.
+        </p>
+
+        <p>
+        In additon to classloader chain information, a plugin resource can 
+        include the declaration of a main class or resource.  The combination 
+        of classloader chain with a loadable target (class or resource) combines 
+        to provide a framework for plugable sub-systems deployment.
+        </p>
+
+      </subsection>
+
+      <subsection name="A sample plugin resource">
+
+        <p>
+        The following property file is an example of a plugin resource.  The 
+        example is a development version of the plugin resource used to mount the 
+        runtime controller that executes within the Metro component management 
+        platform.
+        </p>
+
+        <source>
+#
+# Specification classifier.
+#
+dpml.plugin.meta.namespace = net.dpml
+dpml.plugin.meta.version = 1.0
+
+#
+# Artifact descriptor.
+#
+dpml.artifact.group = dpml/metro
+dpml.artifact.name = dpml-composition-control
+dpml.artifact.version = SNAPSHOT
+dpml.artifact.signature = 20050717.163611
+
+#
+# Type.
+#
+dpml.plugin.class = net.dpml.composition.control.CompositionController
+
+#
+# API dependencies.
+#
+dpml.artifact.dependency.api.0 = artifact:jar:dpml/metro/dpml-logging-api#SNAPSHOT
+dpml.artifact.dependency.api.1 = artifact:jar:dpml/metro/dpml-activity-api#SNAPSHOT
+dpml.artifact.dependency.api.2 = artifact:jar:dpml/metro/dpml-parameters-api#SNAPSHOT
+dpml.artifact.dependency.api.3 = artifact:jar:dpml/metro/dpml-configuration-api#SNAPSHOT
+dpml.artifact.dependency.api.4 = artifact:jar:dpml/transit/dpml-transit-main#SNAPSHOT
+
+#
+# SPI dependencies.
+#
+dpml.artifact.dependency.spi.0 = artifact:jar:dpml/metro/dpml-composition-model#SNAPSHOT
+dpml.artifact.dependency.spi.1 = artifact:jar:dpml/metro/dpml-part-api#SNAPSHOT
+
+#
+# Implementation dependencies.
+#
+dpml.artifact.dependency.0 = artifact:jar:dpml/metro/dpml-parameters-impl#SNAPSHOT
+dpml.artifact.dependency.1 = artifact:jar:dpml/metro/dpml-configuration-impl#SNAPSHOT
+dpml.artifact.dependency.2 = artifact:jar:xerces/xercesImpl#2.6.2
+dpml.artifact.dependency.3 = artifact:jar:xerces/xmlParserAPIs#2.6.2
+dpml.artifact.dependency.4 = artifact:jar:dpml/metro/dpml-composition-control#SNAPSHOT
+
+#
+# EOF.
+#
+        </source>
+
+      </subsection>
+
+      <subsection name="Plugin Creation">
+
+        <p>
+        In practice the creation and maintenance of plugin information is highly 
+        error prone due to overall complexity of dependency management. This was one
+        of the driving factors in the development of the Magic build system.  Magic 
+        was developed from the ground up as an Ant library the provided full transitive 
+        dependency management. Using the Magic project model the job of creating a 
+        plugin definition was reduced down to the following single line statement
+        within an ant build file.
+        </p>
+
+<pre>
+    &lt;x:export class="net.dpml.composition.control.CompositionController"/&gt;
+</pre>
+
+      </subsection>
+
+      <subsection name="Plugin Loading">
+
+        <p>
+        Transit provides a number of plugin related services including loading of 
+        plugin descriptor, creation of a plugin classloader chain, plugin class 
+        establishment, plugin instance establishment, and generic object 
+        instantiation utility function.  Collectively these methods make the 
+        process of sub-systems creation a painless development process.  
+        </p>
+
+        <p>
+        The following example demonstrates the creation of a plugin sub-system 
+        using Transit.
+        </p>
+
+        <source>
+  ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+  URI uri = new URI( "artifact:plugin:dpml/metro/dpml-metro-central#SNAPSHOT" );
+  ContentModel content = createContentModel();
+  Repository repository = Transit.getInstance().getRepository();
+  m_handler = (ContentHandler) repository.getPlugin( classloader, uri, new Object[]{ content } );
+        </source>
+
+        <p>
+        The above code is typical in that it covers the following functions:
+        </p>
+
+        <ol>
+          <li>Establish the classloader that will serve as the anchor for the classloader chain.</li>
+          <li>Create an artifact URI referencing a "plugin" resource.</li>
+          <li>Construct any objects that should be supplied as constructor arguments.</li>
+          <li>Get the reference to theTransit plugin service.</li>
+          <li>Request plugin creation using anchor classloader, the uri, and the constructor arguments.</li>
+        </ol>
+
+        <p>
+        Within production applications you would typically see a reasonable amount of error 
+        handling code wrapping the above code framgment.  The error handling code would typically 
+        handle validation of the plugin either prior to instantiation or part of a try catch block, 
+        type checking, etc.  For additional details see the net.dpml.transit.repository.Repository 
+        interface documentation.
+        </p>
+
+      </subsection>
+
+    </section>
+
+  </body>
+
+</document>
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="osm-home-site" default="install" basedir="."
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="plugin:dpml/magic/dpml-magic-core" >
+
+  <transit:import uri="artifact:template:dpml/magic/standard"/>
+
+  <target name="init" depends="standard.init">
+    <filter token="JAVA-PRODUCT-VERSION" value="1.4"/>
+    <filter token="JAVA-DOWNLOAD-URL" value="http://java.sun.com/j2se/1.4.2/download.html"/>
+    <x:filter token="ANT-PRODUCT-VERSION" feature="version" key="ant"/>
+    <x:filter token="DEPOT-PRODUCT-VERSION" feature="version" key="dpml-depot"/>
+    <x:filter token="TRANSIT-PRODUCT-VERSION" feature="version" key="dpml-transit"/>
+    <x:filter token="MAGIC-PRODUCT-VERSION" feature="version" key="dpml-magic"/>
+    <x:filter token="METRO-PRODUCT-VERSION" feature="version" key="dpml-metro"/>
+  </target>
+
+  <target name="install" depends="docs"/>
+
+  <target name="docs" depends="prepare">
+    <x:property name="spec" feature="plugin" key="dpml-magic-doc"/>
+    <transit:plugin uri="${spec}">
+      <task class="net.dpml.magic.doc.DocTask" name="docs"/>
+    </transit:plugin>
+    <docs/>
+  </target>
+
+</project>
+

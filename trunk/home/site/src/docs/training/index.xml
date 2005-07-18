@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Training Material Index ">
+
+      <p>
+      The OSM Tutorials are provided with the aim of getting you and operational
+      as quickly as possible.  The tutorials are loosly related to the DPML products
+      Transit, Magic, Depot, and Metro - each representing a specific concern in 
+      Java based component development and application deivery.
+      </p>
+
+      <p>
+      The tutorial assumes you have already <a href="../download/index.html">downloaded</a> 
+      and <a href="../download/setup/index.html">installed</a> Depot and 
+      prerequise products (JDK and Ant build system). 
+      </p>
+
+      <table>
+        <tr><th>Subject</th><th>Description</th></tr>
+        <tr>
+          <td><a href="resources/index.html">Resource Management</a></td>
+          <td>
+            This tutorial introduces the Transit resource managment system
+            and takes you though examples of how you can improve your code by 
+            eliminating resource location and retrival concerns from you development
+            code.  The tutorial also present strategies concerning classloader 
+            construction, classloader chains, and plugin management solutions.
+            This material will be of particular interest to developers and architects 
+            dealing with dynamically adaptive or runtime evolvable systems. This 
+            material is to some exent optional as is deals with the a general but 
+            low-level concern - however, a quick read through of the introductory
+            page is recommended.
+          </td>
+        </tr>
+        <tr>
+          <td><a href="tooling/index.html">Development Tooling</a></td>
+          <td>
+            This tutorial focusses on the establishment of a production build 
+            environment using technologies that provide transitive dependency 
+            management.  The tutorial presents the general setup of a build 
+            environment, examples of projects representing typical development 
+            needs, examples of the use of transitive dependencies in development
+            and the generation of project data and runtime information.  Readers 
+            planning on getting into component development should go thought this 
+            material and personal interested in capturaturing project metrics 
+            and related quality assurance concerns could going some interesting 
+            milage.
+          </td>
+        </tr>
+        <tr>
+          <td><a href="components/index.html">Component Development</a></td>
+          <td>
+            This tutorial is all about the development of components using the 
+            IOC (Inversion of Control) principal.  The tutorial takes you though the 
+            development, testing, and management of component solutions using the 
+            DPML Metro component management solution.  It presents a series of 
+            examples dealing with context driven IOC of simple though to complex 
+            composite components and stretegies supporting effective component 
+            reuse.  Feel free to kick off on this tutorial as it delivers the most 
+            value in terms of potential development productivity.
+          </td>
+        </tr>
+        <tr>
+          <td><a href="applications/index.html">Application Management</a></td>
+          <td>
+            This tutorial is primarily concerned with the management of deployed 
+            applications. However, developers will find this material valuable relative
+            to its coverage of configuration management and instalation services. 
+            Product support personel will be more interested in Depot managenent aspects
+            and the potential for applying Depot as an application delivery vehicle.
+          </td>
+        </tr>
+      </table>
+
+    
+    </section>
+
+  </body>
+</document>
+

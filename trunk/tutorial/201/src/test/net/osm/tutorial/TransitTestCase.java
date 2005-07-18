@@ -37,9 +37,9 @@ public class TransitTestCase extends TestCase
 
     public void testPropertyLoading() throws Exception
     {
-        Properties properties = new Properties();
         URL url = new URL( "artifact:spec:dpml/test/example-property-file#2.2" );
         InputStream input = url.openStream();
+        Properties properties = new Properties();
         properties.load( input );
         String message = properties.getProperty( "tutorial.message" );
         System.out.println( message );

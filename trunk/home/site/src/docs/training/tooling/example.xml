@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Development Tooling Tutorial">
+
+      <p>To get started using Magic follow these steps:</p>
+      <ol>
+        <li>
+            You will need to install Transit and Magic
+            <br/>
+            <a href='http://www.dpml.net/about/setup/index.html'>http://www.dpml.net/about/setup/index.html</a>
+          </p>
+        </li>
+        <li>
+          <p>
+            Put a copy of the following files into .ant/lib
+            <ul>
+              <li>dpml-transit-main-xxx.jar</li>
+              <li>dpml-transit-tools.xxx.jar</li>
+            </ul>
+          </p>
+        </li>
+      </ol>
+      <p>You are now ready to start using Magic:</p>
+      <ol>
+        <li>
+          <p>Create a new directory "demo"</p>
+        </li>
+        <li>
+          <p>
+            Create a file names index.xml along the lines 
+            of the following:
+          </p>
+<source><![CDATA[
+<index>
+  <import uri="artifact:module:dpml/magic/dpml-magic#xxx"/>
+  <project basedir=".">
+    <info>
+      <group>acme</group>
+      <name>acme-demo</name>
+      <type>jar</type>
+    </info>
+  </project>     
+</index>
+]]></source>
+          <p>
+            Note: the above is importing a module for magic which
+            is included in the repository that was established when you 
+            installed Transit.  
+          </p>
+        </li>
+        <li>
+          <p>
+            Create a build.xml file along the lines of the following:
+          </p>
+<source><![CDATA[
+<project name="acme-demo" default="install" basedir="."
+  xmlns:transit="antlib:net.dpml.transit"
+  xmlns:x="plugin:dpml/magic/dpml-magic-core" >
+  <transit:import uri="artifact:template:dpml/magic/standard"/>
+</project>
+]]></source>
+        </li>
+        <li>
+          <p>
+            Put your java source files in demo/src/main (e.g.
+            Demo/src/main/com/acme/widget/MyWidget.java)
+          </p>
+        </li>
+        <li>
+          <p>
+            Build the project
+<source>
+$ ant
+</source>
+          </p>
+        </li>
+      </ol>
+
+    </section>
+
+  </body>
+</document>
+

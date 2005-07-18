@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="About OSM">
+
+      <p>
+      The resource center for component based development.
+      </p>
+
+      <ul>
+
+        <li>software systems architecture for reuse and long-term maintainability </li>
+        <li>training and development programmes dealing with java-based component 
+            development and service oriented design </li>
+        <li>component infrastructure and development tooling </li>
+        <li>application design, development and deployment solutions</li>
+        <li>opensource collaborative development strategies for industry groups</li> 
+        <li>project management</li>
+
+      </ul>
+        
+    </section>
+
+  </body>
+</document>
+
