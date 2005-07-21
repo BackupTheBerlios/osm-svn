@@ -18,7 +18,7 @@
   limitations under the License.
 -->
 
-<project name="osm-tutorial-101" default="install" basedir="."
+<project name="osm-application-101" default="install" basedir="."
     xmlns:transit="antlib:net.dpml.transit" 
     xmlns:x="plugin:dpml/magic/dpml-magic-core"
     xmlns:c="plugin:dpml/composition/dpml-composition-builder">

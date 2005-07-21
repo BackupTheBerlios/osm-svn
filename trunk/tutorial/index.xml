@@ -37,23 +37,7 @@
     </dependencies>
   </project>
 
-  <!-- 101 -->
-
-  <project basedir="101">
-    <info>
-      <group>osm/tutorial</group>
-      <name>osm-tutorial-101</name>
-      <types>
-        <type>jar</type>
-      </types>
-    </info>
-    <dependencies>
-      <include key="dpml-composition-model" runtime="false"/> <!-- testing -->
-    </dependencies>
-    <plugins>
-      <include key="dpml-composition-builder"/>
-    </plugins>
-  </project>
+  <!-- resources -->
 
   <project basedir="resources">
     <info>
@@ -66,6 +50,24 @@
     <dependencies>
       <include key="dpml-transit-main"/>
     </dependencies>
+  </project>
+
+  <!-- applications -->
+
+  <project basedir="applications/101">
+    <info>
+      <group>osm/tutorial</group>
+      <name>osm-application-101</name>
+      <types>
+        <type>jar</type>
+      </types>
+    </info>
+    <dependencies>
+      <include key="dpml-composition-model" runtime="false"/> <!-- testing -->
+    </dependencies>
+    <plugins>
+      <include key="dpml-composition-builder"/>
+    </plugins>
   </project>
 
 </index>
