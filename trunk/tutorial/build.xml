@@ -35,9 +35,6 @@
         <home href="http://www.osm.net/tutorial/"/>
       </header>
     </x:module>
-    <x:property name="module.uri" feature="uri" type="module"/>
-    <property name="link" value="target/deliverables/modules/${project.name}.module.link"/>
-    <echo file="${link}">${module.uri}</echo>
   </target>
 
 </project>

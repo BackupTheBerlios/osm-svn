@@ -21,75 +21,17 @@
       handler.
       </p>
 
-      <p>A typical Transit URL is show below:</p>
+      <subsection name="Tutorial Index">
 
-      <code>artifact:jar:dpml/metro/dpml-metro-composition#3000</code>
+        <ol>
+          <li><a href="overview.html">Overview of the Transit system and it's role in resource managmeent.</a></li>
+          <li><a href="artifacts.html">Artifacts creation and usage</a></li>
+          <li><a href="plugins.html">Classloader construction using plugins and the Transit services.</a></li>
+          <li><a href="content.html">Using Transit content handlers.</a></li>
+          <li><a href="repositories.html">Creating your own repository.</a></li>
+        </ol>
 
-      <p>
-      The above URL is referencing a 'jar' resource within the group 'dpml/metro', named
-      'dpml-metro-composition', and version '3000'. This information is sufficient for 
-      Transit to retrieve the resource from one of resurce hosts it is associated with and 
-      locally cache the resource. 
-      </p>
-
-      <p>In effect ...</p>
-<pre>
-    |-----------------------------------|
-    | artifact:thing:mygroup/myname#123 | is a URI
-    |-----------------------------------|
-            | 
-            | is handled by 
-            |
-    |-----------------------------------| n    1 |-----------| 1   n |----------------|
-    | net.dpml.transit.artifact.Handler | &lt;&gt;---- | Transit   | &lt;&gt;----| ResourceHost   |
-    |-----------------------------------|        |-----------|       |----------------|
-</pre>
-
-      <p>
-      Using URIs you can reference and work with resources in a more abstract manner as your 
-      dealing with URI as opposed to a URL.  A URI "identifies" a resource whereas a URL 
-      "locates" a resource.  Transit maps URIs to URLs when interogating 
-      resource host that are declared within the Tranist configuration. As Transit 
-      supports multiple hosts and multiple protocols you in effect remove resource
-      location concerns from you code.
-      </p>
-
-      <p>
-      Here is an example of URI and URL construction:
-      </p>
-
-      <source>String path = "artifact:jar:dpml/metro/dpml-metro-composition#3000";
-URI uri = new URI( path );
-URL url = uri.toURL();</source>
-
-      <p>
-      To use Transit in your application you will need to ensure that the following two 
-      conditions are met:
-      </p>
-
-      <ol>
-        <li>the system property <code>java.protocol.handler.pkgs</code> is declared
-          with a value including <code>net.dpml.transit</code>. For example:<br/><br/><code>
-   System.setProperty( "java.protocol.handler.pkgs", "net.dpml.transit" );</code><br/><br/></li>
-        <li>the <code>dpml-transit-main.jar</code> is included within the system classloader</li>
-      </ol>
-
-      <p>
-      If you plan on using Transit in a production scenario you will want to take a close 
-      look at the information concerning the setup and configuration of Transit provided 
-      under the <a href="http://www.dpml.net/transit">Transit home page</a>.
-      </p>
-
-      <p>
-      This tutorial will cover the following subjects:
-      </p>
-     
-      <ol>
-        <li><a href="artifacts.html">Simple artifacts creation and usage</a></li>
-        <li><a href="plugins.html">Classloader construction using plugins and the Transit services.</a></li>
-        <li><a href="content.html">Using Transit content handlers.</a></li>
-        <li><a href="repositories.html">Creating your own repository.</a></li>
-      </ol>
+      </subsection>
 
     </section>
   </body>

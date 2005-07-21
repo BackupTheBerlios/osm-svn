@@ -28,7 +28,9 @@
     <info>
       <group>osm/tutorial</group>
       <name>osm-tutorial</name>
-      <type>module</type>
+      <types>
+        <type name="module"/>
+      </types>
     </info>
     <dependencies>
       <include key="dpml-metro"/>
@@ -44,7 +46,7 @@
       <group>osm/tutorial</group>
       <name>osm-resource-tutorial</name>
       <types>
-        <type>jar</type>
+        <type name="jar"/>
       </types>
     </info>
     <dependencies>
@@ -59,7 +61,7 @@
       <group>osm/tutorial</group>
       <name>osm-application-101</name>
       <types>
-        <type>jar</type>
+        <type name="jar"/>
       </types>
     </info>
     <dependencies>

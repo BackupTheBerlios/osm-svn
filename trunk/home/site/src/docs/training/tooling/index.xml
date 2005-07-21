@@ -18,39 +18,42 @@
 
         <table>
           <tr>
-            <td><a href="install.html">Installing.</a></td>
+            <td width="15%"><a href="install.html">Installing Magic</a></td>
             <td>
               Instructions for triggering the automatic magic install.
             </td>
           </tr>
           <tr>
-            <td><a href="example.html">Gettings Started.</a></td>
+            <td><a href="example.html">Gettings Started</a></td>
             <td>
               A walk through of setting up an index, creating a couple of 
               projects, adding some content, adding a reactor build, followed by
               a review of the process and the generated project resources.
             </td>
           </tr>
-          <!--
           <tr>
-            <td>Adding Unit Tests</td>
+            <td><a href="testcase.html">Testcases</a></td>
             <td>
-              COMMING SOON
+              Addition of a testcase to our 'system' project and demonstration 
+              of the automatic compilation and test execution provided by Magic.
             </td>
           </tr>
           <tr>
-            <td>Adding a Module project</td>
+            <td><a href="filtering.html">Source Filtering</a></td>
             <td>
-              COMMING SOON
+              A quick introduction to source filtering including the use of 
+              Magic's filter task and the demonstration of how project model
+              information can be easily extracted and used in your build process.
             </td>
           </tr>
           <tr>
-            <td>Build customization.</td>
+            <td><a href="module.html">Creating a Module</a></td>
             <td>
-              COMMING SOON
+              This tutorial takes us through the process of module creation and 
+              and includes an summary of the generated module and it's potential
+              application when publishing content.
             </td>
           </tr>
-          -->
         </table>
 
       </subsection>

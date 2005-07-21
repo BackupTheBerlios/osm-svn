@@ -7,7 +7,7 @@
       <group>acme</group>
       <name>acme-client</name>
       <types>
-        <type>jar</type>
+        <type name="jar"/>
       </types>
     </info>
   </project>
@@ -17,7 +17,7 @@
       <group>acme</group>
       <name>acme-system</name>
       <types>
-        <type>jar</type>
+        <type name="jar"/>
       </types>
     </info>
     <dependencies>

@@ -25,6 +25,7 @@
  <body>
 
     <menu>
+      <item name="Overview" href="overview.html"/>
       <item name="Artifacts" href="artifacts.html"/>
       <item name="Plugins" href="plugins.html"/>
       <item name="Content Handlers" href="content.html"/>

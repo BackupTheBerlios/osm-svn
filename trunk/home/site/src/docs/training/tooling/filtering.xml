@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Source Filtering">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to demonstrate the use of 
+        classic Ant filters and compare this with Magic filters and how
+        you can use Magic's filter task to aquire information from the 
+        project model.
+        </p>
+
+      </subsection>
+
+      <subsection name="Adding filters to the buildfile">
+
+        <p>
+        The following updates need to included in you 'system' project
+        build file.  These updates are included as a task named <code>init</code>
+        which is one of the standard task declared in the imported template.  The 
+        <code>depends</code> atttribute tells ant that our new <code>init</code>
+        target depends on the execution of the standard <code>init</code> target.
+        The first first filter is a classic ant filter that will replace all occurances
+        of the pattern <code>@COLOR@</code> in a sources wityh the value <code>red</code>.
+        The second filter is a filter that lets us extract some information from Magic's
+        project model and apply this as a filter argument.  In this example the feature
+        we are requesting is the name of the project.
+        </p>
+    
+        <p>Changes to the 'system' project include:</p>
+
+        <ol>
+          <li>Addition of the magic antlib namespace declaration to the build file header 
+              and the addition of an <code>init</code> target that extends the standard
+              <code>init</code> definition with our filter directives.
+<source><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="acme-system" default="install" basedir="."
+    xmlns:transit="antlib:net.dpml.transit"
+    xmlns:x="plugin:dpml/magic/dpml-magic-core" >
+
+  <transit:import uri="artifact:template:dpml/magic/standard"/>
+
+  <target name="init" depends="standard.init">
+    <filter token="COLOR" value="red"/>
+    <x:filter token="NAME" feature="name"/>
+  </target>
+
+</project>
+]]></source></li>
+          <li>Updates to the DefaultWidget.java source to use the filtered values.
+<source>
+    public String buildMessage( String color )
+    {
+        if( null == color )
+        {
+            return "I'm a plain old " + COLOR + " widget named " + NAME + ".";
+        }
+        else
+        {       
+            return "I'm a " + color + " widget named " + NAME;
+        }
+    }
+
+    private static final String NAME = "@NAME@";
+    private static final String COLOR = "@COLOR@";
+</source></li>
+          <li>Updates to DefaultWidgetTestCase.java.
+<source>
+    public void testDefaultMessage() throws Exception
+    {
+        DefaultWidget widget = new DefaultWidget();
+        String result = widget.buildMessage( null );
+        String expected = "I'm a plain old " + COLOR + " widget named " + NAME + ".";
+        assertEquals( "default", expected, result );
+        widget.process( null );
+    }
+
+    public void testExplicitMessage() throws Exception
+    {
+        DefaultWidget widget = new DefaultWidget();
+        String color = "blue";
+        String result = widget.buildMessage( color );
+        String expected = "I'm a " + color + " widget named " + NAME;
+        assertEquals( "explicit", expected, result );
+        widget.process( color );
+    }
+
+    private static final String NAME = "@NAME@";
+    private static final String COLOR = "@COLOR@";
+</source></li>
+       </ol>
+
+      </subsection>
+
+      <subsection name="Build Output">
+
+        <pre>
+test:
+  [x:junit] Compiling 1 source file to C:\dev\system\target\test-classes
+  [x:junit] executing in local jvm
+  [x:junit] Running acme.impl.test.DefaultWidgetTestCase
+[x:reactor] I'm a plain old red widget named acme-system.
+[x:reactor] I'm a blue widget named acme-system
+  [x:junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
+        </pre>
+
+      </subsection>
+
+      <subsection name="Tutorial Summary">
+
+        <p>
+        The are a couple of important things covered in this tutorial.  Firstly,
+        when Magic prepares project content it constructs a working codebase under
+        the <code>${basedir}/target/build</code> directory.  This codebase is the 
+        result of applying any filters declared prior to the execution of the 
+        <code>prepart</code> target.  Secondly, the example demonstrates how you 
+        can easily extend the standard build behaviour using Ant's logic on target 
+        naming - basically it's the convention of referencing an imported template 
+        target with the imported template's filename followed by the name of the 
+        target we want to extend.
+        </p>
+        
+        <p><i>
+        Logically speaking the approach to task extension follows the following convention:
+        </i></p>
+<pre><![CDATA[
+<target name="[target-name]" depends="[template-filename].[target-name]">
+  <!-- extended content goes here -->
+</target>
+]]></pre>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Adding testcases">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to demonstrate the addition of a 
+        JUnit testcase and show how this is included automatically in your 
+        build process.
+        </p>
+
+      </subsection>
+
+      <subsection name="Creating the Testcase">
+
+        <p>
+        When we installed Magic the resources necessary to run JUnit 
+        tests were installed for you.  All we need to do is to add the 
+        test case source to the test codebase <code>[project]/src/test</code>.
+        In the case of the <code>system</code> this means adding our testcase
+        to the <code>dev/system/src/test/acme/impl/test/DefaultWidgetTestCase.java</code>.
+        Note: we are using the package name <code>acme/impl/test</code> so that
+        we properly simulate usage of our class as an external client by ensuring 
+        we are not executing in the same package namespace as the target.
+        </p>
+
+        <source>
+package acme.impl.test;
+
+import junit.framework.TestCase;
+
+import acme.Widget;
+import acme.impl.DefaultWidget;
+
+public class DefaultWidgetTestCase extends TestCase
+{
+    public void testDefaultMessage() throws Exception
+    {
+        DefaultWidget widget = new DefaultWidget();
+        String result = widget.buildMessage( null );
+        String expected = "I'm a plain old widget.";
+        assertEquals( "default", expected, result );
+    }
+
+    public void testExplicitMessage() throws Exception
+    {
+        DefaultWidget widget = new DefaultWidget();
+        String color = "blue";
+        String result = widget.buildMessage( color );
+        String expected = "I'm a " + color + " widget.";
+        assertEquals( "explicit", expected, result );
+    }
+
+    public void testImplementsWidget() throws Exception
+    {
+        DefaultWidget impl = new DefaultWidget();
+        try
+        {
+            Widget widget = (Widget) impl;
+        }
+        catch( ClassCastException e )
+        {
+            fail( "DefaultWidget does not implement the Widget service interface." );
+        }
+    }
+}</source>
+      </subsection>
+
+      <subsection name="Rebuild">
+
+<pre>
+$ cd system
+$ ant
+</pre>
+
+        <p>
+        During the build Magic will look for testcases in the projects <code>src/test</code>
+        directory and compile these taking into account the project's dependencies.
+        </p>
+
+        <p>
+        Output from the build should look like the following:
+        </p>
+<pre>
+test:
+  [x:junit] Compiling 1 source file to C:\dev\system\target\test-classes
+  [x:junit] Created dir: C:\dev\system\target\test-reports
+  [x:junit] executing in local jvm
+  [x:junit] Running acme.impl.test.DefaultWidgetTestCase
+  [x:junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
+</pre>
+
+      </subsection>
+
+ 
+    </section>
+
+  </body>
+</document>
+

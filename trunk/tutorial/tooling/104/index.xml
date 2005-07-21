@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<index>
+<index key="acme">
+
+  <project basedir=".">
+    <info>
+      <group>acme</group>
+      <name>acme</name>
+      <types>
+        <type name="module"/>
+      </types>
+    </info>
+  </project>
 
   <project basedir="client">
     <info>
       <group>acme</group>
       <name>acme-client</name>
       <types>
-        <type>jar</type>
+        <type name="jar"/>
       </types>
     </info>
   </project>
@@ -17,7 +27,7 @@
       <group>acme</group>
       <name>acme-system</name>
       <types>
-        <type>jar</type>
+        <type name="jar"/>
       </types>
     </info>
     <dependencies>

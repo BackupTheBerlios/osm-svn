@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Creating a group Module">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to intrioduce the concept of a module
+        and walk through the process of module creation.  The tutorial concludes
+        with the summary of the generated content and description of how a module
+        resource can be used when sharing your project resources.
+        </p>
+
+      </subsection>
+
+      <subsection name="dev/index.xml">
+
+        <p>
+        We need to update our index.xml file to include the defintion of a new
+        project to handle the creation of the module resource.  There are two 
+        additions here:
+        </p>
+
+        <ol>
+          <li>The addition of the project name <code>acme</code> with 
+              output type production of <code>module</code>.</li>
+          <li>The addition of the <code>key</code> attribute to the root
+              index element which tells magic that name of the project that is 
+              producing the module.</li>
+        </ol>
+
+<source><![CDATA[
+<index key="acme">
+
+  <project basedir=".">
+    <info>
+      <group>acme</group>
+      <name>acme</name>
+      <types>
+        <type name="module"/>
+      </types>
+    </info>
+  </project>
+
+  ....
+
+</index>
+]]></source>
+
+      </subsection>
+
+      <subsection name="dev/build.xml">
+
+        <p>
+        Rather than creating a new sub-directory the approach taken in this
+        tutorial is to change our reactor based build file (dev/build.xml) with a 
+        approach based on the standard template.  Key features include:
+        </p>
+
+        <ol>
+          <li>Project name has been updated to match the module project name in the index.</li>
+          <li>Uses the standard template instead of the reactor template.</li>
+          <li>Calls the reactor build under a extended <code>init</code> target using the 
+              reactor task directly.</li>
+          <li>Creates the module resource withou output to the 
+              <code>dev/target/deliverables/modules</code> directory.</li>
+        </ol>
+    
+<source><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="acme" default="install" basedir="." 
+    xmlns:transit="antlib:net.dpml.transit"
+    xmlns:x="plugin:dpml/magic/dpml-magic-core">
+
+  <transit:import uri="artifact:template:dpml/magic/standard"/>
+
+  <target name="init" depends="standard.init">
+    <x:reactor/>
+  </target>
+
+  <target name="build" depends="standard.build">
+    <x:module index="index.xml">
+      <header>
+        <svn href="svn://osm.berlios.de/repos/osm/trunk/tutorial/tooling/104"/>
+        <home href="http://www.osm.net/tutorial/tooling/module.html"/>
+      </header>
+    </x:module>
+  </target>
+
+</project>
+]]></source>
+
+      </subsection>
+
+      <subsection name="Content of the Module Resource">
+
+        <p>
+        The contents of the module resources created as an output of Magic's module
+        task is listed below.  It contains some summary information about the project
+        group (in this case a reference to the group's home page and it's svn repository), 
+        together with the set of projects defined within the module.  The project data
+        has been collected and presented as <code>&lt;resource&gt;</code> entires suitable for 
+        reference by other external projects.
+        </p>
+
+        <p><i>
+        NOTE: The following module is not suitable for publication just yet as it 
+        references development content - in particular the resources are listed with the 
+        <code>SNAPSHOT</code> version which as a matter of principal should never be publishedo outside
+        of a closed development environment.  We will come back to this point in a later 
+        tutorial dealing with content publication and module versioning.
+        </i></p>
+
+<source><![CDATA[
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<module uri="artifact:module:acme/acme#SNAPSHOT">
+
+  <header>
+    <publisher name=""/>
+    <home href="http://www.osm.net/tutorial/tooling/module.html"/>
+    <docs href=""/>
+    <legal>
+      <license href=""/>
+      <notice href=""/>
+    </legal>
+    <svn href="svn://osm.berlios.de/repos/osm/trunk/tutorial/tooling/104"/>
+    <repository href=""/>
+  </header>
+
+  <resources>
+
+    <!-- module resources -->
+
+    <resource key="acme-client">
+      <info>
+        <group>acme</group>
+        <name>acme-client</name>
+        <version>SNAPSHOT</version>
+        <types>
+          <type name="jar"/>
+        </types>
+      </info>
+    </resource>
+
+    <resource key="acme-system">
+      <info>
+        <group>acme</group>
+        <name>acme-system</name>
+        <version>SNAPSHOT</version>
+        <types>
+          <type name="jar"/>
+        </types>
+      </info>
+      <dependencies>
+        <include key="acme-client"/>
+      </dependencies>
+    </resource>
+
+  </resources>
+
+</module>]]></source>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+
