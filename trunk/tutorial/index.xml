@@ -55,10 +55,10 @@
     </plugins>
   </project>
 
-  <project basedir="201"> <!-- transit property loading -->
+  <project basedir="resources">
     <info>
       <group>osm/tutorial</group>
-      <name>osm-tutorial-201</name>
+      <name>osm-resource-tutorial</name>
       <types>
         <type>jar</type>
       </types>
@@ -67,6 +67,5 @@
       <include key="dpml-transit-main"/>
     </dependencies>
   </project>
-
 
 </index>

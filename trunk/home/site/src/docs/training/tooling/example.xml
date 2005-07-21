@@ -8,82 +8,345 @@
 
   <body>
 
-    <section name="Development Tooling Tutorial">
+    <section name="Getting Started">
 
-      <p>To get started using Magic follow these steps:</p>
-      <ol>
-        <li>
-            You will need to install Transit and Magic
-            <br/>
-            <a href='http://www.dpml.net/about/setup/index.html'>http://www.dpml.net/about/setup/index.html</a>
-          </p>
-        </li>
-        <li>
-          <p>
-            Put a copy of the following files into .ant/lib
-            <ul>
-              <li>dpml-transit-main-xxx.jar</li>
-              <li>dpml-transit-tools.xxx.jar</li>
-            </ul>
-          </p>
-        </li>
-      </ol>
-      <p>You are now ready to start using Magic:</p>
-      <ol>
-        <li>
-          <p>Create a new directory "demo"</p>
-        </li>
-        <li>
-          <p>
-            Create a file names index.xml along the lines 
-            of the following:
-          </p>
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to walk you though the setup 
+        of a small development environment the includes two related projects
+        and a single index. 
+        </p>
+
+      </subsection>
+
+      <subsection name="Setting up ...">
+
+        <table>
+          <tr>
+            <td>dev</td>
+            <td>
+              Create a root directory named 'dev' 
+              (or any other name you prefer).  This directory 
+              will be used as the root directory for two projects 
+              and the directory into which we will add an index.
+            </td>
+          </tr>
+          <tr>
+            <td>index.xml</td>
+            <td>
+              Create a new file in the dev directory named index.xml.  The
+              index.xml file should contain project defintions for out two projects.
+              The index file should contain the defintion of two projects, one named
+              'acme-client' and the other named 'acme-system'.  For both projects 
+              we have declared that they produce jar resource, and that acme-system 
+              is dependent on acme-client.
 <source><![CDATA[
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
 <index>
-  <import uri="artifact:module:dpml/magic/dpml-magic#xxx"/>
-  <project basedir=".">
+
+  <project basedir="client">
     <info>
       <group>acme</group>
-      <name>acme-demo</name>
-      <type>jar</type>
+      <name>acme-client</name>
+      <types>
+        <type>jar</type>
+      </types>
     </info>
-  </project>     
+  </project>
+
+  <project basedir="system">
+    <info>
+      <group>acme</group>
+      <name>acme-system</name>
+      <types>
+        <type>jar</type>
+      </types>
+    </info>
+    <dependencies>
+      <include key="acme-client"/>
+    </dependencies>
+  </project>
+
 </index>
 ]]></source>
-          <p>
-            Note: the above is importing a module for magic which
-            is included in the repository that was established when you 
-            installed Transit.  
-          </p>
-        </li>
-        <li>
-          <p>
-            Create a build.xml file along the lines of the following:
-          </p>
+            </td>
+          </tr>
+          <tr>
+            <td>basedirs</td>
+            <td>
+              Create two sub-directories under 'dev' - one named 'client' and the other named 'system'.
+              These directories correspond to the project basedir referenced by basedir attribute 
+              values we declared in our index file.
+            </td>
+          </tr>
+          <tr>
+            <td>client/build.xml</td>
+            <td>
+              Add a build.xml file to the client directory.  Note that the project name attribute
+              refers to the name of the project in our index.  This is used when we go to build the
+              project as the imported template will lookup infromation about the project in the 
+              index.xml file.
 <source><![CDATA[
-<project name="acme-demo" default="install" basedir="."
-  xmlns:transit="antlib:net.dpml.transit"
-  xmlns:x="plugin:dpml/magic/dpml-magic-core" >
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="acme-client" default="install" basedir="."
+    xmlns:transit="antlib:net.dpml.transit">
+
   <transit:import uri="artifact:template:dpml/magic/standard"/>
+
 </project>
 ]]></source>
-        </li>
-        <li>
-          <p>
-            Put your java source files in demo/src/main (e.g.
-            Demo/src/main/com/acme/widget/MyWidget.java)
-          </p>
-        </li>
-        <li>
-          <p>
-            Build the project
-<source>
-$ ant
-</source>
-          </p>
-        </li>
-      </ol>
+            </td>
+          </tr>
+          <tr>
+            <td>system/build.xml</td>
+            <td>
+              Add a build.xml file to the system directory (making sure that the 
+              project name references <strong>ame-system</strong>.
+<source><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
 
+<project name="acme-system" default="install" basedir="."
+    xmlns:transit="antlib:net.dpml.transit">
+
+  <transit:import uri="artifact:template:dpml/magic/standard"/>
+
+</project>
+]]></source>
+            </td>
+          </tr>
+        </table>
+      </subsection>
+
+      <subsection name="Adding some content">
+
+         <p>
+         If we try to build either of the above project we would get a 
+         buiild failure because we don't have any content in place
+         </p>
+
+        <table>
+          <tr>
+            <td>Widget.java</td>
+            <td>
+              Magic uses a strict file structure in order to automate things like 
+              build produces, testing and reporting.  The codebase for our projects 
+              will be located in <code>[basedir]/src/main</code> so for the client 
+              project we will create an interface source file at 
+              <code>client/src/main/acme/Widget.java</code>.
+              <source>
+package acme;
+
+public interface Widget
+{
+    void process( String color );
+}
+              </source>
+            </td>
+          </tr>
+           <tr>
+            <td>DefaultWidget.xml</td>
+            <td>
+              Create a Java source for the class DefaultWidget.java.  Not that we 
+              are suggesting a different package namespace for this class as it's 
+              generally good practice and will avoid potential problems with jar  
+              file sealing.  The location of the DefaultWidget source file should 
+              be <code>system/src/main/acme/impl/DefaultWidget.java</code>.
+<source>
+package acme.impl;
+
+import acme.Widget;
+
+public class DefaultWidget implements Widget
+{
+    public void process( String color )
+    {
+        String message = buildMessage( color );
+        System.out.println( message );
+    }
+
+    public String buildMessage( String color )
+    {
+        if( null == color )
+        {
+            return "I'm a plain old widget.";
+        }
+        else
+        {       
+            return "I'm a " + color + " widget.";
+        }
+    }
+}
+</source>
+            </td>
+          </tr>
+        </table>
+      </subsection>
+
+      <subsection name="Add a reactor!">
+
+        <p>
+        We could jump in now and ask ant to build either of our projects.
+        However it's a lot more convinient if we add a reactor build to the 
+        dev directory.  A reactor build is simply a build file that uses a 
+        special template that will result in the building of all of our
+        subprojects automatically (and in the right order based on the 
+        dependencies that our projects declare).
+        </p>
+        <p>
+        Here is the contents of the reactor based build.xml file.  The only 
+        important thing to note is the name of the import resource.  Instead of 
+        importing the standard template we are importing the reactor template.
+        </p>
+
+<source><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="acme" default="default" basedir="." 
+    xmlns:transit="antlib:net.dpml.transit">
+
+  <transit:import uri="artifact:template:dpml/magic/reactor"/>
+
+</project>
+]]></source>
+
+      </subsection>
+
+      <subsection name="Build everything ...">
+
+        <p>
+        Lets' roll ..
+        </p>
+
+<pre>
+$ cd dev
+$ ant
+</pre>
+
+        <p>
+        The output of the build procedure should be something like the following:
+        </p>
+
+<pre>
+Buildfile: build.xml
+
+Assigning Transit component helper to project: C:\dev\osm\trunk\tutorial\magic\101
+Overriding previous definition of reference to ant.ComponentHelper
+
+default:
+installing plugin: plugin:dpml/magic/dpml-magic-core / artifact:plugin:dpml/magic/dpml-magic-core#SNAPSHOT:reactor
+Candidates: 2
+------------------------------------------------------------------------
+[acme/acme-client]
+[acme/acme-system]
+------------------------------------------------------------------------
+[x:reactor] building [acme/acme-client] with default target
+
+Assigning Transit component helper to project: C:\dev\client
+Overriding previous definition of reference to ant.ComponentHelper
+
+info:
+------------------------------------------------------------------------
+key: acme-client
+------------------------------------------------------------------------
+
+init:
+
+prepare:
+[x:prepare] Created dir: C:\dev\client\target
+[x:prepare] Created dir: C:\dev\client\target\test
+[x:prepare] Created dir: C:\dev\client\target\build\main
+[x:prepare] Copying 1 file to C:\dev\client\target\build\main
+
+build:
+  [x:javac] Created dir: C:\dev\client\target\classes
+  [x:javac] Compiling 1 source file to C:\dev\client\target\classes
+
+package:
+    [x:jar] Created dir: C:\dev\client\target\deliverables\jars
+    [x:jar] Building jar: C:\dev\client\target\deliverables\jars\acme-client-SNAPSHOT.jar
+    [x:jar] Creating md5 checksum
+
+test:
+
+install:
+[x:install] Copying 2 files to C:\osm\Data\cache\acme
+[x:reactor] building [acme/acme-system] with default target
+
+Assigning Transit component helper to project: C:\dev\system
+Overriding previous definition of reference to ant.ComponentHelper
+
+info:
+------------------------------------------------------------------------
+key: acme-system
+------------------------------------------------------------------------
+
+init:
+
+prepare:
+[x:prepare] Created dir: C:\dev\system\target
+[x:prepare] Created dir: C:\dev\system\target\test
+[x:prepare] Created dir: C:\dev\system\target\build\main
+[x:prepare] Copying 1 file to C:\dev\system\target\build\main
+
+build:
+  [x:javac] Created dir: C:\dev\system\target\classes
+  [x:javac] Compiling 1 source file to C:\dev\system\target\classes
+
+package:
+    [x:jar] Created dir: C:\dev\system\target\deliverables\jars
+    [x:jar] Building jar: C:\dev\system\target\deliverables\jars\acme-system-SNAPSHOT.jar
+    [x:jar] Creating md5 checksum
+
+test:
+
+install:
+[x:install] Copying 2 files to C:\osm\Data\cache\acme
+
+BUILD SUCCESSFUL
+Total time: 2 seconds</pre>
+
+      </subsection>
+
+      <subsection name="Looking at what happened ...">
+
+        <p>
+        Here is a summary of what just happened:
+        </p>
+
+        <ol>
+          <li>Ant used the dpml-transit-tools antlib to load the reactor template.</li>
+          <li>The template initialized magic and called the default target declared in 
+              the reactor build file.</li>
+          <li>During Magic initialization the index file was used to construct a model
+              of all of the projects and the reactor task created a list of projects
+              in the correct build order.  The reactor then invoked a an build on each 
+              project.</li>
+          <li>For each project the first instruction is the template loading. In both 
+              our projects this involves the loading of the standard template which 
+              contains your classic sequence of preparation, compilation, jar file
+              creation, testing, and finally the publication of project resources 
+              to our local cache.</li>
+        </ol>
+
+      </subsection>
+
+      <subsection name="Looking at what was produced ...">
+
+        <p>
+        If you take a look at each of the projects you will notice a new 
+        directory named ${basedir}/target has been created.  This holds working
+        content produced during the build process.  The main results are contained
+        in the ${basedir}/target/deliverables directory.  In case both projects 
+        are producing jar file which we can find in ${basedir}/target/deliverables/jars
+        and copies under ${dpml.cache}/acme/jars.
+        </p>
+
+      </subsection>
+
+ 
     </section>
 
   </body>

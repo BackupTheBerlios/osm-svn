@@ -14,7 +14,46 @@
       Also know as adding a little magic to your development toolkit.
       </p>
  
-      <p>CONTENT UNDER PREPARATION</p>
+      <subsection name="Contents">
+
+        <table>
+          <tr>
+            <td><a href="install.html">Installing.</a></td>
+            <td>
+              Instructions for triggering the automatic magic install.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="example.html">Gettings Started.</a></td>
+            <td>
+              A walk through of setting up an index, creating a couple of 
+              projects, adding some content, adding a reactor build, followed by
+              a review of the process and the generated project resources.
+            </td>
+          </tr>
+          <!--
+          <tr>
+            <td>Adding Unit Tests</td>
+            <td>
+              COMMING SOON
+            </td>
+          </tr>
+          <tr>
+            <td>Adding a Module project</td>
+            <td>
+              COMMING SOON
+            </td>
+          </tr>
+          <tr>
+            <td>Build customization.</td>
+            <td>
+              COMMING SOON
+            </td>
+          </tr>
+          -->
+        </table>
+
+      </subsection>
 
     </section>
 

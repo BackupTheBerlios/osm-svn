@@ -18,7 +18,7 @@
   limitations under the License.
 -->
 
-<project name="osm-tutorial-201" default="install" basedir="."
+<project name="osm-resource-tutorial" default="install" basedir="."
     xmlns:transit="antlib:net.dpml.transit">
 
   <transit:import uri="artifact:template:dpml/magic/standard"/>

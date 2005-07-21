@@ -19,7 +19,7 @@
   <target name="install" depends="docs"/>
 
   <target name="docs" depends="prepare">
-    <x:property name="spec" feature="plugin" key="dpml-magic-doc"/>
+    <x:property name="spec" feature="uri" type="plugin" key="dpml-magic-doc"/>
     <transit:plugin uri="${spec}">
       <task class="net.dpml.magic.doc.DocTask" name="docs"/>
     </transit:plugin>

@@ -24,14 +24,14 @@
       <subsection name="Definition of a Plugin">
 
         <p>
-        A <code>plugin</code> is an artifact type that is used to describe 
+        A <code>plugin</code> is an resource type that is used to describe 
         a classloader chain.  The plugin resource is a property file that 
         declares the contents of an API classloader, SPI classloader, 
         and an implementation classloader. Each classloader defintion is 
         expressed as a series of jar artifact uris.  Transit provides 
         support for the construction of classloader chains based on the 
         information contained within the plugin resource.  A chain is 
-        constructed by creating an API classloader a child of a supplied 
+        constructed by creating an API classloader as child of a supplied 
         parent classloader, an SPI classloader as a child of the API classloader, 
         and an implementation classloader as a child of the SPI classloader.
         </p>

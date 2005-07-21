@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Installing Magic">
+
+      <p>
+      These instructions assume that you have already installed
+      Depot and Ant (see <a href="/download/index.html">the download
+      page</a> for details).
+      </p>
+
+      <subsection name="Installation Procedure">
+
+         <p>
+         The following command will install magic resources under
+         <code>${dpml.prefs}/magic</code> and dependent jar files into 
+         <code>${dpml.lib}/dpml/magic</code>. The install procedure 
+         will make copy of two jar file dpml-transit-main and dpml-transit-tools
+         under <code>${user.home}/.ant/lib</code> directory. Finally,
+         the installation will create a Transit profile for use with Magic
+         under the user branch of you JVM preferences with a 
+         node identifier of <code>net/dpml/transit/profiles/development</code>.
+         </p>
+
+         <pre>$ depot -install magic</pre>
+
+      </subsection>
+ 
+    </section>
+
+  </body>
+</document>
+

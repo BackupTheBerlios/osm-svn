@@ -33,19 +33,9 @@
         <type>doc</type>
       </types>
     </info>
-    <dependencies>
-      <include key="osm-home-theme"/>
-    </dependencies>
     <plugins>
       <include key="dpml-magic-publish" />
     </plugins>
-  </project>
-
-  <project basedir="theme">
-    <info>
-      <group>osm/home</group>
-      <name>osm-home-theme</name>
-    </info>
   </project>
 
 </index>
