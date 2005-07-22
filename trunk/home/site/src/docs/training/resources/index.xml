@@ -23,13 +23,38 @@
 
       <subsection name="Tutorial Index">
 
-        <ol>
-          <li><a href="overview.html">Overview of the Transit system and it's role in resource managmeent.</a></li>
-          <li><a href="artifacts.html">Artifacts creation and usage</a></li>
-          <li><a href="plugins.html">Classloader construction using plugins and the Transit services.</a></li>
-          <li><a href="content.html">Using Transit content handlers.</a></li>
-          <li><a href="repositories.html">Creating your own repository.</a></li>
-        </ol>
+        <table>
+          <tr>
+            <td width="15%"><a href="overview.html">Overview</a></td>
+            <td>
+              Overview of the Transit system and it's role in resource managmeent
+            </td>
+          </tr>
+          <tr>
+            <td><a href="artifacts.html">Artifacts</a></td>
+            <td>
+              Artifacts creation and usage.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="plugins.html">Plugins</a></td>
+            <td>
+              Classloader construction using plugins and the Transit services.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="content.html">Content Handlers</a></td>
+            <td>
+              Using Transit content handlers.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="repositories.html">Repositories</a></td>
+            <td>
+              Creating your own repository.
+            </td>
+          </tr>
+        </table>
 
       </subsection>
 

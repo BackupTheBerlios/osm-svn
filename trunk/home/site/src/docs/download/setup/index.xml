@@ -22,7 +22,7 @@
 
         <p>
           To get up and operation ASAP define an environment variable named DPML_HOME 
-          pointing to the directory containing the unxipped contents of the Depot 
+          pointing to the directory containing the unzipped contents of the Depot 
           installation.  Add the bin directory to your path and you should be ready to 
           go.
         </p>

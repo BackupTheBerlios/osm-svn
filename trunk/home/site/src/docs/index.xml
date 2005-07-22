@@ -25,8 +25,25 @@
         <li>project management</li>
 
       </ul>
-        
+
     </section>
+
+    <section name="About the DPML">
+
+      <p>
+      The <a href="http://www.dpml.net">Digital Product Meta Library (DPML)</a> is 
+      open community project developing advanced Java-based component management 
+      solutions.
+      </p>
+
+      <p>
+      The DPML codebase is available to the public and all content is 
+      published under the commercially friendly 
+      <a href="http://www.dpml.net/about/legal/license.html">Apache 2.0 License</a>.
+      </p>
+
+    </section>
+
 
   </body>
 </document>
