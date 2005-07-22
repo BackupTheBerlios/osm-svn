@@ -2,6 +2,8 @@
 
 <index key="acme">
 
+  <!-- the project the produces the module -->
+
   <project basedir=".">
     <info>
       <group>acme</group>
@@ -11,6 +13,8 @@
       </types>
     </info>
   </project>
+
+  <!-- the normal projects -->
 
   <project basedir="client">
     <info>
