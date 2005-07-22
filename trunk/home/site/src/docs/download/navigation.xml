@@ -25,7 +25,7 @@
  <body>
 
     <menu>
-      <item name="Index" href="index.html"/>
+      <item name="Binaries" href="index.html"/>
       <item name="Installation" href="setup/index.html"/>
     </menu>
 
