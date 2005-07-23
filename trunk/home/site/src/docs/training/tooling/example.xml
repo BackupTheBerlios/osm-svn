@@ -230,13 +230,14 @@ $ ant
         </p>
 
 <pre>
+$ ant
 Buildfile: build.xml
 
-Assigning Transit component helper to project: C:\dev\osm\trunk\tutorial\magic\101
+Assigning Transit component helper to project: C:\dev
 Overriding previous definition of reference to ant.ComponentHelper
 
 default:
-installing plugin: plugin:dpml/magic/dpml-magic-core / artifact:plugin:dpml/magic/dpml-magic-core#SNAPSHOT:reactor
+installing: link:plugin:dpml/magic/dpml-magic-core as plugin:dpml/magic/dpml-magic-core
 Candidates: 2
 ------------------------------------------------------------------------
 [acme/acme-client]
@@ -267,6 +268,7 @@ build:
 package:
     [x:jar] Created dir: C:\dev\client\target\deliverables\jars
     [x:jar] Building jar: C:\dev\client\target\deliverables\jars\acme-client-SNAPSHOT.jar
+
     [x:jar] Creating md5 checksum
 
 test:
@@ -298,6 +300,7 @@ build:
 package:
     [x:jar] Created dir: C:\dev\system\target\deliverables\jars
     [x:jar] Building jar: C:\dev\system\target\deliverables\jars\acme-system-SNAPSHOT.jar
+
     [x:jar] Creating md5 checksum
 
 test:
@@ -306,7 +309,8 @@ install:
 [x:install] Copying 2 files to C:\osm\Data\cache\acme
 
 BUILD SUCCESSFUL
-Total time: 2 seconds</pre>
+Total time: 2 seconds
+</pre>
 
       </subsection>
 
