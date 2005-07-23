@@ -18,16 +18,12 @@
   limitations under the License.
 -->
 
-<project name="osm-application-101" default="install" basedir="."
+<project name="osm-component-101" default="install" basedir="."
     xmlns:transit="antlib:net.dpml.transit" 
     xmlns:x="plugin:dpml/magic/dpml-magic-core"
     xmlns:c="plugin:dpml/composition/dpml-composition-builder">
 
   <transit:import uri="local:template:magic/standard"/>
-
-  <target name="init" depends="standard.init">
-    <x:filter token="METRO-CENTRAL-URI" key="dpml-metro-central" type="plugin" feature="uri" />
-  </target>
 
   <target name="build" depends="standard.build">
     <c:type class="net.osm.tutorial.SimpleWidget"/>

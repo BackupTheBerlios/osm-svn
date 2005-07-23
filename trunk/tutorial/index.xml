@@ -56,10 +56,10 @@
 
   <!-- applications -->
 
-  <project basedir="applications/101">
+  <project basedir="components/101">
     <info>
       <group>osm/tutorial</group>
-      <name>osm-application-101</name>
+      <name>osm-component-101</name>
       <types>
         <type name="jar"/>
       </types>
