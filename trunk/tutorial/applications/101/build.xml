@@ -23,7 +23,7 @@
     xmlns:x="plugin:dpml/magic/dpml-magic-core"
     xmlns:c="plugin:dpml/composition/dpml-composition-builder">
 
-  <transit:import uri="artifact:template:dpml/magic/standard"/>
+  <transit:import uri="local:template:magic/standard"/>
 
   <target name="init" depends="standard.init">
     <x:filter token="METRO-CENTRAL-URI" key="dpml-metro-central" type="plugin" feature="uri" />

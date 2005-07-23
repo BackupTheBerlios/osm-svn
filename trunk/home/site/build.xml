@@ -4,7 +4,7 @@
     xmlns:transit="antlib:net.dpml.transit" 
     xmlns:x="plugin:dpml/magic/dpml-magic-core" >
 
-  <transit:import uri="artifact:template:dpml/magic/standard"/>
+  <transit:import uri="local:template:magic/standard"/>
 
   <target name="init" depends="standard.init">
     <filter token="JAVA-PRODUCT-VERSION" value="1.4"/>

@@ -49,7 +49,7 @@
     xmlns:transit="antlib:net.dpml.transit"
     xmlns:x="plugin:dpml/magic/dpml-magic-core" >
 
-  <transit:import uri="artifact:template:dpml/magic/standard"/>
+  <transit:import uri="local:template:magic/standard"/>
 
   <target name="init" depends="standard.init">
     <filter token="COLOR" value="red"/>
@@ -127,15 +127,15 @@ test:
         <code>prepart</code> target.  Secondly, the example demonstrates how you 
         can easily extend the standard build behaviour using Ant's logic on target 
         naming - basically it's the convention of referencing an imported template 
-        target with the imported template's filename followed by the name of the 
-        target we want to extend.
+        target with the imported template's declared project name followed by the 
+        name of the target we want to extend.
         </p>
         
         <p><i>
         Logically speaking the approach to task extension follows the following convention:
         </i></p>
 <pre><![CDATA[
-<target name="[target-name]" depends="[template-filename].[target-name]">
+<target name="[target-name]" depends="[template-name].[target-name]">
   <!-- extended content goes here -->
 </target>
 ]]></pre>

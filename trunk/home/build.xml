@@ -3,6 +3,6 @@
 <project name="osm-home" default="default" basedir="." 
     xmlns:transit="antlib:net.dpml.transit">
 
-  <transit:import uri="artifact:template:dpml/magic/reactor"/>
+  <transit:import uri="local:template:magic/reactor"/>
 
 </project>

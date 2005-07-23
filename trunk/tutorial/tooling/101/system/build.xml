@@ -3,6 +3,6 @@
 <project name="acme-system" default="install" basedir="."
     xmlns:transit="antlib:net.dpml.transit">
 
-  <transit:import uri="artifact:template:dpml/magic/standard"/>
+  <transit:import uri="local:template:magic/standard"/>
 
 </project>
