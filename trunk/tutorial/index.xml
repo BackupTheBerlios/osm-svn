@@ -46,7 +46,7 @@
       <group>osm/tutorial</group>
       <name>osm-resource-tutorial</name>
       <types>
-        <type name="jar"/>
+        <type name="null"/>
       </types>
     </info>
     <dependencies>
