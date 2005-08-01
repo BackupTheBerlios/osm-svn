@@ -20,6 +20,7 @@
       <a href="http://www.dpml.net">DPML</a> solution.
       </p>
 
+      <!--
       <p><i>WARNING: if you see <code>SNAPSHOT</code> referenced as the product version 
         you will not be able to download the distribution.  The <code>SNAPSHOT</code>
         version reference means that you looking a pre-release version of our 
@@ -28,6 +29,7 @@
         and follow the <a href="http://www.dpml.net/about/resources/build.html">
         DPML build procedures</a>.
       </i></p>
+      -->
 
       <table>
         <tr><th>System</th><th>Description</th></tr>

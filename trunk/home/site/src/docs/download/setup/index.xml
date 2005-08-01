@@ -43,6 +43,19 @@ $ depot -version
 
       </subsection>
       
+      <subsection name="Installing Magic and Metro">
+
+        <p>
+          The Depot application includes an install service that is preconfigured
+          with the current versions of Magic and Metro. 
+        </p>
+
+<pre>
+$ depot -install magic
+$ depot -install metro
+</pre>
+
+      </subsection>
 
     </section>
 

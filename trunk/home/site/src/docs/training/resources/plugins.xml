@@ -162,7 +162,7 @@ dpml.artifact.dependency.4 = artifact:jar:dpml/metro/dpml-composition-control#SN
         Within production applications you would typically see a reasonable amount of error 
         handling code wrapping the above code framgment.  The error handling code would typically 
         handle validation of the plugin either prior to instantiation or part of a try catch block, 
-        type checking, etc.  For additional details see the net.dpml.transit.repository.Repository 
+        type checking, etc.  For additional details see the net.dpml.transit.Repository 
         interface documentation.
         </p>
 
