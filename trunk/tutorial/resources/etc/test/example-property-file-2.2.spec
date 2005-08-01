@@ -4,4 +4,6 @@
 # (which happns to be repository.dpml.net server)
 #
 
-tutorial.message = "Hello World!"
+tutorial.message = Welcome to the world of Transit!
+
+
