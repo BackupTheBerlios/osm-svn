@@ -1,0 +1,79 @@
+[INFO   ] (depot): Version
+
+
+  Java:                 1.5.0_04
+  Depot Console:        artifact:jar:dpml/depot/dpml-depot-console#SNAPSHOT
+  Exec Handler:         artifact:plugin:dpml/depot/dpml-depot-exec#SNAPSHOT
+  Install Handler:      artifact:plugin:dpml/depot/dpml-depot-install#SNAPSHOT
+  Prefs Handler:        artifact:plugin:dpml/depot/dpml-depot-prefs#SNAPSHOT
+  Station Handler:      artifact:plugin:dpml/depot/dpml-depot-station#SNAPSHOT
+  Transit Library:      artifact:jar:dpml/transit/dpml-transit-main#SNAPSHOT
+  Profile Library:      artifact:plugin:dpml/depot/dpml-profile-impl#SNAPSHOT
+
+-- listing properties --
+dpml.home=C:\osm
+java.runtime.name=Java(TM) 2 Runtime Environment, Stand...
+java.protocol.handler.pkgs=net.dpml.transit
+sun.boot.library.path=c:\system\jdk5\jre\bin
+java.vm.version=1.5.0_04-b05
+java.rmi.server.RMIClassLoaderSpi=net.dpml.depot.DepotRMIClassLoaderSpi
+java.vm.vendor=Sun Microsystems Inc.
+java.vendor.url=http://java.sun.com/
+path.separator=;
+java.vm.name=Java HotSpot(TM) Client VM
+file.encoding.pkg=sun.io
+user.country=AU
+sun.os.patch.level=Service Pack 1
+java.vm.specification.name=Java Virtual Machine Specification
+user.dir=c:\dev\dpml\main
+java.runtime.version=1.5.0_04-b05
+java.awt.graphicsenv=sun.awt.Win32GraphicsEnvironment
+java.endorsed.dirs=c:\system\jdk5\jre\lib\endorsed
+os.arch=x86
+java.io.tmpdir=C:\DOCUME~1\MCCONN~1\LOCALS~1\Temp\
+line.separator=
+
+java.vm.specification.vendor=Sun Microsystems Inc.
+user.variant=
+java.util.logging.manager=net.dpml.depot.logging.LoggingManager
+os.name=Windows XP
+sun.jnu.encoding=Cp1252
+java.system.class.loader=net.dpml.depot.DepotClassLoader
+java.library.path=c:\system\jdk5\bin;.;C:\WINDOWS\Syste...
+java.specification.name=Java Platform API Specification
+java.util.logging.manager.altclassloader=net.dpml.depot.logging.LoggingManager
+java.class.version=49.0
+sun.management.compiler=HotSpot Client Compiler
+os.version=5.1
+user.home=C:\Documents and Settings\mcconnell
+user.timezone=Australia/Adelaide
+java.security.policy=C:\osm\Shared\bin\security.policy
+java.awt.printerjob=sun.awt.windows.WPrinterJob
+java.specification.version=1.5
+file.encoding=Cp1252
+java.util.logging.config.class=net.dpml.transit.util.ConfigurationHa...
+user.name=mcconnell
+java.class.path=C:\osm\Data\lib\dpml-depot-console.ja...
+java.vm.specification.version=1.0
+sun.arch.data.model=32
+java.home=c:\system\jdk5\jre
+java.specification.vendor=Sun Microsystems Inc.
+user.language=en
+dpml.data=C:\osm\Data
+awt.toolkit=sun.awt.windows.WToolkit
+java.vm.info=mixed mode, sharing
+dpml.build=SNAPSHOT
+dpml.logging.level=FINE
+java.version=1.5.0_04
+java.ext.dirs=c:\system\jdk5\jre\lib\ext
+sun.boot.class.path=c:\system\jdk5\jre\lib\rt.jar;c:\syst...
+java.vendor=Sun Microsystems Inc.
+dpml.system=C:\osm\Shared
+file.separator=\
+java.vendor.url.bug=http://java.sun.com/cgi-bin/bugreport...
+dpml.transit.version=SNAPSHOT
+sun.cpu.endian=little
+sun.io.unicode.encoding=UnicodeLittle
+sun.desktop=windows
+dpml.prefs=C:\osm\Preferences
+sun.cpu.isalist=

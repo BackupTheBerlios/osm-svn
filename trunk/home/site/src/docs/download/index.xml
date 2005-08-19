@@ -20,17 +20,6 @@
       <a href="http://www.dpml.net">DPML</a> solution.
       </p>
 
-      <!--
-      <p><i>WARNING: if you see <code>SNAPSHOT</code> referenced as the product version 
-        you will not be able to download the distribution.  The <code>SNAPSHOT</code>
-        version reference means that you looking a pre-release version of our 
-        generated documentation and that means you'll need to either wait a bit or 
-        <a href="http://www.dpml.net/about/resources/checkout.html">build from SVN</a>
-        and follow the <a href="http://www.dpml.net/about/resources/build.html">
-        DPML build procedures</a>.
-      </i></p>
-      -->
-
       <table>
         <tr><th>System</th><th>Description</th></tr>
         <tr>
@@ -92,10 +81,9 @@
       </subsection>
 
       <table>
-        <tr><th>Platform</th><th>Product</th><th>Binary</th><th>MD5</th><!--<th>ASC</th>--></tr>
+        <tr><th>Platform</th><th>Binary</th><th>MD5</th><!--<th>ASC</th>--></tr>
         <tr>
           <td>Windows</td>
-          <td>Depot</td>
           <td>
             <a href="http://download.dpml.net/milestones/depot/@DEPOT-PRODUCT-VERSION@/dpml-depot-win32-@DEPOT-PRODUCT-VERSION@.zip">
               dpml-depot-win32-@DEPOT-PRODUCT-VERSION@.zip</a>
@@ -106,10 +94,9 @@
         </tr>
         <tr>
           <td>Linux</td>
-          <td>Depot</td>
           <td>
-            <a href="http://download.dpml.net/milestones/depot/@DEPOT-PRODUCT-VERSION@/dpml-depot-linux-@DEPOT-PRODUCT-VERSION@.zip">
-              dpml-depot-win32-@DEPOT-PRODUCT-VERSION@.tar.gz</a>
+            <a href="http://download.dpml.net/milestones/depot/@DEPOT-PRODUCT-VERSION@/dpml-depot-linux-@DEPOT-PRODUCT-VERSION@.tar.gz">
+              dpml-depot-linux-@DEPOT-PRODUCT-VERSION@.tar.gz</a>
           </td>
           <td>
             <a href="http://download.dpml.net/milestones/depot/@DEPOT-PRODUCT-VERSION@/dpml-depot-linux-@DEPOT-PRODUCT-VERSION@.md5">MD5</a>
@@ -119,14 +106,13 @@
 
     </section>
 
-
     <section name="Prerequisite Products">
 
       <subsection name="Java JDK @JAVA-PRODUCT-VERSION@">
 
         <p>
         Products and tutorials included under this site require the installation of 
-        Java @JAVA-PRODUCT-VERSION@.  General speaking this means you need to install
+        Java @JAVA-PRODUCT-VERSION@ or later.  General speaking this means you need to install
         the <a href="@JAVA-DOWNLOAD-URL@">Java @JAVA-PRODUCT-VERSION@ SDK</a> for development 
         purposes.  If your needs are limited to runtime solutions you may want to install 
         just the Java @JAVA-PRODUCT-VERSION@ JRE (also included within the JDK).

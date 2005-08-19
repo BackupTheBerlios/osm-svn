@@ -51,8 +51,7 @@ $ depot -version
         </p>
 
 <pre>
-$ depot -install magic
-$ depot -install metro
+$ depot -setup
 </pre>
 
       </subsection>
