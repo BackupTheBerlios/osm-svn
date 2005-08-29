@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<index>
+
+  <project basedir="demo">
+    <info>
+      <group>acme</group>
+      <name>acme-demo</name>
+      <types>
+        <type name="jar"/>
+      </types>
+    </info>
+  </project>
+
+</index>

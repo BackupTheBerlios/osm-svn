@@ -89,7 +89,7 @@ public class SimpleWidgetTestCase extends TestCase
             //
 
             Consumer consumer = (Consumer) component;
-            ValueDirective value = new ValueDirective( "my-car-part", "car" );
+            ValueDirective value = new ValueDirective( "java.lang.String", "car" );
             consumer.setProvider( "target", value );
         }
         else
