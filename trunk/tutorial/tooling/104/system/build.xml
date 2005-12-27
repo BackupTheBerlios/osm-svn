@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project name="acme-system" default="install" basedir="."
-    xmlns:transit="antlib:net.dpml.transit">
+<project name="acme-system" default="install"
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="dpml:depot">
 
-  <transit:import uri="local:template:magic/standard"/>
+  <transit:import uri="local:template:dpml/tools/standard"/>
+
+  <target name="init" depends="standard.init">
+    <filter token="COLOR" value="red"/>
+    <x:filter token="NAME" feature="name"/>
+  </target>
 
 </project>

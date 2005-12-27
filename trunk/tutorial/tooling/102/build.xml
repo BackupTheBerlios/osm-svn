@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<project name="acme" default="default" basedir="." 
-    xmlns:transit="antlib:net.dpml.transit">
-
-  <transit:import uri="local:template:magic/reactor"/>
-
-</project>

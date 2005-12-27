@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<module name="tutorial">
+   
+  <types>
+    <type id="module" alias="true"/>
+  </types>
+   
+  <project name="osm-validation-resources" basedir="resources">
+    <types>
+      <type id="jar"/>
+    </types>
+    <dependencies>
+      <include ref="dpml/transit/dpml-transit-main"/>
+    </dependencies>
+    <dependencies scope="test">
+      <include ref="ant/ant-junit"/>
+    </dependencies>
+  </project>
+
+</module>

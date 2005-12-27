@@ -18,16 +18,10 @@
 
         <table>
           <tr>
-            <td width="15%"><a href="install.html">Installing Magic</a></td>
-            <td>
-              Instructions for triggering the automatic magic install.
-            </td>
-          </tr>
-          <tr>
-            <td><a href="example.html">Gettings Started</a></td>
+            <td width="15%"><a href="example.html">Gettings Started</a></td>
             <td>
               A walk through of setting up an index, creating a couple of 
-              projects, adding some content, adding a reactor build, followed by
+              projects, adding some content, executing a build, followed by
               a review of the process and the generated project resources.
             </td>
           </tr>
@@ -39,11 +33,11 @@
             </td>
           </tr>
           <tr>
-            <td><a href="filtering.html">Source Filtering</a></td>
+            <td><a href="filtering.html">Build Customization</a></td>
             <td>
-              A quick introduction to source filtering including the use of 
-              Magic's filter task and the demonstration of how project model
-              information can be easily extracted and used in your build process.
+              A simple example of build customization using an explicit build.xml
+              file.  The example demonstrates the usage of classic Ant filters and 
+              the Depot filter task within an extended init phase.
             </td>
           </tr>
           <tr>

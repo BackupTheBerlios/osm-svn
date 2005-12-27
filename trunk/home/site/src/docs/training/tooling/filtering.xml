@@ -14,42 +14,39 @@
 
         <p>
         The objective of this tutorial is to demonstrate the use of 
-        classic Ant filters and compare this with Magic filters and how
-        you can use Magic's filter task to aquire information from the 
-        project model.
+        a classic Ant build file to customize the project build.  In the
+        example we will add some classic Ant filters and compare this 
+        with Depot's builder filters and how you can use Depot task within
+        a project build.
         </p>
 
       </subsection>
 
-      <subsection name="Adding filters to the buildfile">
+      <subsection name="Adding a buildfile">
 
         <p>
-        The following updates need to included in you 'system' project
-        build file.  These updates are included as a task named <code>init</code>
-        which is one of the standard task declared in the imported template.  The 
-        <code>depends</code> atttribute tells ant that our new <code>init</code>
-        target depends on the execution of the standard <code>init</code> target.
-        The first first filter is a classic ant filter that will replace all occurances
-        of the pattern <code>@COLOR@</code> in a sources wityh the value <code>red</code>.
-        The second filter is a filter that lets us extract some information from Magic's
-        project model and apply this as a filter argument.  In this example the feature
-        we are requesting is the name of the project.
+        Up to now we have not declared a build.xml file - instead we have 
+        used the default template, however, we are now going to add some 
+        source code filters.  To do this we will need to declare this 
+        information in a build file.  By default the Ant-based builder will
+        execute a build using a file named <tt>build.xml</tt> if present in the 
+        projects basedir.
         </p>
-    
-        <p>Changes to the 'system' project include:</p>
 
-        <ol>
-          <li>Addition of the magic antlib namespace declaration to the build file header 
-              and the addition of an <code>init</code> target that extends the standard
-              <code>init</code> definition with our filter directives.
+        <p>
+        The following <tt>build.xml</tt> file is basically doing exactly the 
+        same thing as before except that we are extending the initialization
+        target with some additional content.
+        </p>
+
 <source><![CDATA[
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project name="acme-system" default="install" basedir="."
-    xmlns:transit="antlib:net.dpml.transit"
-    xmlns:x="plugin:dpml/magic/dpml-magic-core" >
+<project name="acme-system" default="install"
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="dpml:depot">
 
-  <transit:import uri="local:template:magic/standard"/>
+  <transit:import uri="local:template:dpml/tools/standard"/>
 
   <target name="init" depends="standard.init">
     <filter token="COLOR" value="red"/>
@@ -57,31 +54,80 @@
   </target>
 
 </project>
-]]></source></li>
-          <li>Updates to the DefaultWidget.java source to use the filtered values.
+]]></source>
+
+       <p>
+       Notable items in the build file include:
+       </p>
+
+       <ol>
+         <li>Usage of Transit's imporet task to include a template from 
+            tyhe DPML preferences directory.</li>
+         <li>The addition of a classic Ant filter.</li>
+         <li>The addition of a Depot filter that assigns a project feature
+             to a symbolic value.</li>
+       </ol>
+
+        <p>
+        The first filter is a classic ant filter that will replace all occurances
+        of the pattern <code>@COLOR@</code> in a sources wityh the value <code>red</code>.
+        The second filter is a filter that lets us extract some information from the
+        project model and apply this as a filter argument.  In this example the feature
+        we are requesting is the name of the project.
+        </p>
+        
+      </subsection>
+    
+      <subsection name="Updates to DefaultWidget.java">
+
 <source>
+package acme.impl;
+
+import acme.Widget;
+
+public class DefaultWidget implements Widget
+{
+    public void process( String color )
+    {
+        String message = buildMessage( color );
+        System.out.println( message );
+    }
+
     public String buildMessage( String color )
     {
         if( null == color )
         {
-            return "I'm a plain old " + COLOR + " widget named " + NAME + ".";
+            <font color="darkred">return "I'm a plain old " + COLOR + " widget named " + NAME + ".";</font>
         }
         else
         {       
-            return "I'm a " + color + " widget named " + NAME;
+            <font color="darkred">return "I'm a " + color + " widget named " + NAME;</font>
         }
     }
 
-    private static final String NAME = "@NAME@";
-    private static final String COLOR = "@COLOR@";
-</source></li>
-          <li>Updates to DefaultWidgetTestCase.java.
+    <font color="darkred">private static final String NAME = "@NAME@";
+    private static final String COLOR = "@COLOR@";</font>
+ 
+}
+</source>
+
+       </subsection>
+
+       <subsection name="Updates to DefaultWidgetTestCase.java">
+       
+         <p>
+         Similar apdates have been made to out testcase to validate default and 
+         explicit output values.
+         </p>
+         
+        <p><i>DefaultWidgetTestCase.java</i></p>
+
 <source>
     public void testDefaultMessage() throws Exception
     {
         DefaultWidget widget = new DefaultWidget();
         String result = widget.buildMessage( null );
-        String expected = "I'm a plain old " + COLOR + " widget named " + NAME + ".";
+        <font color="darkred">String expected = "I'm a plain old " + COLOR + " widget named " + NAME + ".";</font>
         assertEquals( "default", expected, result );
         widget.process( null );
     }
@@ -91,15 +137,14 @@
         DefaultWidget widget = new DefaultWidget();
         String color = "blue";
         String result = widget.buildMessage( color );
-        String expected = "I'm a " + color + " widget named " + NAME;
+        <font color="darkred">String expected = "I'm a " + color + " widget named " + NAME;</font>
         assertEquals( "explicit", expected, result );
         widget.process( color );
     }
 
-    private static final String NAME = "@NAME@";
-    private static final String COLOR = "@COLOR@";
-</source></li>
-       </ol>
+    <font color="darkred">private static final String NAME = "@NAME@";
+    private static final String COLOR = "@COLOR@";</font>
+</source>
 
       </subsection>
 
@@ -110,8 +155,8 @@ test:
   [x:junit] Compiling 1 source file to C:\dev\system\target\test-classes
   [x:junit] executing in local jvm
   [x:junit] Running acme.impl.test.DefaultWidgetTestCase
-[x:reactor] I'm a plain old red widget named acme-system.
-[x:reactor] I'm a blue widget named acme-system
+<font color="darkred">I'm a plain old red widget named acme-system.
+I'm a blue widget named acme-system</font>
   [x:junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
         </pre>
 
@@ -121,10 +166,10 @@ test:
 
         <p>
         The are a couple of important things covered in this tutorial.  Firstly,
-        when Magic prepares project content it constructs a working codebase under
+        when Depot prepares project content it constructs a working codebase under
         the <code>${basedir}/target/build</code> directory.  This codebase is the 
-        result of applying any filters declared prior to the execution of the 
-        <code>prepart</code> target.  Secondly, the example demonstrates how you 
+        result of applying any filters declared within the <code>init</code> target.  
+        Secondly, the example demonstrates how you 
         can easily extend the standard build behaviour using Ant's logic on target 
         naming - basically it's the convention of referencing an imported template 
         target with the imported template's declared project name followed by the 
@@ -145,5 +190,6 @@ test:
     </section>
 
   </body>
+  
 </document>
 

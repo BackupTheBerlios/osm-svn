@@ -3,20 +3,10 @@
 <document>
   <properties>
     <author email="mcconnell@osm.net">Stephen McConnell</author>
-    <title>Component Development Strategies</title>
+    <title>OSM Professional Services</title>
   </properties>
 
   <body>
-
-    <section name="DPML Support">
-
-      <p>
-      The <a href="http://www.dpml.net">DPML</a> provides a dedicated 
-      <a href="http://www.dpml.net/about/resources/lists.html">Support Mailing Lists</a>
-      that is actively monitored by the DPML community.
-      </p>
-    
-    </section>
 
     <section name="Professional Services">
 
@@ -27,10 +17,11 @@
 
       <ul>
         <li>dedicated product support</li>
-        <li>consulting services related to product architecture and planning</li>
-        <li>migration strategy development and operational support</li>
+        <li>product architecture and planning</li>
+        <li>migration strategy development</li>
         <li>branch management and maintenance</li>
         <li>project mentoring</li>
+        <li>collaboration</li>
       </ul>
 
       <p>

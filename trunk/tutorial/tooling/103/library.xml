@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<library>
+
+  <imports>
+    <import uri="link:module:ant"/>
+  </imports>
+
+  <modules>
+
+    <module name="acme">
+
+      <project name="acme-client" basedir="client">
+        <types>
+          <type id="jar"/>
+        </types>
+      </project>
+    
+      <project name="acme-system" basedir="system">
+        <types>
+          <type id="jar"/>
+        </types>
+        <dependencies>
+          <include key="acme-client"/>
+        </dependencies>
+        <dependencies scope="test">
+          <include ref="ant/ant-junit"/>
+        </dependencies>
+      </project>
+      
+    </module>
+
+  </modules>
+
+</library>

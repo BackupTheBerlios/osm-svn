@@ -23,10 +23,9 @@
       <subsection name="Creating the Testcase">
 
         <p>
-        When we installed Magic the resources necessary to run JUnit 
-        tests were installed for you.  All we need to do is to add the 
-        test case source to the test codebase <code>[project]/src/test</code>.
-        In the case of the <code>system</code> this means adding our testcase
+        All we need to do is to add the test case source to the test codebase 
+        <code>[project]/src/test/[package]/[classname].java</code>.
+        In the case of the <code>system</code> project this means adding our testcase
         to the <code>dev/system/src/test/acme/impl/test/DefaultWidgetTestCase.java</code>.
         Note: we are using the package name <code>acme/impl/test</code> so that
         we properly simulate usage of our class as an external client by ensuring 
@@ -75,35 +74,97 @@ public class DefaultWidgetTestCase extends TestCase
 }</source>
       </subsection>
 
+      <subsection name="Updating the system project test dependencies">
+
+        <p>
+        The above addition of a testcase to the system project introduces 
+        new test-time dependencies.  To enable the compilation of the 
+        testcase we need to update out project definition to include 
+        Ant's Junit extension. Notice that the revised library.xml 
+        includes the following updates:
+        </p>
+
+        <ol>
+          <li>Import of the external ant module.</li>
+          <li>Addition of a test scope <tt>&lt;dependencies&gt;</tt>
+              element to the server project containing the 
+              reference to the external <tt>ant-junit</tt> resource 
+              defined under the imported <tt>ant</tt> module.</li>
+        </ol>
+
+<source>
+&lt;library&gt;
+
+  <font color="darkred">&lt;imports&gt;
+    &lt;import uri="link:module:ant"/&gt;
+  &lt;/imports&gt;</font>
+
+  &lt;modules&gt;
+
+    &lt;module name="acme"&gt;
+
+      &lt;project name="acme-client" basedir="client"&gt;
+        &lt;types&gt;
+          &lt;type id="jar"/&gt;
+        &lt;/types&gt;
+      &lt;/project&gt;
+    
+      &lt;project name="acme-system" basedir="system"&gt;
+        &lt;types&gt;
+          &lt;type id="jar"/&gt;
+        &lt;/types&gt;
+        &lt;dependencies&gt;
+          &lt;include key="acme-client"/&gt;
+        &lt;/dependencies&gt;
+        <font color="darkred">&lt;dependencies scope="test"&gt;
+          &lt;include ref="ant/ant-junit"/&gt;
+        &lt;/dependencies&gt;</font>
+      &lt;/project&gt;
+      
+    &lt;/module&gt;
+
+  &lt;/modules&gt;
+
+&lt;/library&gt;
+</source>
+
+      </subsection>
+
       <subsection name="Rebuild">
 
+        <p>
+        Rebuild the system project.
+        </p>
+
 <pre>
-$ cd system
-$ ant
+$ build -select acme/system
 </pre>
 
         <p>
-        During the build Magic will look for testcases in the projects <code>src/test</code>
-        directory and compile these taking into account the project's dependencies.
+        The builder will look for testcases in the projects <tt>src/test</tt>
+        directory and compile these taking into account the project's runtime and test 
+        dependencies.
         </p>
 
         <p>
-        Output from the build should look like the following:
+        Output from the system projects build during the test pahse should look like 
+        the following:
         </p>
 <pre>
 test:
-  [x:junit] Compiling 1 source file to C:\dev\system\target\test-classes
-  [x:junit] Created dir: C:\dev\system\target\test-reports
-  [x:junit] executing in local jvm
-  [x:junit] Running acme.impl.test.DefaultWidgetTestCase
-  [x:junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
+    [javac] Created dir: C:\dev\system\target\classes\test
+    [javac] Compiling 1 source file to C:\dev\system\target\classes\test
+    [junit] Created dir: C:\dev\system\target\reports\test
+    [junit] executing in local jvm
+    [junit] Running acme.impl.test.DefaultWidgetTestCase
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
 </pre>
 
       </subsection>
 
- 
     </section>
 
   </body>
+
 </document>
 

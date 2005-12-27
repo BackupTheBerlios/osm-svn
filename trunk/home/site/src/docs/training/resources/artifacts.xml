@@ -70,7 +70,7 @@
         spec resource.
         </p>
 
-        <p><i>Source: Tutorial: 201</i></p>
+        <p><i>Source:</i> <tt>trunk/validation/resources/src/test/net/osm/tutorial/TransitTestCase.java</tt></p>
         <source>
 public class TransitTestCase extends TestCase
 {

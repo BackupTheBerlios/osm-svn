@@ -15,11 +15,15 @@ public class DefaultWidget implements Widget
     {
         if( null == color )
         {
-            return "I'm a plain old widget.";
+            return "I'm a plain old " + COLOR + " widget named " + NAME + ".";
         }
         else
         {       
-            return "I'm a " + color + " widget.";
+            return "I'm a " + color + " widget named " + NAME;
         }
     }
+
+    private static final String NAME = "@NAME@";
+    private static final String COLOR = "@COLOR@";
+ 
 }

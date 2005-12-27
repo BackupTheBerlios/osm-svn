@@ -15,160 +15,233 @@
         <p>
         The objective of this tutorial is to intrioduce the concept of a module
         and walk through the process of module creation.  The tutorial concludes
-        with the summary of the generated content and description of how a module
-        resource can be used when sharing your project resources.
+        with the summary of the generated module artifact and a description of 
+        how a module can be used when sharing your project resources with others.
         </p>
 
       </subsection>
 
-      <subsection name="dev/index.xml">
+      <subsection name="dev/library.xml">
 
         <p>
-        We need to update our index.xml file to include the defintion of a new
-        project to handle the creation of the module resource.  There are two 
-        additions here:
+        We need to update our library.xml file to include the declaration of a
+        module basedir and the assignment of an output artifact type.
         </p>
 
-        <ol>
-          <li>The addition of the project name <code>acme</code> with 
-              output type production of <code>module</code>.</li>
-          <li>The addition of the <code>key</code> attribute to the root
-              index element which tells magic that name of the project that is 
-              producing the module.</li>
-        </ol>
+<source>
+&lt;library&gt;
 
-<source><![CDATA[
-<index key="acme">
+  &lt;imports&gt;
+    &lt;import uri="link:module:ant"/&gt;
+  &lt;/imports&gt;
 
-  <project basedir=".">
-    <info>
-      <group>acme</group>
-      <name>acme</name>
-      <types>
-        <type name="module"/>
-      </types>
-    </info>
-  </project>
+  &lt;modules&gt;
 
-  ....
+    &lt;module name="acme" <font color="darkred">basedir="."</font>&gt;
 
-</index>
-]]></source>
+      <font color="darkred">&lt;types&gt;
+        &lt;type id="module"/&gt;
+      &lt;/types&gt;</font>
 
-      </subsection>
-
-      <subsection name="dev/build.xml">
-
-        <p>
-        Rather than creating a new sub-directory the approach taken in this
-        tutorial is to change our reactor based build file (dev/build.xml) with a 
-        approach based on the standard template.  Key features include:
-        </p>
-
-        <ol>
-          <li>Project name has been updated to match the module project name in the index.</li>
-          <li>Uses the standard template instead of the reactor template.</li>
-          <li>Calls the reactor build under a extended <code>init</code> target using the 
-              reactor task directly.</li>
-          <li>Creates the module resource withou output to the 
-              <code>dev/target/deliverables/modules</code> directory.</li>
-        </ol>
+      &lt;project name="acme-client" basedir="client"&gt;
+        &lt;types&gt;
+          &lt;type id="jar"/&gt;
+        &lt;/types&gt;
+      &lt;/project&gt;
     
-<source><![CDATA[
-<?xml version="1.0" encoding="UTF-8" ?>
+      &lt;project name="acme-system" basedir="system"&gt;
+        &lt;types&gt;
+          &lt;type id="jar"/&gt;
+        &lt;/types&gt;
+        &lt;dependencies&gt;
+          &lt;include key="acme-client"/&gt;
+        &lt;/dependencies&gt;
+        &lt;dependencies scope="test"&gt;
+          &lt;include ref="ant/ant-junit"/&gt;
+        &lt;/dependencies&gt;
+      &lt;/project&gt;
+      
+    &lt;/module&gt;
 
-<project name="acme" default="install" basedir="." 
-    xmlns:transit="antlib:net.dpml.transit"
-    xmlns:x="plugin:dpml/magic/dpml-magic-core">
+  &lt;/modules&gt;
 
-  <transit:import uri="local:template:magic/standard"/>
-
-  <target name="init" depends="standard.init">
-    <x:reactor/>
-  </target>
-
-  <target name="build" depends="standard.build">
-    <x:module index="index.xml">
-      <header>
-        <svn href="svn://osm.berlios.de/repos/osm/trunk/tutorial/tooling/104"/>
-        <home href="http://www.osm.net/tutorial/tooling/module.html"/>
-      </header>
-    </x:module>
-  </target>
-
-</project>
-]]></source>
+&lt;/library&gt;
+</source>
 
       </subsection>
 
-      <subsection name="The generated content of the Module Resource">
+      <subsection name="Validating Module Definition">
 
         <p>
-        The contents of the module resources created as an output of Magic's module
-        task is listed below.  It contains some summary information about the project
-        group (in this case a reference to the group's home page and it's svn repository), 
-        together with the set of projects defined within the module.  The project data
-        has been collected and presented as <code>&lt;resource&gt;</code> entires suitable for 
-        reference by other external projects.
+        To validate that the module has been declared correctly you should be able
+        list information about the module project using the following command:
         </p>
 
-        <p><i>
-        NOTE: The following module is not suitable for publication just yet as it 
-        references development content - in particular the resources are listed with the 
-        <code>SNAPSHOT</code> version which as a matter of principal should never be publishedo outside
-        of a closed development environment.  We will come back to this point in a later 
-        tutorial dealing with content publication and module versioning.
-        </i></p>
+<pre>
+$ build -list -select acme
+</pre>
+<source>
+Listing module [acme]
 
-<source><![CDATA[
-<?xml version="1.0" encoding="ISO-8859-1"?>
 
-<module uri="artifact:module:acme/acme#SNAPSHOT">
+module:acme
 
-  <header>
-    <publisher name=""/>
-    <home href="http://www.osm.net/tutorial/tooling/module.html"/>
-    <docs href=""/>
-    <legal>
-      <license href=""/>
-      <notice href=""/>
-    </legal>
-    <svn href="svn://osm.berlios.de/repos/osm/trunk/tutorial/tooling/104"/>
-    <repository href=""/>
-  </header>
+  version: SNAPSHOT
+  basedir: C:\dev\osm\trunk\tutorial\tooling\104
+  imports: (1)
+    module:ant
+  resources: (2)
+    project:acme/acme-client
+    project:acme/acme-system
 
-  <resources>
+$
+</source>
 
-    <!-- module resources -->
+        <p>
+        Building the module will result in the creation of a module resource
+        under the <tt>target/deliverables/modules</tt> subdirectory.
+        </p>
 
-    <resource key="acme-client">
-      <info>
-        <group>acme</group>
-        <name>acme-client</name>
-        <version>SNAPSHOT</version>
-        <types>
-          <type name="jar"/>
-        </types>
-      </info>
-    </resource>
+<pre>
+$ build -select acme
+</pre>
 
-    <resource key="acme-system">
-      <info>
-        <group>acme</group>
-        <name>acme-system</name>
-        <version>SNAPSHOT</version>
-        <types>
-          <type name="jar"/>
-        </types>
-      </info>
-      <dependencies>
-        <include key="acme-client"/>
-      </dependencies>
-    </resource>
+<source>
+$ build -select acme
 
-  </resources>
+-------------------------------------------------------------------------
+acme
+-------------------------------------------------------------------------
 
-</module>]]></source>
+init:
+
+prepare:
+
+build:
+   [module] Exporting module to: C:\dev\target\deliverables\modules\acme-SNAPSHOT.module
+   [module] Creating md5 checksum
+
+package:
+
+test:
+
+install:
+[x:install] Copying 2 files to C:\osm\data\cache
+
+BUILD SUCCESSFUL
+Total time: 2 seconds
+
+$
+</source>
+
+      </subsection>
+
+      <subsection name="Referencing the Module Resource">
+
+        <p>
+        The contents of the module resources created as an output of the build is
+        an encoded XML file.  It contains all module property declarations and our
+        two projects in the form of resource defintions suitable for use by external 
+        projects in the same way we imported the ant module during the testcase 
+        tutorial.
+        </p>
+
+        <p><i>Example of an import by an external library of the module created above:</i></p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="<font color="darkred">artifact:module:acme#SNAPSHOT</font>"/&gt;
+  &lt;/imports&gt;
+
+   &lt;modules&gt;
+
+    ...
+
+  &lt;/modules&gt;
+
+&lt;/library>
+</source>
+
+        <p>
+        However - there are a couple if issue here.  Firstly it is bad practive
+        to reference SNAPSHOT versions and it is generally considered very bad practive 
+        to publish SNAPSHOT artifacts.  There are two things we can use to deal with
+        these concerns:
+        </p>
+
+        <ol>
+          <li>creation of a non-version artifact link</li>
+          <li>building using an explicit version</li>
+        </ol>
+
+      </subsection>
+
+      <subsection name="Adding an Alias">
+
+        <p>
+        To simplify local management of modules we can use the <tt>alias</tt> attribuite
+        on a type declaration.  This request the creation of a link which is an artifact
+        that references another artifact.
+        </p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="link:module:ant"/&gt;
+  &lt;/imports&gt;
+
+  &lt;modules&gt;
+
+    &lt;module name="acme" <font color="darkred">basedir="."</font>&gt;
+
+      &lt;types&gt;
+        &lt;type id="module" <font color="darkred">alias="true"</font>/&gt;
+      &lt;/types&gt;
+
+      ...
+      
+    &lt;/module&gt;
+
+  &lt;/modules&gt;
+
+&lt;/library&gt;
+</source>
+
+        <p>
+        After executing the module build you will fin an artifact named 
+        <tt>acme.module.link</tt> in the <tt>target/deliverables/modules</tt>
+        directory.  The link datastructure can be referenced using Transit's 
+        link protocol as show in the following example import statement.
+        </p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="<font color="darkred">link:module:acme</font>"/&gt;
+  &lt;/imports&gt;
+
+   &lt;modules&gt;
+
+    ...
+
+  &lt;/modules&gt;
+
+&lt;/library>
+</source>
+
+        <p>
+        In effect the link datastructure is simply a reference to a 
+        versioned artifact (similar to a unix symlink for artifacts).
+        </p>
+
+        <p>
+        The second subject of <a href="versioned.html">versioned builds</a> 
+        is addressed in the following tutorial.
+        </p>
 
       </subsection>
 

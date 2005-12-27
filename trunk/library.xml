@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<library>
+
+  <imports>
+    <import uri="link:module:ant"/>
+    <import uri="link:module:dpml"/>
+  </imports>
+
+  <modules>
+
+    <module name="osm" basedir=".">
+
+      <types>
+        <type id="module" alias="true"/>
+      </types>
+
+      <properties>
+        <property name="project.publisher.name" value="OSM"/>
+        <property name="project.organization.name" value="OSM"/>
+        <property name="project.docs.brand.name" value="OSM"/>
+        <property name="project.specification.vendor" value="${project.publisher.name}"/>
+        <property name="project.implementation.vendor" value="${project.publisher.name}"/>
+        <property name="project.implementation.vendor-id" value="net.osm"/>
+        <property name="project.publisher.url" value="http://www.osm.net"/>
+        <property name="project.resource.host" value="http://repository.osm.net"/>
+        <property name="project.api.host" value="http://api.osm.net"/>
+        <property name="project.svn.host" value="svn://svn.berlios.de/osm/trunk"/>
+      </properties>
+
+      <!--<module base="tutorial"/>-->
+      <module base="validation"/>
+
+      <project name="home" basedir="home/site"/>
+   
+    </module>
+
+  </modules>
+
+</library>
