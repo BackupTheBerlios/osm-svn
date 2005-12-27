@@ -16,7 +16,7 @@
   </target>
 
   <target name="build" depends="standard.build">
-    <x:docs dest="${dpml.data}/docs"/>
+    <x:docs/>
   </target>
 
 </project>
