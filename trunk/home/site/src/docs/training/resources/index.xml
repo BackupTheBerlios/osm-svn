@@ -43,12 +43,6 @@
             </td>
           </tr>
           <tr>
-            <td><a href="content.html">Content Handlers</a></td>
-            <td>
-              Using Transit content handlers.
-            </td>
-          </tr>
-          <tr>
             <td><a href="repositories.html">Repositories</a></td>
             <td>
               Creating your own repository.

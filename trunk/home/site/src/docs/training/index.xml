@@ -24,7 +24,7 @@
       </p>
 
       <table>
-        <tr><th>Subject</th><th>Description</th></tr>
+        <tr><th width="120">Subject</th><th>Description</th></tr>
         <tr>
           <td><a href="resources/index.html">Resource Management</a></td>
           <td>
@@ -53,8 +53,15 @@
             and approaches to content publication and version management.
           </td>
         </tr>
+      </table>
+
+      <p>
+      The following tutorials are comming soon.
+      </p>
+      
+      <table>
         <tr>
-          <td><a href="components/index.html">Component Development</a></td>
+          <td width="120"><a href="components/index.html">Component Development</a></td>
           <td>
             This tutorial is about the development of components using the 
             IOC (Inversion of Control) principal.  The tutorial takes you though the 
@@ -75,7 +82,6 @@
           </td>
         </tr>
       </table>
-
     
     </section>
 

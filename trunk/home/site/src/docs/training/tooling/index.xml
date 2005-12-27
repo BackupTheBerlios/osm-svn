@@ -11,7 +11,10 @@
     <section name="Development Tooling Tutorial">
 
       <p>
-      Also know as adding a little magic to your development toolkit.
+      The development tooling tutorial walkes through the process of setting 
+      up a couple of projects using a central project library, building 
+      projects, adding testcases, creation modules, using alias references, 
+      and executing versioned builds.
       </p>
  
       <subsection name="Tutorial Index">
@@ -19,34 +22,38 @@
         <table>
           <tr>
             <td width="15%"><a href="example.html">Gettings Started</a></td>
-            <td>
+            <td width="60%">
               A walk through of setting up an index, creating a couple of 
               projects, adding some content, executing a build, followed by
               a review of the process and the generated project resources.
             </td>
+            <td/>
           </tr>
           <tr>
             <td><a href="testcase.html">Testcases</a></td>
             <td>
               Addition of a testcase to our 'system' project and demonstration 
-              of the automatic compilation and test execution provided by Magic.
+              of the automatic compilation and test execution provided by Depot.
             </td>
+            <td/>
           </tr>
           <tr>
             <td><a href="filtering.html">Build Customization</a></td>
             <td>
               A simple example of build customization using an explicit build.xml
-              file.  The example demonstrates the usage of classic Ant filters and 
-              the Depot filter task within an extended init phase.
+              file.  The example demonstrates the customaization of a build process
+              using an overriding build file.
             </td>
+            <td/>
           </tr>
           <tr>
             <td><a href="module.html">Creating a Module</a></td>
             <td>
               This tutorial takes us through the process of module creation and 
               and includes an summary of the generated module and it's potential
-              application when publishing content.
+              application when publishing content to external users.
             </td>
+            <td/>
           </tr>
           <tr>
             <td><a href="versioned.html">Versioned Builds</a></td>
@@ -54,6 +61,7 @@
               Demonstrates the process of creating a collection of versioned 
               artifacts and supporting module suitable for publication.
             </td>
+            <td/>
           </tr>
         </table>
 
