@@ -10,6 +10,8 @@
 
     <section name="About OSM">
 
+      <subsection name="OSM Resources and Services">
+
       <p>
       The resource center for component based development.
       </p>
@@ -26,17 +28,19 @@
 
       </ul>
 
+    </subsection>
+
     <subsection name="About the DPML">
 
       <p>
-      The <a href="http://www.dpml.net">Digital Product Meta Library (DPML)</a> is 
-      open community project developing advanced Java-based component management 
-      solutions.
+      OSM is affiliated with <a href="http://www.dpml.net">The Digital Product Meta 
+      Library (DPML)</a> - an open community project developing advanced Java-based 
+      component management solutions.
       </p>
 
       <p>
-      The DPML codebase is available to the public and all content is 
-      published under the commercially friendly 
+      The DPML codebase is available to the public with content published under the 
+      commercially friendly 
       <a href="http://www.dpml.net/about/legal/license.html">Apache 2.0 License</a>.
       </p>
 
@@ -48,7 +52,8 @@
       Ibiblio is home to one of the largest "collections of collections" on the Internet, 
       <a href="http://www.ibiblio.net">ibiblio.org</a> is a conservancy of freely available 
       information, including software, music, literature, art, history, science, politics, and 
-      cultural studies and host to the OSM collection of component resources and training material.
+      cultural studies and host to the OSM collection of component resources and training 
+      material.
       </p>
 
     </subsection>
