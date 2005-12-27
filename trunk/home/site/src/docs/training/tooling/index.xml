@@ -48,6 +48,13 @@
               application when publishing content.
             </td>
           </tr>
+          <tr>
+            <td><a href="versioned.html">Versioned Builds</a></td>
+            <td>
+              Demonstrates the process of creating a collection of versioned 
+              artifacts and supporting module suitable for publication.
+            </td>
+          </tr>
         </table>
 
       </subsection>

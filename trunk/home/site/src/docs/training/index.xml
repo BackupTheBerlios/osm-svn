@@ -11,16 +11,16 @@
     <section name="Training Material Index ">
 
       <p>
-      The OSM Tutorials are provided with the aim of getting you and operational
+      The OSM Tutorials are provided with the aim of getting you up and operational
       as quickly as possible.  The tutorials are loosly related to the DPML products
-      Transit, Magic, Depot, and Metro - each representing a specific concern in 
-      Java based component development and application deivery.
+      Transit, Depot, Metro, and the Station server management platform - each 
+      representing a specific concern in Java based component development and 
+      application delivery.
       </p>
 
       <p>
-      The tutorial assumes you have already <a href="../download/index.html">downloaded</a> 
-      and <a href="../download/setup/index.html">installed</a> Depot and 
-      prerequise products (JDK and Ant build system). 
+      The tutorial assumes you have <a href="../download/index.html">downloaded</a> 
+      and installed a JDK and the DPML SDK.
       </p>
 
       <table>
@@ -30,14 +30,13 @@
           <td>
             This tutorial introduces the Transit resource managment system
             and takes you though examples of how you can improve your code by 
-            eliminating resource location and retrival concerns from you development
-            code.  The tutorial also present strategies concerning classloader 
+            eliminating resource location and retrival concerns.  
+            The tutorial also present strategies concerning classloader 
             construction, classloader chains, and plugin management solutions.
             This material will be of particular interest to developers and architects 
             dealing with dynamically adaptive or runtime evolvable systems. This 
-            material is to some exent optional as is deals with the a general but 
-            low-level concern - however, a quick read through of the introductory
-            page is recommended.
+            material is to some extent optional as is deals with the a general but 
+            low-level concern - however, a read through is recommended.
           </td>
         </tr>
         <tr>
@@ -49,22 +48,21 @@
             environment, examples of projects representing typical development 
             needs, examples of the use of transitive dependencies in development
             and the generation of project data and runtime information.  Readers 
-            planning on getting into component development should go thought this 
-            material and personal interested in capturaturing project metrics 
-            and related quality assurance concerns could going some interesting 
-            milage.
+            will gain an understanding of the concerns related to build configuration,
+            centralization of project information, strategies concerning test automation, 
+            and approaches to content publication and version management.
           </td>
         </tr>
         <tr>
           <td><a href="components/index.html">Component Development</a></td>
           <td>
-            This tutorial is all about the development of components using the 
+            This tutorial is about the development of components using the 
             IOC (Inversion of Control) principal.  The tutorial takes you though the 
             development, testing, and management of component solutions using the 
-            DPML Metro component management solution.  It presents a series of 
+            DPML Metro container.  It presents a series of 
             examples dealing with context driven IOC of simple though to complex 
-            composite components and stretegies supporting effective component 
-            reuse.  Feel free to kick off on this tutorial as it delivers the most 
+            composite components and strategies supporting effective component 
+            reuse.  Feel free to start on this tutorial as it delivers the most 
             value in terms of potential development productivity.
           </td>
         </tr>
@@ -73,9 +71,7 @@
           <td>
             This tutorial is primarily concerned with the management of deployed 
             applications. However, developers will find this material valuable relative
-            to its coverage of configuration management and instalation services. 
-            Product support personel will be more interested in Depot managenent aspects
-            and the potential for applying Depot as an application delivery vehicle.
+            to its coverage of remote component management of application clusters.
           </td>
         </tr>
       </table>
