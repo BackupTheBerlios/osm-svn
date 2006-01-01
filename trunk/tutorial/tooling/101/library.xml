@@ -2,6 +2,9 @@
 
 <library>
 
+  <properties>
+  </properties>
+
   <modules>
 
     <module name="acme">
