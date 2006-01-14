@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Kicking off ..">
+
+      <p>
+        The aim of this tutorial is to introduce the basics. The tutorial
+        kicks off with your everyday hello-widget application, a plain 
+        old java object with a <strong>personality</strong>.  When we say personality 
+        we just saying the this POJO has sufficient attitudue to at least declare what
+        it wants out of the world.
+      </p>
+
+      <subsection name="Strait to the source ...">
+
+        <p>
+        First up, the service interface.
+        </p>
+<source>
+package net.osm.tutorial;
+
+public interface Widget
+{
+    void process( String color );
+}
+</source>
+
+        <p>
+        Next, the component implementation.
+        </p>
+
+<source>
+package net.osm.tutorial;
+
+import java.util.logging.Logger;
+
+public class SimpleWidget implements Widget
+{
+    //------------------------------------------------------------------
+    // context
+    //------------------------------------------------------------------
+
+    public interface Context
+    {
+        String getActivity();
+        String getOwner();
+        String getTarget();
+    }
+
+    //------------------------------------------------------------------
+    // state
+    //------------------------------------------------------------------
+
+    private final Logger m_logger;
+    private final Context m_context;
+
+    //------------------------------------------------------------------
+    // constructor
+    //------------------------------------------------------------------
+
+    public SimpleWidget( Logger logger, Context context  )
+    {
+        m_logger = logger;
+        m_context = context;
+    }
+
+    //------------------------------------------------------------------
+    // Widget
+    //------------------------------------------------------------------
+
+    public void process( String color )
+    {
+        String message = buildMessage( color );
+        m_logger.info( message );
+    }
+
+    //------------------------------------------------------------------
+    // internals
+    //------------------------------------------------------------------
+
+    public String buildMessage( String color )
+    {
+        String owner = m_context.getOwner();
+        String activity = m_context.getActivity();
+        String target = m_context.getTarget();
+
+        return activity + " " + owner + "'s " + target + " " + color + ".";
+    }
+}
+</source>
+
+      </subsection>
+
+      <subsection name="Move along everyone, there's nothing to see ...">
+
+        <p>
+          OK, so here's a regular Java object.  No framework imports, no tag markup, 
+          just plain old java.  Well - almost.  There are a couple of interesting 
+          questions that should at least be answered. Question no. 1 is where does the 
+          logger come from?  Question no. 2 is what the hell is that Context thing?
+        </p>
+
+      </subsection>
+
+      <subsection name="Constructor parameters">
+
+        <p>
+          In our example there are two constructor parameters - an instance of 
+          <code>java.util.logging.Logger</code> and an instance of <code>Content</code>.
+          Both arguments come from the container that this component is running within.
+          The Logger argument is just one one of several constructor arguments that the 
+          container provides out of the box.  Generally speaking you can add constructor 
+          arguments like <code>java.util.Logger</code>, <code>java.util.prefs.Preferences</code>
+          and a number of convinient utility types.  How these arguments get constructed is 
+          not a concern of the component in question (or for this tutorial) - but what is a 
+          concern is that all constructor arguments are valid and properly prepared.
+        </p>
+        <p>
+          <i>
+            The important point is that you can declare any of the following 
+            optional framework independent constructor parameter types in your 
+            component implementation (or none at all if you want is to take 
+            the totally inhibited track):
+          </i>
+        </p>
+
+        <ul>
+          <li>java.util.logging.Logger</li>
+          <li>java.util.prefs.Preferences</li>
+          <li>#Context</li>
+        </ul>
+
+        <p>
+        Above and beyond the pure java tyes you can also declare any of the following
+        generic utility types:
+        </p>
+
+        <ul>
+          <li>net.dpml.logging.Logger</li>
+          <li>net.dpml.parameters.Parameters</li>
+          <li>net.dpml.configuration.Configuration</li>
+        </ul>
+
+      </subsection>
+
+      <subsection name="And semantics too!">
+
+         <p>
+         But what about implementation semantics?  
+         Is this component thread-safe.  What are the static charateristics of 
+         this component - what are the logging assumptions, the dependencies implied 
+         bu that Context argument, configuration and parameter presumations, what 
+         about things like memory collection semantics?
+         </p>
+
+         <p>
+         We collection static semantics using an ant task named "type".  This 
+         tasks grills the component class and creates a serialized object with
+         a bunch of information about the component implementation which it stores 
+         along side the component class.
+         </p>
+
+         <p>
+         Here's an example of static data collection using an Ant build file:
+         </p>
+
+         <pre><![CDATA[  <target name="build" depends="standard.build">
+    <c:type class="net.osm.tutorial.SimpleWidget" threadsafe="true"/>
+  </target>]]></pre>
+
+         <p>And the build output from the above is ..
+         </p>
+         
+         <pre>  [c:type] creating [net.osm.tutorial.SimpleWidget] </pre>
+
+         <p>But more imprtant is the output .. take a look in your <code>
+            ${basedir}/target/classes</code> directory and you will find 
+            an additional resource named <code>[classname].type</code>. This 
+            file contains a serialized representation of you component.  The
+            information it contains will be used by built-time and run-time
+            systems during the prepration and execution phases.
+         </p>
+         
+         <pre>  [c:type] creating [net.osm.tutorial.SimpleWidget] </pre>
+
+
+      </subsection>
+
+      <subsection name="Supply versus Demand">
+
+        <p>
+          The Context interface is about component driven demand.  A component can 
+          declare an inner Context interface.  The information disclosed in the interface
+          will be analysed by the container and appropriate solutions will be established
+          using a solution scenario provided by someone in control.  The solution 
+          scenario is the supply side of the equation.  Fortunately we provide a bunch of tools 
+          to make solution creation nothing less than a walk-in-the-park - but first of all
+          lets' take a look at the demand proposition:
+        </p>
+
+<source> 
+public class SimpleWidget implements Widget
+{
+    public interface Context
+    {
+        String getActivity();
+        String getOwner();
+        String getTarget();
+    }
+
+    ...
+}
+</source>
+
+        <p>
+          This contract is stating that an implementation of the Context interface 
+          (which is a component assertion but a container concern) <strong>must</strong> supply a value for 
+          the features <code>activity</code>, <code>owner</code>, and <code>target</code>, 
+          each of which happens to be a <code>java.lang.String</code> type.
+        </p>
+
+        <p><i>
+          Important point here is the implicit semantics:
+        </i></p>
+
+        <ol>
+          <li>no exceptions in method declaration</li>
+          <li>dependency type is the method return type (and any return type including primatives and custom interfaces are valid return type)</li>
+          <li>dependency key is based on the bean pattern get[key] principal</li>
+          <li>optional defalt values may be passed as a operation argument - for example:<source>int getHeight( int defaultHeight );</source></li>
+        </ol>
+
+        <p><i>Here's an example of the creation of a solution using another Ant task:</i></p>
+
+         <pre><![CDATA[  <c:component type="net.osm.tutorial.SimpleWidget" name="demo">
+    <context>
+      <entry key="activity" value="Painting"/>
+      <entry key="owner" value="$${user.name}"/>
+      <entry key="target" value="house"/>
+    </context>
+  </c:component>]]></pre>
+ 
+         <p>And the Ant output ..</p>
+<pre>
+[c:component] creating [demo] using [net.osm.tutorial.SimpleWidget]
+[c:component] saving part to: artifact:part:osm/tutorial/osm-application-101#SNAPSHOT
+[c:component] Created report in C:\dev\applications\101\target\reports\parts\demo.xml</pre>
+
+      </subsection>
+
+      <subsection name="The bottom line">
+
+        <p>
+          The container will make best efforts to assemble a viable deployment 
+          scenario.  If that scenario cannot be established then your component will 
+          not see the light of day. But don't dispair! The container knows it's stuff 
+          and your make sure the solutions are viable.  Lets move on and look at the 
+          deployment of our Widget based on the information we have already generated.
+        </p>
+
+      </subsection>
+
+
+      <subsection name="Next steps (a.k.a. lighting the fires and burning the tires)!">
+
+        <p>
+          In the <a href="testcase.html">next tutorial</a> we will run up this 
+          component in a test case.  <br/>
+          Sounds dull? Wait and see.
+        </p>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+

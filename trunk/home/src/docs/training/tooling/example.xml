@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Getting Started">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to walk you though the setup 
+        of a small development environment the includes two related projects
+        and a single index. 
+        </p>
+
+      </subsection>
+
+      <subsection name="Setting up ...">
+
+        <table>
+          <tr>
+            <td width="160">dev</td>
+            <td>
+              Create a root directory named 'dev' 
+              (or any other name you prefer).  This directory 
+              will be used as the root directory for two projects 
+              and the directory into which we will add an index.
+            </td>
+          </tr>
+          <tr>
+            <td>library.xml</td>
+            <td>
+              Create a new file in the dev directory named <tt>library.xml</tt>.  The
+              library.xml file should contain the definitions for our two projects, 
+              one named 'acme-client' and the other named 'acme-system'.  We will 
+              declare that they each produce jar resources, and that the acme-system 
+              project is dependent on the acme-client project.
+<source><![CDATA[
+<library>
+
+  <modules>
+
+    <module name="acme">
+
+      <project name="acme-client" basedir="client">
+        <types>
+          <type id="jar"/>
+        </types>
+      </project>
+    
+      <project name="acme-system" basedir="system">
+        <types>
+          <type id="jar"/>
+        </types>
+        <dependencies>
+          <include key="acme-client"/>
+        </dependencies>
+      </project>
+      
+    </module>
+
+  </modules>
+
+</library>
+]]></source>
+            </td>
+          </tr>
+          <tr>
+            <td>basedirs</td>
+            <td>
+              Create two sub-directories under 'dev' - one named 'client' and the other named 'system'.
+              These directories correspond to the project basedir referenced by basedir attribute 
+              values we declared in our library file.
+            </td>
+          </tr>
+        </table>
+      </subsection>
+
+      <subsection name="Adding some content">
+
+         <p>
+         Our next step is to add some sources to our respective projects. In 
+         the client project we will define a minamalistic interface for a 
+         <tt>Widget</tt>.  The server project will contain an implementation
+         class named <tt>DefaultWidget</tt>.
+         </p>
+
+        <table>
+          <tr>
+            <td width="160">Widget.java</td>
+            <td>
+              The Ant based builder for Depot uses a strict file structure in 
+              order to automate things like build produces, testing and reporting.  
+              The codebase for our projects 
+              will be located in <code>[basedir]/src/main/[package]</code> so for 
+              the client project we will create an interface source file at 
+              <code>client/src/main/acme/Widget.java</code>.
+              <source>
+package acme;
+
+public interface Widget
+{
+    void process( String color );
+}
+              </source>
+            </td>
+          </tr>
+           <tr>
+            <td>DefaultWidget.xml</td>
+            <td>
+              Create a Java source for the class DefaultWidget.java.  Note that we 
+              recommend a different package namespace for this class as it's 
+              generally good practice and will avoid potential problems with jar  
+              file sealing.  The location of the DefaultWidget source file should 
+              be <code>system/src/main/acme/impl/DefaultWidget.java</code>.
+<source>
+package acme.impl;
+
+import acme.Widget;
+
+public class DefaultWidget implements Widget
+{
+    public void process( String color )
+    {
+        String message = buildMessage( color );
+        System.out.println( message );
+    }
+
+    public String buildMessage( String color )
+    {
+        if( null == color )
+        {
+            return "I'm a plain old widget.";
+        }
+        else
+        {       
+            return "I'm a " + color + " widget.";
+        }
+    }
+}
+</source>
+            </td>
+          </tr>
+        </table>
+      </subsection>
+
+      <subsection name="Build everything ...">
+
+        <p>
+        Lets' roll ..
+        </p>
+
+<pre>
+$ cd dev
+$ build
+</pre>
+
+        <p>
+        The output of the build procedure should be something like the following:
+        </p>
+
+<pre>
+$ build
+[212  ] [INFO   ] (depot.build): Initiating build sequence: (2)
+
+  (1)   acme/acme-client
+  (2)   acme/acme-system
+
+
+-------------------------------------------------------------------------
+acme/acme-client
+-------------------------------------------------------------------------
+
+init:
+
+prepare:
+[x:prepare] Created dir: C:\dev\client\target
+[x:prepare] Created dir: C:\dev\client\target\build\main
+[x:prepare] Copying 1 file to C:\dev\client\target\build\main
+
+build:
+    [javac] Created dir: C:\dev\client\target\classes\main
+    [javac] Compiling 1 source file to C:\dev\client\target\classes\main
+
+package:
+      [jar] Created dir: C:\dev\client\target\deliverables\jars
+      [jar] Building jar: C:\dev\client\target\deliverables\jars\acme-client-SNAPSHOT.jar
+      [jar] Creating md5 checksum
+
+test:
+
+install:
+[x:install] Copying 2 files to C:\osm\data\cache\acme
+
+BUILD SUCCESSFUL
+Total time: 3 seconds
+
+-------------------------------------------------------------------------
+acme/acme-system
+-------------------------------------------------------------------------
+
+init:
+
+prepare:
+[x:prepare] Created dir: C:\dev\system\target
+[x:prepare] Created dir: C:\dev\system\target\build\main
+[x:prepare] Copying 1 file to C:\dev\system\target\build\main
+
+build:
+    [javac] Created dir: C:\dev\system\target\classes\main
+    [javac] Compiling 1 source file to C:\dev\system\target\classes\main
+
+package:
+      [jar] Created dir: C:\dev\system\target\deliverables\jars
+      [jar] Building jar: C:\dev\system\target\deliverables\jars\acme-system-SNAPSHOT.jar
+      [jar] Creating md5 checksum
+
+test:
+
+install:
+[x:install] Copying 2 files to C:\osm\data\cache\acme
+
+BUILD SUCCESSFUL
+Total time: 1 second
+
+$
+</pre>
+
+      </subsection>
+
+      <subsection name="Looking at what happened ...">
+
+        <p>
+        Here is a summary of what just happened:
+        </p>
+
+        <ol>
+          <li>The builder loads the common library (<tt>library.xml</tt>).</li>
+          <li>The builder requests the selection of all projects with a basedir
+              equal to or deeper than our current directory. In this case the 
+              selection matches the client and server projects we defined earlier.
+              The selection is sorted relative to project depenedencies resulting
+              in a list starting with the client project (no dependencies) and 
+              followed by the server project (dependent on the client project).</li>
+          <li>The builder loads a build tool - in this case its the default 
+              Ant-based builder and requests a build of each project in the selection.</li>
+          <li>Control passed to the Ant builder which evaluates the types declared by
+              the supplied project definition and from this information associates
+              build listeners responsible for the creation of declared output artifacts.</li>
+          <li>In this particular example we have not declared a build file as such 
+              therfore a default template will be used.</li>
+          <li>The build is initiated with a default target which in turn triggers
+              our build listeners in accordance with a series of standard build 
+              phases declared within the template (initialization, code preparation, 
+              build, packaging, testing, and finally instalation).</li>
+        </ol>
+
+      </subsection>
+
+      <subsection name="Looking at what was produced ...">
+
+        <p>
+        If you take a look at each of the projects you will notice a new 
+        directory named ${basedir}/target has been created.  This holds working
+        content produced during the build process.  The main results are contained
+        in the <tt>${basedir}/target/deliverables</tt> directory.  In case both projects 
+        are producing jar files which we can find in ${basedir}/target/deliverables/jars
+        and are copies under ${dpml.cache}/acme/jars during the install phase.
+        </p>
+
+      </subsection>
+
+ 
+    </section>
+
+  </body>
+</document>
+

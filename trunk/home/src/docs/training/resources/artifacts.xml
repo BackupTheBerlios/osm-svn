@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Resource Management</title>
+  </properties>
+
+  <body>
+
+    <section name="Transit Artifacts">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The aim of this tutorial is to establish a good understanding 
+        of the term "artifact", the structure of an artifact URI, an the 
+        role of the Transit system concerning resource retrieval, hosts,
+        and resource caching.
+        </p>
+
+      </subsection>
+
+      <subsection name="Definition of an Artifact">
+
+        <p>
+        An artifact is any streamable resource locatable using the <code>artifact</code>
+        URL protocol.  Examples of resources include - jar files, property files, XML 
+        files, files containing meta data, serialized objects, images, etc.  Resources 
+        can be viewed as artifacts if they can be located using the <code>artifact</code>
+        protocol. The protocol structure is as follows:
+        </p>
+
+        <code>artifact:[type]:[group]/[name]#[version]</code>
+
+        <p>
+        To locate a resource Transit maps the <code>[type], [group], 
+        [name],</code> and <code>[version]</code> fields of the artifact URI to a URL
+        using a layout assigned to a particular host defintion.  The most common layout 
+        strategy (refered to as the classic layout) maps the artifact specifications 
+        according to the following rule:
+        </p>
+
+        <code>[host-address]/[group]/[name]-[version].[type]</code>
+
+        <p>
+        The eclipse layout maps artifacts in accordance with the following scheme:
+        </p>
+
+        <code>[host-address]/[group]-[version]/[name].[type]</code>
+
+        <p>
+        In addition to the above you can create and declare a custom layout handler
+        via the Transit Management API via <code>net.dpml.transit.model.LayoutRegistryModel</code>.
+        </p>
+
+      </subsection>
+
+      <subsection name="Using Artifacts">
+
+        <p> 
+        The following testcase demonstrates the use of an artifact to retrieve a property 
+        file from a remote location and supply it as an input stream to a Properties object.
+        The initial <code>setUp()</code> method handles the declaration of the Artifact protocol handler 
+        to the JVM.  This is Transit's hook into the JVM's URL Hander object model.  Within the 
+        <code>testPropertyLoading()</code> we construct a new URL using an artifact specification
+        that declares a resource type of "spec", a group named "dpml/test", the name 
+        "example-property-file" and a version equal to "2.2".  We then pass the URLs resource 
+        stream to a new Property instance and print out the value of a property declared in the 
+        spec resource.
+        </p>
+
+        <p><i>Source:</i> <tt>trunk/validation/resources/src/test/net/osm/tutorial/TransitTestCase.java</tt></p>
+        <source>
+public class TransitTestCase extends TestCase
+{
+    protected void setUp() throws Exception
+    {
+        System.setProperty( "java.protocol.handler.pkgs", "net.dpml.transit" );
+    }
+
+    public void testPropertyLoading() throws Exception
+    {
+        URL url = new URL( "artifact:spec:dpml/test/example-property-file#2.2" );
+        InputStream input = url.openStream();
+        Properties properties = new Properties();
+        properties.load( input );
+        String message = properties.getProperty( "tutorial.message" );
+        System.out.println( message );
+    }
+}</source>
+        <p>
+        Testcase output:
+        </p>
+<pre>  [x:junit] Executing forked test.
+  [x:junit] Running net.osm.tutorial.TransitTestCase
+  [x:junit] Welcome to the world of Transit!
+  [x:junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.344 sec</pre>
+
+      </subsection>
+
+
+      <subsection name="Behind the Scenes">
+
+        <p>
+        When the new URL constructor is invoked the JVM checks available URLStreamHandlers
+        using a number of mechanisms - one of which is to check the value of the 
+        "java.protocol.handler.pkgs" system property.  The JVM will look for a protocol
+        handler named "net.dpml.transit" + [protocol].Handler.  The Transit's artifact
+        Handler class is primarily responsible for the establishment of a ArtifactURLConnection.
+        The ArtifactURLConnection holds a reference to the Transit system.  When the openStream
+        operation is invoked the Artifact URL connection will use a cache handler to resolve
+        the URL to a local cached resource.  The cache handler will check prioritized hosts for 
+        the resource (converting the artifact to the appropriate URL for the host as it evaluates
+        potential multiple candidates).  When a host is located a network service downloads the 
+        resource to the local cache (itself equivalent to a local files based repository). The 
+        openStream() request is then delegated to the local resource.
+        </p>
+
+      </subsection>
+
+      <subsection name="Key Benefits">
+
+        <ul>
+          <li>Removal of "location" concerns from the codebase.</li>
+          <li>Notion of transport protocol is abstracted out.</li>
+          <li>Potential redundancy when a resource exists on multiple hosts.</li>
+          <li>Configuration concerns are separted from usage.</li>
+          <li>Artifact structure encorages consistent naming patterns and resource versioning.</li>
+          <li>Functionlity is encapsulated with the URL and URLConnection object model.</li>
+        </ul>
+
+      </subsection>
+
+    </section>
+
+  </body>
+
+</document>
+

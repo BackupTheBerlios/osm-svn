@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Source Filtering">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to demonstrate the use of 
+        a classic Ant build file to customize the project build.  In the
+        example we will add some classic Ant filters and compare this 
+        with Depot's builder filters and how you can use Depot task within
+        a project build.
+        </p>
+
+      </subsection>
+
+      <subsection name="Adding a buildfile">
+
+        <p>
+        Up to now we have not declared a build.xml file - instead we have 
+        used the default template, however, we are now going to add some 
+        source code filters.  To do this we will need to declare this 
+        information in a build file.  By default the Ant-based builder will
+        execute a build using a file named <tt>build.xml</tt> if present in the 
+        projects basedir.
+        </p>
+
+        <p>
+        The following <tt>build.xml</tt> file is basically doing exactly the 
+        same thing as before except that we are extending the initialization
+        target with some additional content.
+        </p>
+
+<source><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="acme-system" default="install"
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="dpml:depot">
+
+  <transit:import uri="local:template:dpml/tools/standard"/>
+
+  <target name="init" depends="standard.init">
+    <filter token="COLOR" value="red"/>
+    <x:filter token="NAME" feature="name"/>
+  </target>
+
+</project>
+]]></source>
+
+       <p>
+       Notable items in the build file include:
+       </p>
+
+       <ol>
+         <li>Usage of Transit's imporet task to include a template from 
+            tyhe DPML preferences directory.</li>
+         <li>The addition of a classic Ant filter.</li>
+         <li>The addition of a Depot filter that assigns a project feature
+             to a symbolic value.</li>
+       </ol>
+
+        <p>
+        The first filter is a classic ant filter that will replace all occurances
+        of the pattern <code>@COLOR@</code> in a sources wityh the value <code>red</code>.
+        The second filter is a filter that lets us extract some information from the
+        project model and apply this as a filter argument.  In this example the feature
+        we are requesting is the name of the project.
+        </p>
+        
+      </subsection>
+    
+      <subsection name="Updates to DefaultWidget.java">
+
+<source>
+package acme.impl;
+
+import acme.Widget;
+
+public class DefaultWidget implements Widget
+{
+    public void process( String color )
+    {
+        String message = buildMessage( color );
+        System.out.println( message );
+    }
+
+    public String buildMessage( String color )
+    {
+        if( null == color )
+        {
+            <font color="darkred">return "I'm a plain old " + COLOR + " widget named " + NAME + ".";</font>
+        }
+        else
+        {       
+            <font color="darkred">return "I'm a " + color + " widget named " + NAME;</font>
+        }
+    }
+
+    <font color="darkred">private static final String NAME = "@NAME@";
+    private static final String COLOR = "@COLOR@";</font>
+ 
+}
+</source>
+
+       </subsection>
+
+       <subsection name="Updates to DefaultWidgetTestCase.java">
+       
+         <p>
+         Similar apdates have been made to out testcase to validate default and 
+         explicit output values.
+         </p>
+         
+        <p><i>DefaultWidgetTestCase.java</i></p>
+
+<source>
+    public void testDefaultMessage() throws Exception
+    {
+        DefaultWidget widget = new DefaultWidget();
+        String result = widget.buildMessage( null );
+        <font color="darkred">String expected = "I'm a plain old " + COLOR + " widget named " + NAME + ".";</font>
+        assertEquals( "default", expected, result );
+        widget.process( null );
+    }
+
+    public void testExplicitMessage() throws Exception
+    {
+        DefaultWidget widget = new DefaultWidget();
+        String color = "blue";
+        String result = widget.buildMessage( color );
+        <font color="darkred">String expected = "I'm a " + color + " widget named " + NAME;</font>
+        assertEquals( "explicit", expected, result );
+        widget.process( color );
+    }
+
+    <font color="darkred">private static final String NAME = "@NAME@";
+    private static final String COLOR = "@COLOR@";</font>
+</source>
+
+      </subsection>
+
+      <subsection name="Build Output">
+
+        <pre>
+test:
+  [x:junit] Compiling 1 source file to C:\dev\system\target\test-classes
+  [x:junit] executing in local jvm
+  [x:junit] Running acme.impl.test.DefaultWidgetTestCase
+<font color="darkred">I'm a plain old red widget named acme-system.
+I'm a blue widget named acme-system</font>
+  [x:junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
+        </pre>
+
+      </subsection>
+
+      <subsection name="Tutorial Summary">
+
+        <p>
+        The are a couple of important things covered in this tutorial.  Firstly,
+        when Depot prepares project content it constructs a working codebase under
+        the <code>${basedir}/target/build</code> directory.  This codebase is the 
+        result of applying any filters declared within the <code>init</code> target.  
+        Secondly, the example demonstrates how you 
+        can easily extend the standard build behaviour using Ant's logic on target 
+        naming - basically it's the convention of referencing an imported template 
+        target with the imported template's declared project name followed by the 
+        name of the target we want to extend.
+        </p>
+        
+        <p><i>
+        Logically speaking the approach to task extension follows the following convention:
+        </i></p>
+<pre><![CDATA[
+<target name="[target-name]" depends="[template-name].[target-name]">
+  <!-- extended content goes here -->
+</target>
+]]></pre>
+
+      </subsection>
+
+    </section>
+
+  </body>
+  
+</document>
+

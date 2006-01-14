@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Versioned Builds">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to demonstrate the usage of 
+        the <tt>-version</tt> option when building multiple projects.
+        </p>
+
+      </subsection>
+
+      <subsection name="Executing a versioned build">
+
+        <p>
+        By default the build system assigns the version identifier of 
+        <tt>SNAPSHOT</tt>.  
+        </p>
+        <p>
+        We can override this using the <tt>-version</tt> 
+        commandline option.
+        </p>
+
+<pre>
+$ build -version 1.0.0 clean install
+</pre>
+
+<source><![CDATA[
+$ build -version 1.0.0 clean install
+[1968 ] [INFO   ] (depot.build): Initiating build sequence: (3)
+
+  (1)   acme/acme-client
+  (2)   acme/acme-system
+  (3)   acme
+
+
+-------------------------------------------------------------------------
+acme/acme-client
+-------------------------------------------------------------------------
+
+init:
+
+clean:
+   [delete] Deleting directory C:\dev\client\target
+
+init:
+
+prepare:
+[x:prepare] Created dir: C:\dev\client\target
+[x:prepare] Created dir: C:\dev\client\target\build\main
+[x:prepare] Copying 1 file to C:\dev\client\target\build\main
+
+build:
+    [javac] Created dir: C:\dev\client\target\classes\main
+    [javac] Compiling 1 source file to C:\dev\client\target\classes\main
+
+package:
+      [jar] Created dir: C:\dev\client\target\deliverables\jars
+      [jar] Building jar: C:\dev\client\target\deliverables\jars\acme-client-1.0.0.jar
+      [jar] Creating md5 checksum
+
+test:
+
+install:
+[x:install] Copying 2 files to C:\osm\data\cache\acme
+
+BUILD SUCCESSFUL
+Total time: 2 seconds
+
+-------------------------------------------------------------------------
+acme/acme-system
+-------------------------------------------------------------------------
+
+standard.init:
+
+init:
+
+clean:
+   [delete] Deleting directory C:\dev\system\target
+
+standard.init:
+
+init:
+
+prepare:
+[x:prepare] Created dir: C:\dev\system\target
+[x:prepare] Created dir: C:\dev\system\target\build\main
+[x:prepare] Copying 1 file to C:\dev\system\target\build\main
+
+build:
+    [javac] Created dir: C:\dev\system\target\classes\main
+    [javac] Compiling 1 source file to C:\dev\system\target\classes\main
+
+package:
+      [jar] Created dir: C:\dev\system\target\deliverables\jars
+      [jar] Building jar: C:\dev\system\target\deliverables\jars\acme-system-1.0.0.jar
+      [jar] Creating md5 checksum
+
+test:
+    [javac] Created dir: C:\dev\system\target\classes\test
+    [javac] Compiling 1 source file to C:\dev\system\target\classes\test
+    [junit] Created dir: C:\dev\system\target\reports\test
+    [junit] executing in local jvm
+    [junit] Running acme.impl.test.DefaultWidgetTestCase
+I'm a plain old red widget named acme-system.
+I'm a blue widget named acme-system
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
+
+install:
+[x:install] Copying 2 files to C:\osm\data\cache\acme
+
+BUILD SUCCESSFUL
+Total time: 1 second
+
+-------------------------------------------------------------------------
+acme
+-------------------------------------------------------------------------
+
+init:
+
+clean:
+   [delete] Deleting directory C:\dev\target
+
+init:
+
+prepare:
+[x:prepare] Created dir: C:\dev\target
+
+build:
+   [module] Exporting module to: C:\dev\target\deliverables\modules\acme-1.0.0.module
+   [module] Creating md5 checksum
+
+package:
+
+test:
+
+install:
+[x:install] acme.module.link
+[x:install] artifact:module:acme#1.0.0
+[x:install] Copying 3 files to C:\osm\data\cache
+
+BUILD SUCCESSFUL
+Total time: 1 second
+
+$
+]]></source>
+
+      </subsection>
+    
+    </section>
+
+  </body>
+  
+</document>
+

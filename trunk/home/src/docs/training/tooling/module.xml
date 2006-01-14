@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Creating a group Module">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to intrioduce the concept of a module
+        and walk through the process of module creation.  The tutorial concludes
+        with the summary of the generated module artifact and a description of 
+        how a module can be used when sharing your project resources with others.
+        </p>
+
+      </subsection>
+
+      <subsection name="dev/library.xml">
+
+        <p>
+        We need to update our library.xml file to include the declaration of a
+        module basedir and the assignment of an output artifact type.
+        </p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="link:module:ant"/&gt;
+  &lt;/imports&gt;
+
+  &lt;modules&gt;
+
+    &lt;module name="acme" <font color="darkred">basedir="."</font>&gt;
+
+      <font color="darkred">&lt;types&gt;
+        &lt;type id="module"/&gt;
+      &lt;/types&gt;</font>
+
+      &lt;project name="acme-client" basedir="client"&gt;
+        &lt;types&gt;
+          &lt;type id="jar"/&gt;
+        &lt;/types&gt;
+      &lt;/project&gt;
+    
+      &lt;project name="acme-system" basedir="system"&gt;
+        &lt;types&gt;
+          &lt;type id="jar"/&gt;
+        &lt;/types&gt;
+        &lt;dependencies&gt;
+          &lt;include key="acme-client"/&gt;
+        &lt;/dependencies&gt;
+        &lt;dependencies scope="test"&gt;
+          &lt;include ref="ant/ant-junit"/&gt;
+        &lt;/dependencies&gt;
+      &lt;/project&gt;
+      
+    &lt;/module&gt;
+
+  &lt;/modules&gt;
+
+&lt;/library&gt;
+</source>
+
+      </subsection>
+
+      <subsection name="Validating Module Definition">
+
+        <p>
+        To validate that the module has been declared correctly you should be able
+        list information about the module project using the following command:
+        </p>
+
+<pre>
+$ build -list -select acme
+</pre>
+<source>
+Listing module [acme]
+
+
+module:acme
+
+  version: SNAPSHOT
+  basedir: C:\dev\osm\trunk\tutorial\tooling\104
+  imports: (1)
+    module:ant
+  resources: (2)
+    project:acme/acme-client
+    project:acme/acme-system
+
+$
+</source>
+
+        <p>
+        Building the module will result in the creation of a module resource
+        under the <tt>target/deliverables/modules</tt> subdirectory.
+        </p>
+
+<pre>
+$ build -select acme
+</pre>
+
+<source>
+$ build -select acme
+
+-------------------------------------------------------------------------
+acme
+-------------------------------------------------------------------------
+
+init:
+
+prepare:
+
+build:
+   [module] Exporting module to: C:\dev\target\deliverables\modules\acme-SNAPSHOT.module
+   [module] Creating md5 checksum
+
+package:
+
+test:
+
+install:
+[x:install] Copying 2 files to C:\osm\data\cache
+
+BUILD SUCCESSFUL
+Total time: 2 seconds
+
+$
+</source>
+
+      </subsection>
+
+      <subsection name="Referencing the Module Resource">
+
+        <p>
+        The contents of the module resources created as an output of the build is
+        an encoded XML file.  It contains all module property declarations and our
+        two projects in the form of resource defintions suitable for use by external 
+        projects in the same way we imported the ant module during the testcase 
+        tutorial.
+        </p>
+
+        <p><i>Example of an import by an external library of the module created above:</i></p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="<font color="darkred">artifact:module:acme#SNAPSHOT</font>"/&gt;
+  &lt;/imports&gt;
+
+   &lt;modules&gt;
+
+    ...
+
+  &lt;/modules&gt;
+
+&lt;/library>
+</source>
+
+        <p>
+        However - there are a couple if issue here.  Firstly it is bad practive
+        to reference SNAPSHOT versions and it is generally considered very bad practive 
+        to publish SNAPSHOT artifacts.  There are two things we can use to deal with
+        these concerns:
+        </p>
+
+        <ol>
+          <li>creation of a non-version artifact link</li>
+          <li>building using an explicit version</li>
+        </ol>
+
+      </subsection>
+
+      <subsection name="Adding an Alias">
+
+        <p>
+        To simplify local management of modules we can use the <tt>alias</tt> attribuite
+        on a type declaration.  This request the creation of a link which is an artifact
+        that references another artifact.
+        </p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="link:module:ant"/&gt;
+  &lt;/imports&gt;
+
+  &lt;modules&gt;
+
+    &lt;module name="acme" <font color="darkred">basedir="."</font>&gt;
+
+      &lt;types&gt;
+        &lt;type id="module" <font color="darkred">alias="true"</font>/&gt;
+      &lt;/types&gt;
+
+      ...
+      
+    &lt;/module&gt;
+
+  &lt;/modules&gt;
+
+&lt;/library&gt;
+</source>
+
+        <p>
+        After executing the module build you will fin an artifact named 
+        <tt>acme.module.link</tt> in the <tt>target/deliverables/modules</tt>
+        directory.  The link datastructure can be referenced using Transit's 
+        link protocol as show in the following example import statement.
+        </p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="<font color="darkred">link:module:acme</font>"/&gt;
+  &lt;/imports&gt;
+
+   &lt;modules&gt;
+
+    ...
+
+  &lt;/modules&gt;
+
+&lt;/library>
+</source>
+
+        <p>
+        In effect the link datastructure is simply a reference to a 
+        versioned artifact (similar to a unix symlink for artifacts).
+        </p>
+
+        <p>
+        The second subject of <a href="versioned.html">versioned builds</a> 
+        is addressed in the following tutorial.
+        </p>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+
