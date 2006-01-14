@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<library>
+
+  <modules>
+
+    <module name="acme">
+
+      <project name="acme-demo" basedir=".">
+        <types>
+          <type id="jar"/>
+        </types>
+        <dependencies scope="test">
+          <include ref="dpml/metro/dpml-metro-tools"/>
+        </dependencies>
+      </project>
+    
+    </module>
+
+  </modules>
+
+</library>

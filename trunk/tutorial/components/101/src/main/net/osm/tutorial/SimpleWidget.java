@@ -84,5 +84,4 @@ public class SimpleWidget implements Widget
 
         return activity + " " + owner + "'s " + target + " " + color + ".";
     }
-
 }
