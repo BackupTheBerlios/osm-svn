@@ -39,24 +39,11 @@ import org.acme.tutorial.SimpleWidget;
  *
  * @author <a href="http://www.osm.net">Open Service Management</a>
  */
-public class SimpleWidgetTestCase extends TestCase
+public class DefaultsTestCase extends TestCase
 {
     private static final String PATH = "test.part";
     private static final File DIRECTORY = new File( System.getProperty( "project.test.dir" ) );
     private static final Controller CONTROLLER = Controller.STANDARD;
-    
-   /**
-    * Test the cexecution of the widget.
-    * @exception Exception if an error occurs
-    */
-    public void testWidgetExecution() throws Exception
-    {
-        URI uri = new File( DIRECTORY, PATH ).toURI();
-        Component component = CONTROLLER.createComponent( uri );
-        Provider provider = component.getProvider();
-        SimpleWidget widget = (SimpleWidget) provider.getValue( false );
-        widget.process( "blue" );
-    }
     
    /**
     * Test widget defaults.
@@ -81,31 +68,5 @@ public class SimpleWidgetTestCase extends TestCase
         String user = System.getProperty( "user.name" );
         String expected = "Painting " + user + "'s house red.";
         assertEquals( "message content", expected, message );
-    }
-
-   /**
-    * Test widget management.
-    * @exception Exception if an error occurs
-    */
-    public void testWidgetManagement() throws Exception
-    {
-        //
-        // get a reference to the widget Component and from this retrieve the 
-        // definition of the component. 
-        //
-        
-        URI uri = new File( DIRECTORY, PATH ).toURI();
-        ComponentModel model = (ComponentModel) CONTROLLER.createModel( uri );
-        MutableContextModel context = (MutableContextModel) model.getContextModel();
-        ValueDirective value = new ValueDirective( "java.lang.String", "car" );
-        context.setEntryDirective( "target", value );
-        Component component = CONTROLLER.createComponent( model );
-        Provider provider = component.getProvider();
-        SimpleWidget widget = (SimpleWidget) provider.getValue( false );
-        String message = widget.buildMessage( "blue" );
-        String user = System.getProperty( "user.name" );
-        String expected = "Painting " + user + "'s car blue.";
-        assertEquals( "message content", expected, message );
-        widget.process( "red" );
     }
 }
