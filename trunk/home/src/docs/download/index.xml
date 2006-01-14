@@ -10,7 +10,7 @@
 
     <section name="Prerequisite Products">
 
-      <subsection name="DPML SDK @DEPOT-PRODUCT-VERSION@">
+      <subsection name="DPML SDK">
 
         <p>
         A binary distribution of the <a href="http://www.dpml.net/about/setup/index.html">
@@ -26,8 +26,7 @@
         <p>
         Products and tutorials included under this site require the installation of 
         Java @JAVA-PRODUCT-VERSION@ or later.  General speaking this means you need to install
-        the <a href="@JAVA-DOWNLOAD-URL@">Java @JAVA-PRODUCT-VERSION@ SDK</a> for development 
-        purposes.
+        the <a href="@JAVA-DOWNLOAD-URL@">Java 1.5 (or 1.4) SDK</a>.
         </p>
 
       </subsection>
