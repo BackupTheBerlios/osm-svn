@@ -30,7 +30,7 @@
 
       <!--<module base="tutorial"/>-->
 
-      <project name="home" basedir="home/site"/>
+      <project name="home" basedir="home"/>
    
     </module>
 
