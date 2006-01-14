@@ -17,23 +17,22 @@
  * limitations under the License.
  */
 
-package net.osm.tutorial.test;
+package org.acme.tutorial.test;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.URI;
 
 import junit.framework.TestCase;
 
-import net.dpml.part.Part;
-import net.dpml.part.PartContentHandlerFactory;
-import net.dpml.part.PartReference;
-import net.dpml.part.component.Component;
-import net.dpml.part.component.Provider;
+import net.dpml.part.Controller;
+import net.dpml.part.Component;
+import net.dpml.part.Provider;
 
-import net.dpml.composition.data.ValueDirective;
+import net.dpml.metro.data.ValueDirective;
+import net.dpml.metro.model.ComponentModel;
+import net.dpml.metro.model.MutableContextModel;
 
-import net.osm.tutorial.SimpleWidget;
+import org.acme.tutorial.SimpleWidget;
 
 /**
  * Test a widget component.
@@ -43,11 +42,12 @@ import net.osm.tutorial.SimpleWidget;
 public class SimpleWidgetTestCase extends TestCase
 {
     private static final String PATH = "test.part";
-    private static File DIRECTORY = new File( System.getProperty( "project.test.dir" ) );
+    private static final File DIRECTORY = new File( System.getProperty( "project.test.dir" ) );
     private static final Controller CONTROLLER = Controller.STANDARD;
     
    /**
     * Test the cexecution of the widget.
+    * @exception Exception if an error occurs
     */
     public void testWidgetExecution() throws Exception
     {
@@ -60,6 +60,7 @@ public class SimpleWidgetTestCase extends TestCase
     
    /**
     * Test widget defaults.
+    * @exception Exception if an error occurs
     */
     public void testWidgetDefaults() throws Exception
     {
@@ -84,6 +85,7 @@ public class SimpleWidgetTestCase extends TestCase
 
    /**
     * Test widget management.
+    * @exception Exception if an error occurs
     */
     public void testWidgetManagement() throws Exception
     {
@@ -93,10 +95,10 @@ public class SimpleWidgetTestCase extends TestCase
         //
         
         URI uri = new File( DIRECTORY, PATH ).toURI();
-        MutableComponentModel model = (MutableComponentModel) CONTROLLER.createModel( uri );
+        ComponentModel model = (ComponentModel) CONTROLLER.createModel( uri );
         MutableContextModel context = (MutableContextModel) model.getContextModel();
         ValueDirective value = new ValueDirective( "java.lang.String", "car" );
-        context.setEntryDirective( "color", value );
+        context.setEntryDirective( "target", value );
         Component component = CONTROLLER.createComponent( model );
         Provider provider = component.getProvider();
         SimpleWidget widget = (SimpleWidget) provider.getValue( false );
@@ -104,5 +106,6 @@ public class SimpleWidgetTestCase extends TestCase
         String user = System.getProperty( "user.name" );
         String expected = "Painting " + user + "'s car blue.";
         assertEquals( "message content", expected, message );
+        widget.process( "red" );
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Stephen J. McConnell, OSM
+ * Copyright 2005 Stephen J. McConnell.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -16,19 +16,23 @@
  * limitations under the License.
  */
 
-package org.acme.tutorial;
+package net.dpml.depot.prefs;
 
-/**
- * An example of a service interface.
- *
- * @author <a href="http://www.osm.net">Open Service Management</a>
+import java.net.Authenticator; 
+import java.net.PasswordAuthentication;
+
+/** 
+ * The PasswordAuthenticationModel is a interface through which
+ * a PasswordAuthentication instance may be retired.
  */
-public interface Widget
-{
+public interface PasswordAuthenticationModel
+{   
    /**
-    * Log a color related message.
-    *
-    * @param color the color to use
+    * Return the password authentication instance.
+    * @return the authentication credentials
     */
-    void process( String color );
+    public PasswordAuthentication getAuthentication(); 
+
+
 }
+

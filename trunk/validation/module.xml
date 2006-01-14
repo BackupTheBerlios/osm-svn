@@ -18,4 +18,17 @@
     </dependencies>
   </project>
 
+  <project name="console-test" basedir="console" version="">
+    <types>
+      <type id="jar">
+        <property name="project.jar.main.class" 
+           value="testing.Demo"/>
+      </type>
+      <type id="plugin">
+        <property name="project.plugin.class" 
+           value="testing.Demo"/>
+      </type>
+    </types>
+  </project>
+
 </module>

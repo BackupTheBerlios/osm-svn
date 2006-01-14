@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<module name="depot">
+   
+  <types>
+    <type id="module" alias="true"/>
+  </types>
+   
+  <project name="dpml-depot-prefs" basedir="prefs">
+    <types>
+      <type id="jar"/>
+      <type id="plugin" alias="true">
+        <property name="project.plugin.class" 
+           value="net.dpml.depot.prefs.DepotPreferencesFrame"/>
+      </type>
+    </types>
+    <dependencies>
+      <include ref="dpml/transit/dpml-transit-main"/>
+      <include key="dpml-profile-api"/>
+      <include ref="jgoodies/looks" tag="system"/>
+    </dependencies>
+  </project>
+
+  <project name="dpml-depot-desktop" basedir="desktop">
+    <types>
+      <type id="jar"/>
+      <type id="plugin" alias="true">
+        <property name="project.plugin.class" 
+           value="net.dpml.depot.desktop.Desktop"/>
+      </type>
+    </types>
+    <dependencies>
+      <include ref="jgoodies/looks" tag="system"/>
+      <include ref="jgoodies/forms"/>
+      <include ref="dpml/transit/dpml-transit-main"/>
+      <include key="dpml-depot-console"/>
+      <include ref="dpml/metro/dpml-part-api"/>
+      <include key="dpml-profile-api"/>
+      <include key="dpml-station-impl"/>
+    </dependencies>
+  </project>   
+   
+</module>

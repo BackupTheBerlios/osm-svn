@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Stephen J. McConnell, OSM
+ * Copyright 2005 Stephen J. McConnell.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -16,19 +16,21 @@
  * limitations under the License.
  */
 
-package org.acme.tutorial;
+package net.dpml.depot.prefs;
 
-/**
- * An example of a service interface.
- *
- * @author <a href="http://www.osm.net">Open Service Management</a>
+import java.util.EventListener;
+
+/** 
+ * The PasswordAuthenticationListener is an interface implmented by 
+ * objects requiring notification of password changes.
  */
-public interface Widget
+public interface PasswordAuthenticationListener extends EventListener
 {
    /**
-    * Log a color related message.
-    *
-    * @param color the color to use
+    * Notify a consumer of a change to the password authentication settings.
+    * @param event the password authentication event
     */
-    void process( String color );
+    void passwordAuthenticationChanged( PasswordAuthenticationEvent event );
+
 }
+

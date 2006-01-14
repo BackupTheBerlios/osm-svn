@@ -2,6 +2,11 @@
 
 <library>
 
+  <imports>
+    <import uri="link:module:ant"/>
+    <import uri="link:module:dpml"/>
+  </imports>
+
   <modules>
 
     <module name="acme">

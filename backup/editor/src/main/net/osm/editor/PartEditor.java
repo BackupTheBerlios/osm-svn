@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Stephen J. McConnell, OSM
+ * Copyright (c) 2005 Stephen J. McConnell
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -16,19 +16,29 @@
  * limitations under the License.
  */
 
-package org.acme.tutorial;
+package net.osm.editor;
+
+import java.awt.Component;
+import java.io.IOException;
+import java.net.URI;
+
+import javax.swing.tree.TreeNode;
+
+import net.dpml.part.Part;
+import net.dpml.part.Component;
 
 /**
- * An example of a service interface.
+ * Interface implemented by part editors.
  *
- * @author <a href="http://www.osm.net">Open Service Management</a>
+ * @author <a href="mcconnell@dpml.net">Stephen J. McConnell</a>
  */
-public interface Widget
+public interface PartEditor
 {
-   /**
-    * Log a color related message.
-    *
-    * @param color the color to use
-    */
-    void process( String color );
+    Part getPart();
+
+    Component getComponent();
+
+    Component[] getPartPanels();
+
+    TreeNode[] getPartNodes();
 }

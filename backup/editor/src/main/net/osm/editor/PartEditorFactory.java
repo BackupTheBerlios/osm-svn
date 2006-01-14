@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Stephen J. McConnell, OSM
+ * Copyright (c) 2005 Stephen J. McConnell
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -16,19 +16,18 @@
  * limitations under the License.
  */
 
-package org.acme.tutorial;
+package net.dpml.part;
+
+import net.dpml.part.Part;
 
 /**
- * An example of a service interface.
+ * Interface for part editor factories.  A edit factory is responsible for 
+ * the construction of a part editor for a supplied part instance.
  *
- * @author <a href="http://www.osm.net">Open Service Management</a>
+ * @author <a href="mailto:dev-dpml@lists.ibiblio.org">The Digital Product Meta Library</a>
+ * @version $Revision: 1.2 $ $Date: 2004/03/17 10:30:09 $
  */
-public interface Widget
+public interface PartEditorFactory
 {
-   /**
-    * Log a color related message.
-    *
-    * @param color the color to use
-    */
-    void process( String color );
+    PartEditor getPartEditor( Part part );
 }

@@ -25,9 +25,10 @@
  <body>
 
     <menu>
+      <item name="Component Context" href="model.html"/>
+      <item name="Component Testing" href="testcase.html"/>
       <!--
       <item name="Kicking Off" href="wcb.html"/>
-      <item name="Taking Control" href="testcase.html"/>
       -->
     </menu>
 

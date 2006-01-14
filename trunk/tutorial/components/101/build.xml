@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project default="install"
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="dpml:depot"
+    xmlns:m="dpml:metro" >
+
+  <transit:import uri="local:template:dpml/tools/standard"/>
+
+  <target name="init" depends="standard.init">
+    <x:plugin uri="link:plugin:dpml/metro/dpml-metro-tools"/>
+  </target>
+
+  <target name="build" depends="standard.build">
+    <m:type class="org.acme.tutorial.SimpleWidget" name="widget"/>
+    <m:component dest="target/test/test.part" test="true"
+        type="org.acme.tutorial.SimpleWidget">
+      <context>
+        <entry key="owner" value="$${user.name}"/>
+        <entry key="activity" value="Painting"/>
+        <entry key="target" value="house"/>
+      </context>
+    </m:component>
+  </target>
+
+  <target name="checkstyle" depends="prepare">
+    <property name="checkstyle.dir" location="${basedir}/target/reports/checkstyle"/>
+    <property name="checkstyle.data" location="${checkstyle.dir}/checkstyle.xml"/>
+    <x:plugin uri="link:plugin:dpml/depot/dpml-depot-checkstyle">
+      <task class="net.dpml.tools.checkstyle.CheckstyleTask" name="checkstyle"/>
+    </x:plugin>
+    <mkdir dir="${checkstyle.dir}"/>
+    <checkstyle>
+      <formatter type="xml" toFile="${checkstyle.data}"/>
+      <fileset dir=".">
+        <include name="**/target/build/test/**/*.java"/>
+      </fileset>
+    </checkstyle>
+    <xslt style="${dpml.prefs}/dpml/tools/xsls/checkstyle-frames.xsl"
+        in="${checkstyle.data}" 
+        out="${checkstyle.dir}/checkstyle_report.html">
+      <param name="output.dir" expression="${checkstyle.dir}"/>
+    </xslt>
+  </target>
+
+
+</project>
