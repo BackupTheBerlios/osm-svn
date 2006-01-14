@@ -28,10 +28,6 @@ import net.dpml.part.Controller;
 import net.dpml.part.Component;
 import net.dpml.part.Provider;
 
-import net.dpml.metro.data.ValueDirective;
-import net.dpml.metro.model.ComponentModel;
-import net.dpml.metro.model.MutableContextModel;
-
 import org.acme.tutorial.SimpleWidget;
 
 /**

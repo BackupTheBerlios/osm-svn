@@ -20,12 +20,14 @@
 
 <project>
 
- <title>Metro Training Programme</title>
+ <title>Basic Context Testcases</title>
 
  <body>
 
     <menu>
-      <item name="Component Context" href="context/index.html"/>
+      <item name="Execution" href="execution.html"/>
+      <item name="Defaults" href="defaults.html"/>
+      <item name="Management" href="management.html"/>
     </menu>
 
  </body>

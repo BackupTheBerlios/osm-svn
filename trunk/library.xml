@@ -29,7 +29,6 @@
       </properties>
 
       <!--<module base="tutorial"/>-->
-      <module base="validation"/>
 
       <project name="home" basedir="home/site"/>
    

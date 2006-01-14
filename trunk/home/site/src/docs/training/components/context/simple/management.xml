@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Taking control ..">
+
+      <subsection name="What to look for ...">
+
+      <p>
+        There are a number of intersteresting features in this testcase.  First of all
+        is the creation of the service instance using a URL.
+      </p>
+
+      <pre>
+  URL url = new File( TEST_DIR, PATH ).toURL();
+  SimpleWidget widget = (SimpleWidget) url.getContent( new Class[]{ Object.class } );
+      </pre>
+
+      <p>
+        The key to making the above lines work is the association of a content 
+        handler using the static <code>URLConnection.setContentHandlerFactory( .. )</code> 
+        method.  While convinient inside a testcase this is handled automatically
+        if you using the <a href="http://www.dpml.net/transit/index.html">Transit</a> content handler 
+        management model. We should also keep in mind that the establishment of the 
+        <code>SimpleWidget</code> confirms that all of the <code>#Context</code> 
+        criteria has been fullfilled.
+      </p>
+
+      <p>
+        The code following the widget instantiation is to some extent plain old Junit test case
+        content (nothing new here) - just the supply a a value and the validation that the 
+        return type is actually what we expect it to be.
+      </p>
+
+      <pre>
+  String message = widget.buildMessage( "red" );
+  String user = System.getProperty( "user.name" );
+  String expected = "Painting " + user + "'s house red.";
+  assertEquals( "message content", expected, message );
+      </pre>
+
+      <p>
+       The next test case method has something more interesting...
+      </p>
+
+      <pre>
+  URL url = new File( TEST_DIR, PATH ).toURL();
+  Component component = (Component) url.getContent( new Class[]{ Component.class } );
+      </pre>
+
+      <p>
+        Instead of accessing the <code>SimpleWidget</code> implementation class we 
+        have asked for a reference to a <code>Component</code>.  As such we are moving into
+        the management domain.  The following code demonstrates the casting of the 
+        component to a service consumer and the manipulation of the component state 
+        by updating component dependencies with a new value.
+      </p>
+
+      <pre>  Consumer consumer = (Consumer) component;
+  ValueDirective value = new ValueDirective( "my-car-part", "car" );
+  consumer.setProvider( "target", value );</pre>
+
+      <p>
+        Using the changed component state the testcase goes ahead and validates 
+        that the management changes are reflected in the runtime state of the component
+        instance.
+      </p>
+
+      <pre>  SimpleWidget widget = (SimpleWidget) component.resolve( false );
+  String message = widget.buildMessage( "blue" );
+  String user = System.getProperty( "user.name" );
+  String expected = "Painting " + user + "'s car blue.";
+  assertEquals( "message content", expected, message );</pre>
+
+      <p>
+        If we look at the console output of the testcase we can actually see the 
+        management changes impacting the runtime state of our component.
+      </p>
+
+      <pre>  [x:junit] Executing forked test.
+  [x:junit] Running net.osm.tutorial.test.SimpleWidgetTestCase
+  [x:junit] [INFO   ] (local.demo): Painting mcconnell's house red.
+  [x:junit] [INFO   ] (local.demo): Painting mcconnell's car blue.
+  [x:junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.765 sec</pre>
+
+      </subsection>
+
+      <subsection name="Key Points">
+
+        <ol>
+          <li>Our component implementation is not dependent on anything outside of the JRE.</li>
+          <li>Our testcase uses a container independent API to exercise management control over the runtime.</li>
+          <li>Our runtime component is dynamically reflecting our management changes.</li>
+        </ol>
+
+      </subsection>
+
+     <subsection name="The Testcase Source ...">
+
+      <source>
+package net.osm.tutorial.test;
+
+import java.io.File;
+import java.net.URL;
+import java.net.URLConnection;
+
+import junit.framework.TestCase;
+
+import net.dpml.part.Part;
+import net.dpml.part.PartContentHandlerFactory;
+import net.dpml.part.PartReference;
+import net.dpml.part.component.Component;
+import net.dpml.part.component.Consumer;
+
+import net.dpml.composition.data.ValueDirective;
+
+import net.osm.tutorial.SimpleWidget;
+
+public class SimpleWidgetTestCase extends TestCase
+{
+   /**
+    * Test the construction of the widget implementation.
+    */
+    public void testWidgetDefaults() throws Exception
+    {
+        //
+        // create the component
+        //
+
+        URL url = new File( TEST_DIR, PATH ).toURL();
+        SimpleWidget widget = (SimpleWidget) url.getContent( new Class[]{ Object.class } );
+
+        //
+        // validate that the default message is what we are expecting
+        //
+
+        String message = widget.buildMessage( "red" );
+        String user = System.getProperty( "user.name" );
+        String expected = "Painting " + user + "'s house red.";
+        assertEquals( "message content", expected, message );
+
+        //
+        // execute it just for fun
+        //
+
+        widget.process( "red" );
+    }
+
+   /**
+    * Test the construction of the widget implementation.
+    */
+    public void testWidgetManagement() throws Exception
+    {
+        //
+        // get a reference to the widget Component and from this retrieve the 
+        // definition of the component. 
+        //
+
+        URL url = new File( TEST_DIR, PATH ).toURL();
+        Component component = (Component) url.getContent( new Class[]{ Component.class } );
+        if( component instanceof Consumer )
+        {
+            //
+            // update the component's 'target' dependency with a new solution
+            //
+
+            Consumer consumer = (Consumer) component;
+            ValueDirective value = new ValueDirective( "my-car-part", "car" );
+            consumer.setProvider( "target", value );
+        }
+        else
+        {
+            // will not happen becaue this component is a Consumer
+            final String error = 
+              "It's not a consumer!";
+            throw new IllegalStateException( error );
+        }
+
+        //
+        // validate that the new directives refects our new solution 
+        //
+
+        SimpleWidget widget = (SimpleWidget) component.resolve( false );
+        String message = widget.buildMessage( "blue" );
+        String user = System.getProperty( "user.name" );
+        String expected = "Painting " + user + "'s car blue.";
+        assertEquals( "message content", expected, message );
+
+        //
+        // execute it just for fun
+        //
+
+        widget.process( "blue" );
+    }
+
+    static
+    {
+        URLConnection.setContentHandlerFactory( new PartContentHandlerFactory() );
+    }
+
+    private static final String PATH = "test.part";
+    private static File TEST_DIR = new File( System.getProperty( "project.test.dir" ) );
+
+}</source>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+

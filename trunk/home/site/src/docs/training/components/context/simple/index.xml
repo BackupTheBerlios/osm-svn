@@ -17,13 +17,10 @@
         Components are typically established and deployed dynamically
         by a controlling system.  To do this the controlling system 
         needs to know about the operational requirements of the 
-        component and delivery mechanism.
-        </p>
-
-        <p>
-        Within the Metro component model both the declaration of 
-        requirement and the delivery mechanism are described using an 
-        inner interface within the component class.
+        component and delivery mechanism. Within the Metro component 
+        model both the declaration of requirement and the delivery 
+        mechanism are described using an inner interface within a 
+        component class.
         </p>
 
         <p>
@@ -31,6 +28,10 @@
         </p>
 
 <source>
+package org.acme.tutorial;
+
+import java.util.logging.Logger;
+
 public class SimpleWidget implements Widget
 {
     <font color="darkred">public interface Context
@@ -49,29 +50,17 @@ public class SimpleWidget implements Widget
         m_context = context;
     }
 
-    //------------------------------------------------------------------
-    // Widget
-    //------------------------------------------------------------------
-
-   /**
-    * Implementation of the widget service contract.
-    */
     public void process( String color )
     {
         String message = buildMessage( color );
         m_logger.info( message );
     }
 
-   /**
-    * Utility operation to construct a message.
-    * @param color the colour to use
-    */
     public String buildMessage( String color )
     {
         String owner = m_context.getOwner();
         String activity = m_context.getActivity();
         String target = m_context.getTarget();
-
         return activity + " " + owner + "'s " + target + " " + color + ".";
     }
 }
@@ -120,7 +109,7 @@ public class SimpleWidget implements Widget
 
       </subsection>
 
-      <subsection name="And semantics too!">
+      <subsection name="Semantics">
 
          <p>
          But what about implementation semantics?  
@@ -160,7 +149,7 @@ public class SimpleWidget implements Widget
          
       </subsection>
 
-      <subsection name="Supply versus Demand">
+      <subsection name="Handling Component Requirements">
 
         <p>
           The Context interface is about component driven demand.  A component can 
@@ -227,12 +216,14 @@ public class SimpleWidget implements Widget
         <p>
           The container will make best efforts to assemble a viable deployment 
           scenario.  If that scenario cannot be established then your component will 
-          not be deployed.
-        </p>
-
-        <p>
-          In the <a href="testcase.html">next tutorial</a> we will run up this 
-          component in a test case.
+          not be deployed.  During deployment the container will evaluate all runtime 
+          requirements declaring with a #Context innner interface, build an context
+          implementation fullfilling the contract (and any other regognized contructor
+          arguments) and deploy the component taking into account lifecyle and lifestyle
+          (but more of these subject later in the tutorial).
+          Tthe <a href="execution.html">next tutorial</a> we will run up this 
+          component in a test case demonstrating contain emabedding, component execution, 
+          default context validation, and runtime context management.
         </p>
 
       </subsection>
@@ -241,4 +232,5 @@ public class SimpleWidget implements Widget
 
   </body>
 </document>
+
 
