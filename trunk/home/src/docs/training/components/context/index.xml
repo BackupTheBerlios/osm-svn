@@ -1,19 +1,179 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <document>
+
   <properties>
     <author email="mcconnell@osm.net">Stephen McConnell</author>
-    <title>Component Development Strategies</title>
+    <title>Context Driven Development</title>
   </properties>
 
   <body>
 
-    <section name="Introducing Component Context">
+    <section name="Working with Context">
 
-      <p>CONTENT UNDER PREPARATION</p>
+      <subsection name="Operation Requirements">
+
+        <p>
+        Components are typically established and deployed dynamically
+        by a controlling system.  To do this the controlling system 
+        needs to know about the operational requirements of the 
+        component and delivery mechanism assumed by a component. Within 
+        the Metro component model both the declaration of requirement and 
+        the delivery mechanism are described using an Context inner 
+        interface within a component implementation class.
+        </p>
+
+        <p>
+        Consider the following component implementation:
+        </p>
+
+<source>
+package org.acme.tutorial;
+
+import java.util.logging.Logger;
+
+public class SimpleWidget implements Widget
+{
+    <font color="darkred">public interface Context
+    {
+        String getActivity();
+        String getOwner();
+        String getTarget();
+    }</font>
+
+    private final Logger m_logger;
+    private final Context m_context;
+
+    public SimpleWidget( Logger logger, Context context  )
+    {
+        m_logger = logger;
+        m_context = context;
+    }
+
+    public void process( String color )
+    {
+        String message = buildMessage( color );
+        m_logger.info( message );
+    }
+
+    public String buildMessage( String color )
+    {
+        String owner = m_context.getOwner();
+        String activity = m_context.getActivity();
+        String target = m_context.getTarget();
+        return activity + " " + owner + "'s " + target + " " + color + ".";
+    }
+}
+</source>
+
+        <p>
+          Generally speaking its a regular Java object.  No framework imports, 
+          no tag markup, just plain old java.  However - just a a classic java 
+          application is supplied with an array of string arguments via a main 
+          method - a component is supplied with arguments via its constructor.
+          In the above example it is the container that is supplying the logger
+          and context implementation.
+        </p>
+
+      </subsection>
+
+      <subsection name="Handling the Context Contract">
+
+        <p>
+          The Context interface is a component driven contract.  The information 
+          disclosed in the interface can be analysed by a container as part of the 
+          container reponsibility for context implementation creation and delivery
+          (which could be a mock object in a testcase or a container that provides 
+          dynamic instance construction).
+        </p>
+
+        <p>
+        Looking closer at the Context interface declared by the component:
+        </p>
+
+<source> 
+public class SimpleWidget implements Widget
+{
+    public interface Context
+    {
+        String getActivity();
+        String getOwner();
+        String getTarget();
+    }
+
+    ...
+}
+</source>
+
+        <p>
+          This contract is stating that an implementation of the Context interface 
+          <strong>must</strong> supply a value for the features <code>activity</code>, 
+          <code>owner</code>, and <code>target</code>, each of which (in this example) 
+          are instances of the <code>java.lang.String</code>.
+        </p>
+
+        <p>
+          <i>
+          Important points to note:
+          </i>
+        </p>
+
+        <ol>
+          <li>no exceptions in method declaration</li>
+          <li>dependency type is the method return type (and any return type 
+            including primatives and custom interfaces and classes are valid 
+            return type)</li>
+          <li>dependency key is based on the method name applying the bean 
+            pattern get[key]</li>
+          <li>defalt values may be passed as a operation argument - for example:<source>int getHeight( int defaultHeight );</source></li>
+        </ol>
+
+        <p><i>Here's an example of the creation of a component type defintion
+           and deployment solution:</i></p>
+
+         <pre><![CDATA[  <target name="build" depends="standard.build">
+    <c:type class="org.acme.tutorial.SimpleWidget" threadsafe="true"/>
+    <c:component type="net.osm.tutorial.SimpleWidget" name="demo">
+      <context>
+        <entry key="activity" value="Painting"/>
+        <entry key="owner" value="$${user.name}"/>
+        <entry key="target" value="house"/>
+      </context>
+    </c:component>
+  </target>
+]]></pre>
+ 
+         <p>And the Ant output ..</p>
+<pre>[c:type] creating [org.acme.tutorial.SimpleWidget]
+[c:component] creating [demo] using [org.acme.tutorial.SimpleWidget]
+[c:component] saving part to: artifact:part:acme/tutorial/acme-application-101#SNAPSHOT
+[c:component] Created report in C:\dev\applications\101\target\reports\parts\demo.xml</pre>
+
+      </subsection>
+
+      <subsection name="Summary ...">
+
+        <p>
+        The container will make best efforts to assemble a viable deployment 
+        scenario.  If that scenario cannot be established then your component will 
+        not be deployed.  During deployment the container will evaluate all runtime 
+        requirements declaring with a #Context innner interface, build an context
+        implementation fullfilling the contract (and any other regognized contructor
+        arguments) and deploy the component taking into account lifecyle and lifestyle
+        (but more of these subject later in the tutorial).
+        <!--
+        The <a href="execution.html">next tutorial</a> we will run up this 
+        component in a test case demonstrating contain emabedding, component execution, 
+        default context validation, and runtime context management.
+        -->
+        </p>
+
+      </subsection>
 
     </section>
 
   </body>
 </document>
+
+
 

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Context Driven Development</title>
+  </properties>
+
+  <body>
+
+    <section name="Constructor Injection">
+
+      <subsection name="Component-Driven Contracts">
+
+        <p>
+        Generally speaking information can be supplied to a component 
+        as a constructor argument or via setter operations.  The 
+        constructor approach is generally regarded as more convinient 
+        in that a component implementation recieves resources in a type
+        safe way.  On the otherhand setter operations (bean style) 
+        enable finer grain control in that a method is simply more 
+        explicit than a constructor parameter.
+        </p>
+
+        <p>
+        In the examples provided here we use a variation of 
+        constructor-based injection whereby information is supplied 
+        to a component as an instance implementing a component defined
+        contract.
+        </p>
+
+      </subsection>
+
+      <subsection name="Context">
+
+        
+        <p>
+        The following example demonstrates the declaration of 
+        a Context contract (as an inner interface) and the declaration 
+        of the context as a constructor argument:
+        </p>
+
+<source>
+package org.acme.tutorial;
+
+import java.awt.Color;
+
+public class Example
+{
+    private static final Color FOREGROUND = Color.WHITE;
+    private static final Color BACKGROUND = Color.BLACK;
+
+    <font color="darkred">public interface Context
+    {
+        int getTransparencyIndex();
+        boolean getDoubleBuffered();
+        Color getForeground( Color color );
+        Color getBackground( Color color );
+    }</font>
+
+    public Example( Context context  )
+    {
+        int index = context.getTransparencyIndex();
+        boolean buffered = context.getDoubleBuffered();
+        Color foreground = context.getForeground( FOREGROUND );
+        Color background = context.getBackground( BACKGROUND );
+
+        ...
+    }
+
+    ...
+}
+</source>
+
+        <p>
+        In the above example the component implementation is declaring 
+        that it requires (a) an int value for the transparency index, 
+        (b) a boolean value declaring a duble-buffering policy, 
+        (c) two instances of Color describing foreground and background
+        settings (with the option of the component implementation supplying
+        a default value).
+        </p>
+
+        <p>
+        The interface is a part of the component implementation and does 
+        not assume any 'framework' interfaces.  A container is responsible 
+        for the delivery of an implementation of the component's Context 
+        interface that fully meets the contract declared by the component - 
+        i.e. "component-driven context assertion" and "adaptive container 
+        supplied solutions delivery".
+        </p>
+
+        <p>
+        The <a href="context/index.html">Context Tutorial</a> presents the 
+        context model in more detail including information about using simple, 
+        primitive, and complex types within a context contract together with 
+        information about tools and runtime support for delivery of dynamic 
+        implementations by a container to a component.
+        </p>
+
+      </subsection>
+
+      <subsection name="Parts">
+
+        <p>
+        </p>
+
+      </subsection>
+
+      <subsection name="Recognized Utility Types">
+
+        <p>
+        </p>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+
+
+

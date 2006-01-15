@@ -1,28 +1,45 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <document>
+
   <properties>
     <author email="mcconnell@osm.net">Stephen McConnell</author>
-    <title>Component Development Strategies</title>
+    <title>Component Development</title>
   </properties>
 
   <body>
 
-    <section name="Component Development Tutorial">
+    <section name="Introduction">
 
-      <p>CONTENT UNDER PREPARATION</p>
+      <subsection name="Constructors">
 
-      <!--
-      <p>
-        The very very initial tutorial content for the Metro 
-        platform is comming into place.  Please be warning that 
-        the information presented here may be changed without notice.
-        Our APIs are still evolving and there is still a lot to do.
-      </p>
-      -->
+        <p>DEPENDENCY INJECTION</p>
+
+      </subsection>
+
+      <subsection name="Composition">
+
+        <p>PARTS</p>
+
+      </subsection>
+
+      <subsection name="Lifestyle">
+
+        <p>THREADSAFE CAPABLE AND LIFESTYLE POLICIES</p>
+
+      </subsection>
+
+      <subsection name="Lifecycle">
+
+        <p>INITIALIZATION, EXECUTION AND TERMINATION POLICIES</p>
+
+      </subsection>
 
     </section>
 
   </body>
+
 </document>
+
+
 

@@ -25,9 +25,8 @@
  <body>
 
     <menu>
-      <item name="Principals" href="simple/index.html"/>
-      <item name="Primitives" href="primitives/index.html"/>
-      <item name="Complex Types" href="complex/index.html"/>
+      <item name="Primitive Types" href="primitives.html"/>
+      <item name="Complex Types" href="complex.html"/>
     </menu>
 
  </body>
