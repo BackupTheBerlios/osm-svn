@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<project name="acme-demo" default="install" basedir="."
-    xmlns:transit="antlib:net.dpml.transit">
-
-  <transit:import uri="local:template:magic/standard"/>
-
-</project>
