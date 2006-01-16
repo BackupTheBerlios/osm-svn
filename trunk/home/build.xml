@@ -16,6 +16,16 @@
     <x:filter token="METRO-PRODUCT-VERSION" feature="version" ref="dpml/metro"/>
   </target>
 
+  <target name="prepare" depends="standard.prepare">
+    <property name="context.docs.dir" location="target/docs/training/components/context/101"/>
+    <mkdir dir="${context.docs.dir}"/>
+    <copy toDir="${context.docs.dir}" flatten="true">
+      <fileset dir="${basedir}/../tutorial/components/101/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+    </copy>
+  </target>
+
   <target name="build" depends="standard.build">
     <x:docs/>
   </target>

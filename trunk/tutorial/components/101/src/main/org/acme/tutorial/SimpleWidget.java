@@ -23,7 +23,8 @@ import java.util.logging.Logger;
 /**
  * A minimal component.
  * 
- * @author <a href="http://www.osm.net">Open Service Management</a>
+ * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
+ * @version @PROJECT-VERSION@
  */
 public class SimpleWidget implements Widget
 {

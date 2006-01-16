@@ -1,6 +1,5 @@
 /*
- * Copyright 2004 Stephen J. McConnell.
- * Copyright 1999-2004 The Apache Software Foundation
+ * Copyright 2005-2006 Stephen J. McConnell.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -24,16 +23,17 @@ import java.net.URI;
 
 import junit.framework.TestCase;
 
-import net.dpml.part.Controller;
-import net.dpml.part.Component;
-import net.dpml.part.Provider;
+import net.dpml.part.local.Controller;
+import net.dpml.part.remote.Component;
+import net.dpml.part.remote.Provider;
 
 import org.acme.tutorial.SimpleWidget;
 
 /**
  * Test a widget component.
  *
- * @author <a href="http://www.osm.net">Open Service Management</a>
+ * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
+ * @version @PROJECT-VERSION@
  */
 public class DefaultsTestCase extends TestCase
 {

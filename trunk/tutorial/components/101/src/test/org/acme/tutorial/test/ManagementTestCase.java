@@ -1,6 +1,5 @@
 /*
- * Copyright 2004 Stephen J. McConnell.
- * Copyright 1999-2004 The Apache Software Foundation
+ * Copyright 2005-2006 Stephen J. McConnell.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -24,9 +23,9 @@ import java.net.URI;
 
 import junit.framework.TestCase;
 
-import net.dpml.part.Controller;
-import net.dpml.part.Component;
-import net.dpml.part.Provider;
+import net.dpml.part.local.Controller;
+import net.dpml.part.remote.Component;
+import net.dpml.part.remote.Provider;
 
 import net.dpml.metro.data.ValueDirective;
 import net.dpml.metro.model.ComponentModel;
@@ -37,7 +36,8 @@ import org.acme.tutorial.SimpleWidget;
 /**
  * Test a widget component.
  *
- * @author <a href="http://www.osm.net">Open Service Management</a>
+ * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
+ * @version @PROJECT-VERSION@
  */
 public class ManagementTestCase extends TestCase
 {
@@ -52,8 +52,9 @@ public class ManagementTestCase extends TestCase
     public void testWidgetManagement() throws Exception
     {
         //
-        // get a reference to the widget Component and from this retrieve the 
-        // definition of the component. 
+        // get a reference to the component model and from this retrieve the 
+        // component's context model and change the definition  of the target
+        // context entry
         //
         
         URI uri = new File( DIRECTORY, PATH ).toURI();
@@ -61,9 +62,19 @@ public class ManagementTestCase extends TestCase
         MutableContextModel context = (MutableContextModel) model.getContextModel();
         ValueDirective value = new ValueDirective( "java.lang.String", "car" );
         context.setEntryDirective( "target", value );
+        
+        //
+        // instantiate the component using our custom model
+        //
+        
         Component component = CONTROLLER.createComponent( model );
         Provider provider = component.getProvider();
         SimpleWidget widget = (SimpleWidget) provider.getValue( false );
+        
+        //
+        // test message produced by the widget
+        //
+        
         String message = widget.buildMessage( "blue" );
         String user = System.getProperty( "user.name" );
         String expected = "Painting " + user + "'s car blue.";

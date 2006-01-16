@@ -3,12 +3,20 @@
 <project default="install"
     xmlns:transit="antlib:net.dpml.transit" 
     xmlns:x="dpml:depot"
-    xmlns:m="dpml:metro" >
+    xmlns:m="dpml:metro">
 
   <transit:import uri="local:template:dpml/tools/standard"/>
 
   <target name="init" depends="standard.init">
     <x:plugin uri="link:plugin:dpml/metro/dpml-metro-tools"/>
+    <x:plugin uri="link:plugin:dpml/depot/dpml-depot-j2h">
+      <task name="convert" class="de.java2html.anttasks.Java2HtmlTask"/>
+    </x:plugin>
+  </target>
+
+  <target name="prepare" depends="standard.prepare">
+    <convert srcdir="target/build/main" destdir="target/reports/src"/>
+    <convert srcdir="target/build/test" destdir="target/reports/src"/>
   </target>
 
   <target name="build" depends="standard.build">

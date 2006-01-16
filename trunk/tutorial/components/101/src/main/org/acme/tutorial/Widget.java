@@ -21,7 +21,8 @@ package org.acme.tutorial;
 /**
  * An example of a service interface.
  *
- * @author <a href="http://www.osm.net">Open Service Management</a>
+ * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
+ * @version @PROJECT-VERSION@
  */
 public interface Widget
 {
