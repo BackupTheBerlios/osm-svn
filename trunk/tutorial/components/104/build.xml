@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project default="install"
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:depot="dpml:depot">
+
+  <transit:import uri="local:template:dpml/tools/standard"/>
+
+  <target name="prepare" depends="standard.prepare">
+    <depot:plugin uri="link:plugin:dpml/depot/dpml-depot-j2h">
+      <task name="convert" class="de.java2html.anttasks.Java2HtmlTask"/>
+    </depot:plugin>
+    <convert srcdir="target/build/main" destdir="target/reports/src"/>
+    <convert srcdir="target/build/test" destdir="target/reports/src"/>
+  </target>
+
+  <target name="build" depends="standard.build">
+    <depot:plugin uri="link:plugin:dpml/metro/dpml-metro-tools" urn="metro"/>
+    <type xmlns="metro" name="server" class="org.acme.tutorial.DefaultServer" lifestyle="singleton"/>
+    <type xmlns="metro" name="listener" class="org.acme.tutorial.DefaultListener" lifestyle="singleton"/>
+    <type xmlns="metro" name="demo" class="org.acme.tutorial.Demo" lifestyle="singleton">
+      <parts>
+        <component key="server" type="org.acme.tutorial.DefaultServer">
+          <context>
+            <entry key="port" value="1010"/>
+          </context>
+        </component>
+        <component key="listener" type="org.acme.tutorial.DefaultListener">
+          <context>
+            <entry key="server" uri="lookup:org.acme.tutorial.Server"/>
+          </context>
+        </component>
+      </parts>
+    </type>
+    <component xmlns="metro" type="org.acme.tutorial.Demo" 
+      dest="target/test/application.part" test="true" 
+      activation="true" collection="hard"/>
+  </target>
+
+</project>

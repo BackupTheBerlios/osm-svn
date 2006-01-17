@@ -25,7 +25,7 @@
       instance implementing a component defined contract.
       </p>
 
-      <subsection name="Tutorial Index">
+      <subsection name="Constructor Parameters">
 
         <table>
           <tr>
@@ -52,7 +52,7 @@
       via a formal state-transition graph).
       </p>
 
-      <subsection name="Tutorial Index">
+      <subsection name="Lifestyle and Lifecycle Semantics">
 
         <table>
           <tr>

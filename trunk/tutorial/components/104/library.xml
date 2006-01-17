@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<library>
+
+  <imports>
+    <import uri="link:module:ant"/>
+    <import uri="link:module:dpml"/>
+  </imports>
+
+  <modules>
+
+    <module name="acme">
+
+      <project name="acme-demo" basedir=".">
+        <types>
+          <type id="jar"/>
+        </types>
+        <dependencies scope="runtime">
+          <include ref="dpml/util/dpml-logging-api"/>
+          <include ref="dpml/metro/dpml-part-api"/>
+        </dependencies>
+        <dependencies scope="test">
+          <include ref="dpml/metro/dpml-metro-tools"/>
+        </dependencies>
+      </project>
+    
+    </module>
+
+  </modules>
+
+</library>
