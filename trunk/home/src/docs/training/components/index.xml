@@ -9,29 +9,67 @@
 
   <body>
 
-    <section name="Introduction">
+    <section name="Instantiation and Configuration">
 
-      <subsection name="Constructors">
+      <p>
+      Generally speaking information can be supplied to a component 
+      as a constructor argument or via setter operations.  The 
+      constructor approach is generally regarded as more convinient 
+      in that a component implementation recieves resources in a 
+      type-safe way.  On the otherhand setter operations (bean style) 
+      enable finer grain control in that a method is simply more 
+      explicit than a constructor parameter.
+      In the examples provided here we use a variation of 
+      constructor-based injection whereby information is supplied 
+      to a component by a container through a dynamically constructed 
+      instance implementing a component defined contract.
+      </p>
 
-        <p>DEPENDENCY INJECTION</p>
+      <subsection name="Tutorial Index">
+
+        <table>
+          <tr>
+            <td width="15%"><a href="context/index.html">Context</a></td>
+            <td>
+            Introduction to <tt>#Context</tt> inner interface.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="parts/index.html">Parts</a></td>
+            <td>
+            Introducing component composition through encapsulation of
+            and management of a collection of internal parts.
+            </td>
+          </tr>
+        </table>
 
       </subsection>
 
-      <subsection name="Composition">
+      <p>
+      Beyond instantiation there are several aspects of a component that 
+      effect its deployment.  These aspects include thread-safety (expressed 
+      via a component lifestyle policy) and a component lifecycle (expressed 
+      via a formal state-transition graph).
+      </p>
 
-        <p>PARTS</p>
+      <subsection name="Tutorial Index">
 
-      </subsection>
-
-      <subsection name="Lifestyle">
-
-        <p>THREADSAFE CAPABLE AND LIFESTYLE POLICIES</p>
-
-      </subsection>
-
-      <subsection name="Lifecycle">
-
-        <p>INITIALIZATION, EXECUTION AND TERMINATION POLICIES</p>
+        <table>
+          <tr>
+            <td><a href="lifestyle.html">Lifestyle</a></td>
+            <td>
+            Overview of different lifestyle policies and the effect that 
+            lifestyle policies have on instantiation and sharing.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="lifecycle.html">Lifecycle</a></td>
+            <td>
+            Introducing the initialization, execution and termination lifecycle
+            and the supporting state-transition model.
+            </td>
+          </tr>
+        </table>
 
       </subsection>
 

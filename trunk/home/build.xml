@@ -17,10 +17,27 @@
   </target>
 
   <target name="prepare" depends="standard.prepare">
-    <property name="context.docs.dir" location="target/docs/training/components/context/101"/>
-    <mkdir dir="${context.docs.dir}"/>
-    <copy toDir="${context.docs.dir}" flatten="true">
-      <fileset dir="${basedir}/../tutorial/components/101/target/reports/src">
+    <property name="101.src.dir" location="${basedir}/../tutorial/components/101"/>
+    <property name="local.101.docs.dir" location="target/docs/training/components/context/101"/>
+    <mkdir dir="${local.101.docs.dir}"/>
+    <copy toDir="${local.101.docs.dir}" flatten="true">
+      <fileset dir="${101.src.dir}/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+    </copy>
+    <property name="102.src.dir" location="${basedir}/../tutorial/components/102"/>
+    <property name="local.102.docs.dir" location="target/docs/training/components/context/102"/>
+    <mkdir dir="${local.102.docs.dir}"/>
+    <copy toDir="${local.102.docs.dir}" flatten="true">
+      <fileset dir="${102.src.dir}/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+    </copy>
+    <property name="103.src.dir" location="${basedir}/../tutorial/components/103"/>
+    <property name="local.103.docs.dir" location="target/docs/training/components/context/103"/>
+    <mkdir dir="${local.103.docs.dir}"/>
+    <copy toDir="${local.103.docs.dir}" flatten="true">
+      <fileset dir="${103.src.dir}/target/reports/src">
         <include name="**/*.html"/>
       </fileset>
     </copy>

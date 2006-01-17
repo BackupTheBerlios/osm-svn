@@ -25,7 +25,6 @@
  <body>
 
     <menu>
-      <item name="Constructors" href="constructor.html"/>
       <item name="Context" href="context/index.html"/>
       <item name="Parts" href="parts/index.html"/>
       <item name="Lifestyle" href="lifestyle.html"/>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project default="install"
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:depot="dpml:depot">
+
+  <transit:import uri="local:template:dpml/tools/standard"/>
+
+  <target name="prepare" depends="standard.prepare">
+    <depot:plugin uri="link:plugin:dpml/depot/dpml-depot-j2h">
+      <task name="convert" class="de.java2html.anttasks.Java2HtmlTask"/>
+    </depot:plugin>
+    <convert srcdir="target/build/main" destdir="target/reports/src"/>
+    <convert srcdir="target/build/test" destdir="target/reports/src"/>
+  </target>
+
+  <target name="build" depends="standard.build">
+    <depot:plugin uri="link:plugin:dpml/metro/dpml-metro-tools" urn="metro"/>
+    <type xmlns="metro" class="org.acme.tutorial.ExampleComponent" name="demo" threadsafe="true"/>
+    <component xmlns="metro" 
+        type="org.acme.tutorial.ExampleComponent" 
+        dest="target/test/example.part" 
+        test="true">
+      <context>
+        <entry key="color">
+          <value class="int" value="100"/>
+          <value class="int" value="200"/>
+          <value class="int" value="0"/>
+        </entry>
+      </context>
+    </component>
+  </target>
+
+</project>

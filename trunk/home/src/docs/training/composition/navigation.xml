@@ -25,9 +25,6 @@
  <body>
 
     <menu>
-      <item name="Primitive Example" href="primitives.html"/>
-      <item name="Constructed Values" href="construct.html"/>
-      <item name="Value Lookup" href="lookup.html"/>
     </menu>
 
  </body>

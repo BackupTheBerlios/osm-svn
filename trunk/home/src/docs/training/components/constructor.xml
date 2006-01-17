@@ -14,20 +14,6 @@
       <subsection name="Component-Driven Contracts">
 
         <p>
-        Generally speaking information can be supplied to a component 
-        as a constructor argument or via setter operations.  The 
-        constructor approach is generally regarded as more convinient 
-        in that a component implementation recieves resources in a type
-        safe way.  On the otherhand setter operations (bean style) 
-        enable finer grain control in that a method is simply more 
-        explicit than a constructor parameter.
-        </p>
-
-        <p>
-        In the examples provided here we use a variation of 
-        constructor-based injection whereby information is supplied 
-        to a component as an instance implementing a component defined
-        contract.
         </p>
 
       </subsection>
