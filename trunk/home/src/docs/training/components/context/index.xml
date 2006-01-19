@@ -25,13 +25,38 @@
         component and delivery mechanism assumed by a component. Within 
         the Metro component model both the declaration of requirement and 
         the delivery mechanism are described using a <tt>Context</tt> inner 
-        interface within a component implementation class.
+        interface within a component implementation class.  
         </p>
+        <p>
+        For example ...
+        </p>
+
+<pre>
+public class Example
+{
+    <font color="darkred">public interface Context
+    {
+        String getName();
+        int getHeight();
+        int getWidth();
+        Color getColor( Color color );
+    }</font>
+
+    public Example( Context context )
+    {
+        String name = context.getName();
+        Color color = context.getColor( Color.RED );
+        ...
+    }
+
+    ...
+}
+</pre>
 
         <p>
         The Context interface is a component driven contract.  The information 
         disclosed in the interface can be analysed by a container.  The container
-        is any system acting in the role of component lifecycle management (which
+        is any system acting in the role of component lifecycle manager (which
         could be a dedicated container solution or even a testcase).
         </p>
 
@@ -63,7 +88,7 @@
         </table>
 
         <p>
-        Looking closer at the Context interface declared by the component we have 
+        Looking closer at the Context interface declared by the SimpleWidget component we have 
         the following inner class declaration:
         </p>
 

@@ -3,14 +3,37 @@
 <document>
   <properties>
     <author email="mcconnell@osm.net">Stephen McConnell</author>
-    <title>Component Development Strategies</title>
+    <title>Component Parts</title>
   </properties>
 
   <body>
 
     <section name="Parts">
 
-      <p>CONTENT UNDER PREPARATION</p>
+      <p>
+A component with Metro may contain other components as a part-of its own internal implementation. As a general rule internal parts represent a fully resolvable system such that deployment of the composite component can be assured providing its context criteria can be fulfilled.  This notion of parts is somewhat similar to the view of a human that as an entity composed of internal parts (heart, lungs, liver, brain, etc.) and that these structures are fully encapsulated within.  A human's dependencies on services such as a reliable oxygen and food supply are distinctly different in they represent the relationship between the human and its environment (i.e. a human's <tt>Context</tt> contract).
+      </p>
+
+      <subsection name="Creating a Composite Component">
+      
+      <p>
+Definition of a nested components are handled within a component <tt>type</tt> definition.
+      </p>
+
+      <p>
+For example:
+      </p>
+
+<pre><![CDATA[
+    <type xmlns="metro" name="parent" class="org.acme.tutorial.ParentComponent" lifestyle="singleton">
+      <parts>
+        <component key="widget" type="org.acme.tutorial.WidgetComponent"/>
+        <component key="gizmo" type="org.acme.tutorial.GizmoComponent"/>
+      </parts>
+    </type>
+]]></pre>
+
+      </subsection>
 
     </section>
 

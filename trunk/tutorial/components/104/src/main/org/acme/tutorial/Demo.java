@@ -20,8 +20,8 @@ package org.acme.tutorial;
 
 import net.dpml.logging.Logger;
 
-import net.dpml.part.local.Parts;
-import net.dpml.part.local.Manager;
+import net.dpml.part.local.PartsManager;
+import net.dpml.part.local.Handler;
 
 /**
  * The demo class is used to aggregate a collection of components and 
@@ -32,15 +32,15 @@ import net.dpml.part.local.Manager;
  */
 public class Demo
 {
-    private final Parts m_parts;
+    private final PartsManager m_parts;
     private final Logger m_logger;
     
    /**
     * Creation of a new demo component.
     * @param logger a logging channel
-    * @param parts the internal parts
+    * @param parts the internal parts manager
     */
-    public Demo( Logger logger, Parts parts )
+    public Demo( Logger logger, PartsManager parts )
     {
         m_logger = logger;
         m_parts = parts;
@@ -62,13 +62,13 @@ public class Demo
     
     DefaultServer getServer() throws Exception
     {
-        Manager manager = m_parts.getManager( "server" );
-        return (DefaultServer) manager.getProvider().getValue( false );
+        Handler handler = m_parts.getComponentHandler( "server" );
+        return (DefaultServer) handler.getProvider().getValue( false );
     }
     
     DefaultListener getListener() throws Exception
     {
-        Manager manager = m_parts.getManager( "listener" );
-        return (DefaultListener) manager.getProvider().getValue( false );
+        Handler handler = m_parts.getComponentHandler( "listener" );
+        return (DefaultListener) handler.getProvider().getValue( false );
     }
 }

@@ -45,6 +45,7 @@
 
   <target name="build" depends="standard.build">
     <x:docs/>
+    <copy file="${basedir}/etc/docs/styles/style.css" toFile="${basedir}/target/docs/styles/style.css" overwrite="true"/>
   </target>
 
 </project>

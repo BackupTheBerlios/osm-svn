@@ -3,7 +3,7 @@
 <document>
   <properties>
     <author email="mcconnell@osm.net">Stephen McConnell</author>
-    <title>Component Development Strategies</title>
+    <title>Value Lookup</title>
   </properties>
 
   <body>
@@ -18,15 +18,11 @@
       the lookup of a service from the containing component.
       </p>
 
-      <p>
-      The lookup protocol is expressed as "<tt>lookup:[service-interface-name]</tt>".
-      </p>
-
       <subsection name="Example Component Directive">
 
         <p>
         The following build file fragment (taken from the component/104 project)
-        shows how you can use a "<tt>lookup</tt>" statement to instruct a container
+        shows how you can use the "<tt>lookup</tt>" attribute to instruct a container
         to resolve a service reference by searching up the component hierachy for
         a component that declares that provides a service assignable to the request
         interface.
@@ -35,7 +31,7 @@
 <pre>
   &lt;component key="listener" type="org.acme.tutorial.DefaultListener"&gt;
     &lt;context&gt;
-      &lt;entry key="server" uri="<font color="darkred">lookup:org.acme.tutorial.Server</font>"/&gt;
+      &lt;entry key="server" lookup="<font color="darkred">org.acme.tutorial.Server</font>"/&gt;
     &lt;/context&gt;
   &lt;/component&gt;
 </pre>
