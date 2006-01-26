@@ -20,9 +20,10 @@ package org.acme.tutorial;
 
 import java.util.logging.Logger;
 
-import net.dpml.part.local.PartsManager;
-import net.dpml.part.local.Handler;
-import net.dpml.part.remote.Provider;
+import net.dpml.metro.PartsManager;
+import net.dpml.metro.ComponentHandler;
+
+import net.dpml.part.Provider;
 
 /**
  * 
@@ -41,7 +42,7 @@ public class ParentComponent
         for( int i=0; i<keys.length; i++ )
         {
             String key = keys[i];
-            Handler handler = parts.getComponentHandler( key );
+            ComponentHandler handler = parts.getComponentHandler( key );
             Provider provider = handler.getProvider();
             Object instance = provider.getValue( false );
             logger.info( "key: " + key + " (" + instance.getClass().getName() + ")" );

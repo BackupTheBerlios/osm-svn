@@ -23,13 +23,13 @@ import java.net.URI;
 
 import junit.framework.TestCase;
 
-import net.dpml.part.local.Controller;
-import net.dpml.part.remote.Component;
-import net.dpml.part.remote.Provider;
+import net.dpml.part.Controller;
+import net.dpml.part.Component;
+import net.dpml.part.Provider;
 
 import net.dpml.metro.data.ValueDirective;
-import net.dpml.metro.model.ComponentModel;
-import net.dpml.metro.model.MutableContextModel;
+import net.dpml.metro.ComponentModel;
+import net.dpml.metro.ContextManager;
 
 import org.acme.tutorial.SimpleWidget;
 
@@ -59,7 +59,7 @@ public class ManagementTestCase extends TestCase
         
         URI uri = new File( DIRECTORY, PATH ).toURI();
         ComponentModel model = (ComponentModel) CONTROLLER.createModel( uri );
-        MutableContextModel context = (MutableContextModel) model.getContextModel();
+        ContextManager context = (ContextManager) model.getContextModel();
         ValueDirective value = new ValueDirective( "java.lang.String", "car" );
         context.setEntryDirective( "target", value );
         

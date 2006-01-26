@@ -20,8 +20,8 @@ package org.acme.tutorial;
 
 import net.dpml.logging.Logger;
 
-import net.dpml.part.local.PartsManager;
-import net.dpml.part.local.Handler;
+import net.dpml.metro.PartsManager;
+import net.dpml.metro.ComponentHandler;
 
 /**
  * The demo class is used to aggregate a collection of components and 
@@ -62,13 +62,13 @@ public class Demo
     
     DefaultServer getServer() throws Exception
     {
-        Handler handler = m_parts.getComponentHandler( "server" );
+        ComponentHandler handler = m_parts.getComponentHandler( "server" );
         return (DefaultServer) handler.getProvider().getValue( false );
     }
     
     DefaultListener getListener() throws Exception
     {
-        Handler handler = m_parts.getComponentHandler( "listener" );
+        ComponentHandler handler = m_parts.getComponentHandler( "listener" );
         return (DefaultListener) handler.getProvider().getValue( false );
     }
 }

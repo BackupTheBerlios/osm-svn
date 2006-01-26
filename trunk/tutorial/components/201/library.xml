@@ -17,7 +17,7 @@
         </types>
         <dependencies scope="runtime">
           <include ref="dpml/util/dpml-logging-api"/>
-          <include ref="dpml/metro/dpml-part-api"/>
+          <include ref="dpml/metro/dpml-metro-model"/>
         </dependencies>
         <dependencies scope="test">
           <include ref="dpml/metro/dpml-metro-tools"/>

@@ -12,7 +12,7 @@
   </target>
 
   <target name="prepare" depends="standard.prepare">
-    <x:plugin uri="link:plugin:dpml/depot/dpml-depot-j2h">
+    <x:plugin uri="link:plugin:dpml/depot/dpml-depot-convert">
       <task name="convert" class="de.java2html.anttasks.Java2HtmlTask"/>
     </x:plugin>
     <convert srcdir="target/build/main" destdir="target/reports/src"/>
