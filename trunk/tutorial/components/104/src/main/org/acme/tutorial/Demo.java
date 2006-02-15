@@ -34,16 +34,20 @@ public class Demo
 {
     private final PartsManager m_parts;
     private final Logger m_logger;
+    private final DefaultServer m_server;
+    private final DefaultListener m_listener;
     
    /**
     * Creation of a new demo component.
     * @param logger a logging channel
     * @param parts the internal parts manager
     */
-    public Demo( Logger logger, PartsManager parts )
+    public Demo( Logger logger, PartsManager parts ) throws Exception
     {
         m_logger = logger;
         m_parts = parts;
+        m_server = getServer();
+        m_listener = getListener();
     }
     
    /**
@@ -56,8 +60,8 @@ public class Demo
     public int test( String message ) throws Exception
     {
         m_logger.debug( "test: " + message );
-        getServer().triggerNotify( message );
-        return getListener().getCount();
+        m_server.triggerNotify( message );
+        return m_listener.getCount();
     }
     
     DefaultServer getServer() throws Exception

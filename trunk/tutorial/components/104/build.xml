@@ -34,7 +34,7 @@
     </type>
     <component xmlns="metro" type="org.acme.tutorial.Demo" 
       dest="target/test/application.part" test="true" 
-      activation="true" collection="hard"/>
+      activation="STARTUP" collection="HARD"/>
   </target>
 
 </project>

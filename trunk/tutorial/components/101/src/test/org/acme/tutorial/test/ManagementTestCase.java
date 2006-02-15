@@ -29,7 +29,7 @@ import net.dpml.part.Provider;
 
 import net.dpml.metro.data.ValueDirective;
 import net.dpml.metro.ComponentModel;
-import net.dpml.metro.ContextManager;
+import net.dpml.metro.ContextModelManager;
 
 import org.acme.tutorial.SimpleWidget;
 
@@ -59,7 +59,7 @@ public class ManagementTestCase extends TestCase
         
         URI uri = new File( DIRECTORY, PATH ).toURI();
         ComponentModel model = (ComponentModel) CONTROLLER.createModel( uri );
-        ContextManager context = (ContextManager) model.getContextModel();
+        ContextModelManager context = (ContextModelManager) model.getContextModel();
         ValueDirective value = new ValueDirective( "java.lang.String", "car" );
         context.setEntryDirective( "target", value );
         

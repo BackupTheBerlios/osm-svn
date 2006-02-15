@@ -26,7 +26,7 @@
     </type>
     <component xmlns="metro" type="org.acme.tutorial.ParentComponent" 
       dest="target/test/parts.part" test="true" 
-      activation="true" collection="hard"/>
+      activation="STARTUP" collection="HARD"/>
   </target>
 
 </project>
