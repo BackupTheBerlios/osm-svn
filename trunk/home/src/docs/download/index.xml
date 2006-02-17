@@ -21,7 +21,7 @@
 
       </subsection>
 
-      <subsection name="Java JDK @JAVA-PRODUCT-VERSION@">
+      <subsection name="Java JDK @JAVA-PRODUCT-VERSION@ (or later)">
 
         <p>
         Products and tutorials included under this site require the installation of 
