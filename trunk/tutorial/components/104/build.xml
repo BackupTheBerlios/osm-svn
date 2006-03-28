@@ -7,7 +7,7 @@
   <transit:import uri="local:template:dpml/tools/standard"/>
 
   <target name="prepare" depends="standard.prepare">
-    <depot:plugin uri="link:plugin:dpml/depot/dpml-depot-convert">
+    <depot:plugin uri="link:part:dpml/depot/dpml-depot-convert">
       <task name="convert" class="de.java2html.anttasks.Java2HtmlTask"/>
     </depot:plugin>
     <convert srcdir="target/build/main" destdir="target/reports/src"/>
@@ -15,7 +15,7 @@
   </target>
 
   <target name="build" depends="standard.build">
-    <depot:plugin uri="link:plugin:dpml/metro/dpml-metro-tools" urn="metro"/>
+    <depot:plugin uri="link:part:dpml/metro/dpml-metro-tools" urn="metro"/>
     <type xmlns="metro" name="server" class="org.acme.tutorial.DefaultServer" lifestyle="singleton"/>
     <type xmlns="metro" name="listener" class="org.acme.tutorial.DefaultListener" lifestyle="singleton"/>
     <type xmlns="metro" name="demo" class="org.acme.tutorial.Demo" lifestyle="singleton">

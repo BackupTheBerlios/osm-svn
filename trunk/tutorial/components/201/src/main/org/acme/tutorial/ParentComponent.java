@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import net.dpml.metro.PartsManager;
 import net.dpml.metro.ComponentHandler;
 
-import net.dpml.part.Provider;
+import net.dpml.component.Provider;
 
 /**
  * 

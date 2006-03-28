@@ -8,11 +8,11 @@
   <transit:import uri="local:template:dpml/tools/standard"/>
 
   <target name="init" depends="standard.init">
-    <x:plugin uri="link:plugin:dpml/metro/dpml-metro-tools"/>
+    <x:plugin uri="link:part:dpml/metro/dpml-metro-tools"/>
   </target>
 
   <target name="prepare" depends="standard.prepare">
-    <x:plugin uri="link:plugin:dpml/depot/dpml-depot-convert">
+    <x:plugin uri="link:part:dpml/depot/dpml-depot-convert">
       <task name="convert" class="de.java2html.anttasks.Java2HtmlTask"/>
     </x:plugin>
     <convert srcdir="target/build/main" destdir="target/reports/src"/>
@@ -34,7 +34,7 @@
   <target name="checkstyle" depends="prepare">
     <property name="checkstyle.dir" location="${basedir}/target/reports/checkstyle"/>
     <property name="checkstyle.data" location="${checkstyle.dir}/checkstyle.xml"/>
-    <x:plugin uri="link:plugin:dpml/depot/dpml-depot-checkstyle">
+    <x:plugin uri="link:part:dpml/depot/dpml-depot-checkstyle">
       <task class="net.dpml.tools.checkstyle.CheckstyleTask" name="checkstyle"/>
     </x:plugin>
     <mkdir dir="${checkstyle.dir}"/>
@@ -50,6 +50,5 @@
       <param name="output.dir" expression="${checkstyle.dir}"/>
     </xslt>
   </target>
-
 
 </project>

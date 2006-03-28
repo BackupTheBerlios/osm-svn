@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-
-<library>
+<library xmlns="artifact:xsd:dpml/lang/dpml-module#1.0" 
+    xmlns:part="artifact:xsd:dpml/lang/dpml-part#1.0">
 
   <imports>
+    <import uri="link:module:junit"/>
     <import uri="link:module:ant"/>
     <import uri="link:module:dpml"/>
   </imports>
@@ -10,10 +11,6 @@
   <modules>
 
     <module name="osm" basedir=".">
-
-      <types>
-        <type id="module" alias="true"/>
-      </types>
 
       <properties>
         <property name="project.publisher.name" value="OSM"/>
@@ -28,7 +25,9 @@
         <property name="project.svn.host" value="svn://svn.berlios.de/osm/trunk"/>
       </properties>
 
-      <!--<module base="tutorial"/>-->
+      <types>
+        <type id="module" alias="true"/>
+      </types>
 
       <project name="home" basedir="home"/>
    

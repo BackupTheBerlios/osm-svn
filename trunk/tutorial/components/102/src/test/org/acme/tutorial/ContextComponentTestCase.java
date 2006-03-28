@@ -24,9 +24,9 @@ import java.net.URI;
 
 import junit.framework.TestCase;
 
-import net.dpml.part.Controller;
-import net.dpml.part.Component;
-import net.dpml.part.Provider;
+import net.dpml.component.Controller;
+import net.dpml.component.Component;
+import net.dpml.component.Provider;
 
 import org.acme.tutorial.ContextTestComponent.Context;
 
