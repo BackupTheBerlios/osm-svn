@@ -8,104 +8,94 @@
 
   <body>
 
-    <section name="Transit Plugin Management">
+    <section name="Transit Part Management">
 
       <subsection name="Tutorial Objective">
 
         <p>
         The aim of this tutorial is to establish a good understanding 
-        of the term "plugin" and how plugin management can help you 
+        of the term "part" and how part management can help you 
         to build flexible and adaptive runtime system by leaveraging
         Transit's cassloader construction services.
         </p>
 
       </subsection>
 
-      <subsection name="Definition of a Plugin">
+      <subsection name="Definition of a Part">
 
         <p>
-        A <code>plugin</code> is an resource type that is used to describe 
-        a classloader chain.  The plugin resource is a property file that 
+        A <code>part</code> is an resource type that is used to describe 
+        a classloader chain.  The part resource is an XML file that 
         declares the contents of an PUBLIC classloader, PROTECTED classloader, 
-        and an PRIVATE implementation classloader. Each classloader defintion is 
+        and an PRIVATE implementation classloader. Each classloader definition is 
         expressed as a series of jar artifact uris.  Transit provides 
         support for the construction of classloader chains based on the 
-        information contained within the plugin resource.  A chain is 
+        information contained within the part definition.  A chain is 
         constructed by creating an PUBLIC classloader as child of a supplied 
-        parent classloader, an PROTECTED classloader as a child of the PUBLIC classloader, 
+        parent classloader, a PROTECTED classloader as a child of the PUBLIC classloader, 
         and a PRIVATE implementation classloader as a child of the PROTECTED classloader.
         </p>
 
         <p>
-        In additon to classloader chain information, a plugin resource can 
-        include the declaration of a main class or resource.  The combination 
-        of classloader chain with a loadable target (class or resource) combines 
+        In additon to classloader chain information, a part resource can 
+        include the declaration of a deployment strategy.  The Transit system provides support
+        for 'plugin' strategies that enable declaration of a main class or resource.  The 
+        combination of classloader chain with a deployment strategy combines 
         to provide a framework for plugable sub-systems deployment.
         </p>
 
       </subsection>
 
-      <subsection name="A sample plugin resource">
+      <subsection name="A sample part resource">
 
         <p>
-        The following property file is an example of a plugin resource.  The 
-        example is a development version of the plugin resource used to mount the 
+        The following file is an example of a part resource.  The 
+        example is a development version of the part resource used to mount the 
         runtime controller that executes within the Metro component management 
         platform.
         </p>
 
-        <source>
+        <source><![CDATA[<?xml version="1.0"?>
 
-#
-# Specification classifier.
-#
-dpml.plugin.meta.namespace = net.dpml
-dpml.plugin.meta.version = 1.0
+<part xmlns="artifact:xsd:dpml/lang/dpml-part#1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-#
-# Artifact descriptor.
-#
-dpml.artifact.group = dpml/metro
-dpml.artifact.name = dpml-metro-runtime
-dpml.artifact.version = 20051228
-dpml.artifact.signature = 20051227.175001
+  <info title="Untitled">
+    <description></description>
+  </info>
 
-#
-# Type.
-#
-dpml.plugin.class = net.dpml.metro.runtime.CompositionController
+  <strategy xsi:type="plugin" class="net.dpml.metro.runtime.CompositionController"/>
 
-#
-# Public.
-#
-dpml.artifact.dependency.api.0 = artifact:jar:dpml/util/dpml-logging-api#20051228
+  <classpath>
+    <public>
+      <uri>artifact:jar:dpml/util/dpml-logging-api#1.0.0-RC4</uri>
+    </public>
+    <protected>
+      <uri>artifact:jar:dpml/metro/dpml-state-api#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/util/dpml-job-api#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/transit/dpml-transit-main#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/metro/dpml-metro-component#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/util/dpml-parameters-api#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/util/dpml-configuration-api#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/metro/dpml-metro-model#1.0.0-RC4</uri>
+    </protected>
+    <private>
+      <uri>artifact:jar:dpml/util/dpml-parameters-impl#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/util/dpml-configuration-impl#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/util/dpml-job-impl#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/metro/dpml-state-impl#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/depot/dpml-library#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/metro/dpml-metro-builder#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/metro/dpml-metro-runtime#1.0.0-RC4</uri>
+    </private>
+  </classpath>
 
-#
-# Protected.
-#
-dpml.artifact.dependency.spi.0 = artifact:jar:dpml/metro/dpml-state-api#20051228
-dpml.artifact.dependency.spi.1 = artifact:jar:dpml/transit/dpml-transit-main#20051228
-dpml.artifact.dependency.spi.2 = artifact:jar:dpml/metro/dpml-part-api#20051228
-dpml.artifact.dependency.spi.3 = artifact:jar:dpml/util/dpml-parameters-api#20051228
-dpml.artifact.dependency.spi.4 = artifact:jar:dpml/util/dpml-configuration-api#20051228
-dpml.artifact.dependency.spi.5 = artifact:jar:dpml/metro/dpml-metro-model#20051228
-
-#
-# Private.
-#
-dpml.artifact.dependency.0 = artifact:jar:dpml/util/dpml-parameters-impl#20051228
-dpml.artifact.dependency.1 = artifact:jar:dpml/util/dpml-configuration-impl#20051228
-dpml.artifact.dependency.2 = artifact:jar:dpml/metro/dpml-state-impl#20051228
-dpml.artifact.dependency.3 = artifact:jar:dpml/metro/dpml-metro-runtime#20051228
-
-#
-# EOF.
-#
-        </source>
+</part>
+]]></source>
 
       </subsection>
 
-      <subsection name="Plugin Creation">
+      <subsection name="Part Creation">
 
         <p>
         In practice the creation and maintenance of plugin information is highly 
@@ -113,27 +103,25 @@ dpml.artifact.dependency.3 = artifact:jar:dpml/metro/dpml-metro-runtime#20051228
         of the driving factors in the development of the Depot build system.  Depot 
         was developed from the ground up to provided full transitive 
         dependency management across build, runtime and test scopes. Using the 
-        Depot project model the job of creating a 
-        plugin definition is reduced down to type production declaration within a 
-        project definition.
+        Depot project model the job of creating a plugin definition is reduced down 
+        to type production declaration within a project definition.
         </p>
 
 <pre>
   &lt;project name="dpml-metro-runtime" basedir="runtime"&gt;
     &lt;types&gt;
       &lt;type id="jar"/&gt;
-      <font color="darkred">&lt;type id="plugin"&gt;
-        &lt;property name="project.plugin.class" 
-           value="net.dpml.metro.runtime.CompositionController"/&gt;
-      &lt;/type&gt;</font>
+      <font color="darkred">&lt;part:plugin alias="true" class="net.dpml.metro.runtime.CompositionController"/&gt;</font>
     &lt;/types&gt;
     &lt;dependencies&gt;
       &lt;include ref="dpml/util/dpml-logging-api" tag="public"/&gt;
       &lt;include ref="dpml/util/dpml-parameters-impl"/&gt;
       &lt;include ref="dpml/util/dpml-configuration-impl"/&gt;
-      &lt;include key="dpml-state-impl"/&gt;
-      &lt;include key="dpml-part-api" tag="protected"/&gt;
+      &lt;include ref="dpml/util/dpml-job-impl"/&gt;
+      &lt;include key="dpml-metro-component" tag="protected"/&gt;
       &lt;include key="dpml-metro-model" tag="protected"/&gt;
+      &lt;include key="dpml-state-impl"/&gt;
+      &lt;include key="dpml-metro-builder" tag="protected"/&gt;
     &lt;/dependencies&gt;
     &lt;dependencies scope="test"&gt;
       &lt;include ref="ant/ant-junit"/&gt;
