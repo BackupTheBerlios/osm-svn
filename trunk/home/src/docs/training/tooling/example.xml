@@ -41,7 +41,8 @@
               declare that they each produce jar resources, and that the acme-system 
               project is dependent on the acme-client project.
 <source><![CDATA[
-<library>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<library xmlns="artifact:xsd:dpml/lang/dpml-module#1.0">
 
   <modules>
 

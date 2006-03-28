@@ -29,7 +29,7 @@
         </p>
 
 <source>
-&lt;library&gt;
+&lt;library xmlns="artifact:xsd:dpml/lang/dpml-module#1.0"&gt;
 
   &lt;imports&gt;
     &lt;import uri="link:module:ant"/&gt;

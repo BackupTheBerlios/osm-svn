@@ -93,7 +93,7 @@ public class DefaultWidgetTestCase extends TestCase
         </ol>
 
 <source>
-&lt;library&gt;
+&lt;library xmlns="artifact:xsd:dpml/lang/dpml-module#1.0"&gt;
 
   <font color="darkred">&lt;imports&gt;
     &lt;import uri="link:module:ant"/&gt;
