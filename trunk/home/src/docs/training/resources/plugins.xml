@@ -147,11 +147,10 @@
         </p>
 
         <source>
-  Logger logger = getLogger();
-  ClassLoader classloader = Thread.currentThread().getContextClassLoader();
   URI uri = new URI( "@METRO-RUNTIME-URI@" );
-  Repository repository = Transit.getInstance().getRepository();
-  m_handler = (ContentHandler) repository.getPlugin( classloader, uri, new Object[]{ logger } );
+  Part part = Part.load( uri );
+  Logger logger = getLogger();
+  m_handler = (ContentHandler) part.instantiate( new Object[]{ logger } );
         </source>
 
         <p>
@@ -162,16 +161,15 @@
           <li>Establish the classloader that will serve as the anchor for the classloader chain.</li>
           <li>Create an artifact URI referencing a "plugin" resource.</li>
           <li>Construct any objects that should be supplied as constructor arguments.</li>
-          <li>Get the reference to the Transit plugin service.</li>
-          <li>Request plugin creation using anchor classloader, the uri, and the constructor arguments.</li>
+          <li>Load the part definition.</li>
+          <li>Request part instantiation using supplied constructor arguments.</li>
         </ol>
 
         <p>
         Within production applications you would typically see a reasonable amount of error 
         handling code wrapping the above code framgment.  The error handling code would typically 
         handle validation of the plugin either prior to instantiation or part of a try catch block, 
-        type checking, etc.  For additional details see the net.dpml.transit.Repository 
-        interface documentation.
+        type checking, etc.
         </p>
 
       </subsection>
