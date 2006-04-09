@@ -21,11 +21,17 @@
           <type id="jar"/>
         </types>
         <dependencies>
-          <include key="acme-client"/>
+          <runtime>
+            <include key="acme-client"/>
+          </runtime>
+          <test>
+            <include ref="ant/ant-junit"/>
+          </test>
         </dependencies>
-        <dependencies scope="test">
-          <include ref="ant/ant-junit"/>
-        </dependencies>
+        <filters>
+          <filter token="COLOR" value="red"/>
+          <feature token="NAME" id="name"/>
+        </filters>
       </project>
       
     </module>

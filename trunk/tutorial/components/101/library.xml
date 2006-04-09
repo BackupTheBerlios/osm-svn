@@ -15,8 +15,10 @@
         <types>
           <type id="jar"/>
         </types>
-        <dependencies scope="test">
-          <include ref="dpml/metro/dpml-metro-tools"/>
+        <dependencies>
+          <test>
+            <include ref="dpml/metro/dpml-metro-tools"/>
+          </test>
         </dependencies>
       </project>
     

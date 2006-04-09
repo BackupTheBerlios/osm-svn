@@ -17,7 +17,9 @@
           <type id="jar"/>
         </types>
         <dependencies>
-          <include key="acme-client"/>
+          <runtime>
+            <include key="acme-client"/>
+          </runtime>
         </dependencies>
       </project>
       

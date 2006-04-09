@@ -21,10 +21,12 @@
           <type id="jar"/>
         </types>
         <dependencies>
-          <include key="acme-client"/>
-        </dependencies>
-        <dependencies scope="test">
-          <include ref="ant/ant-junit"/>
+          <runtime>
+            <include key="acme-client"/>
+          </runtime>
+          <test>
+            <include ref="ant/ant-junit"/>
+          </test>
         </dependencies>
       </project>
       
