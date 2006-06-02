@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<configuration xmlns="@PROJECT-XSD-URI@"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:this="@PROJECT-XSD-URI@" 
+    xmlns:part="@PART-XSD-URI@"> 
+
+  <!-- client products -->
+
+  <dir name="project.basedir" path="${basedir}">
+    <info title="Project base directory.">
+      <description>
+      Project source base directory from which the working
+      target drectory is established.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="src.main" path="${project.src.main.dir}">
+    <info title="Project main source directory.">
+      <description>
+      Project source for primary content to be added to the 
+      normalized ${target.build.main.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="src.test" path="${project.src.test.dir}">
+    <info title="Project test source director.">
+      <description>
+      Project source for test content to be added to the 
+      normalized ${target.build.test.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="etc.main" path="${project.etc.main.dir}">
+    <info title="Project supplimentary main content directory.">
+      <description>
+      Project source for supplimentary content to be added to the 
+      normalized ${target.build.main.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="etc.test" path="${project.etc.test.dir}">
+    <info title="Project supplimentary test content directory.">
+      <description>
+      Project source for supplimentary test content to be added to the 
+      normalized ${target.build.test.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <!-- normalized products -->
+  
+  <dir name="target.dir" path="${project.basedir}/target"/>
+  <dir name="target.test.dir" path="${target.dir}/test"/>
+  <dir name="target.reports.dir" path="${target.dir}/reports"/>
+  <dir name="target.reports.test.dir" path="${target.reports.dir}/test"/>
+  <dir name="target.build.dir" path="${target.dir}/build"/>
+  <dir name="target.build.main.dir" path="${target.build.dir}/main"/>
+  <dir name="target.build.test.dir" path="${target.build.dir}/test"/>
+  <dir name="target.classes.dir" path="${target.dir}/classes"/>
+  <dir name="target.classes.main.dir" path="${target.classes.dir}/main"/>
+  <dir name="target.classes.test.dir" path="${target.classes.dir}/test"/>
+  <dir name="target.deliverables.dir" path="${target.dir}/deliverables"/>
+  
+  <file name="target.deliverables.jar" type="jar" base="target.deliverables.dir"/>
+  <file name="target.deliverables.part" type="part" base="target.deliverables.dir"/>
+  
+  <collection name="all" criteria="file">
+    <info title="All deliverable products.">
+      <description>
+      Collection of all deliverable files associated with a project.
+      </description>
+    </info>
+    <include name="*"/>
+  </collection>
+  
+  <!-- processes -->
+  
+  <process name="init" class="net.dpml.tools.process.InitializationProcess"
+      produces="target.dir">
+    <consumes>
+      <input id="project.basedir"/>
+    </consumes>
+  </process>
+  
+  <process name="install" class="net.dpml.tools.process.InstallProcess"/>
+  
+  <process name="prepare-main" class="net.dpml.tools.process.PrepareMainProcess"
+      produces="target.build.main.dir">
+    <dependencies>
+      <dependency id="init"/>
+    </dependencies>
+    <consumes>
+      <input xsi:type="Selection" id="etc.main" filtering="false">
+        <include name="**/*.exe,**/*.jar*,**/*.dll,**/*.gif,**/*.jpeg,**/*.jpg,**/*.ico,**/*.png,**/*.keystore"/>
+      </input>
+      <input xsi:type="Selection" id="etc.main" filtering="true">
+        <exclude name="**/*.exe,**/*.jar*,**/*.dll,**/*.gif,**/*.jpeg,**/*.jpg,**/*.ico,**/*.png,**/*.keystore"/>
+      </input>
+    </consumes>
+  </process>
+  
+  <process name="prepare-test" class="net.dpml.tools.process.PrepareTestProcess"
+      produces="target.build.test.dir">
+    <dependencies>
+      <dependency id="init"/>
+    </dependencies>
+    <consumes policy="conditional">
+      <input id="target.build.main.dir"/>
+      <input id="src.test" policy="optional"/>
+    </consumes>
+  </process>
+  
+  <process name="compile-main" class="net.dpml.tools.process.CompileMainProcess" implicit="true"
+      produces="target.classes.main.dir">
+    <consumes>
+      <input xsi:type="Selection" id="target.build.main.dir" policy="conditional">
+        <include name="**/*.java,**/package.html"/>
+      </input>
+    </consumes>
+  </process>
+  
+  <process name="compile-test" class="net.dpml.tools.process.CompileTestProcess" implicit="true"
+      produces="target.classes.test.dir">
+    <consumes>
+      <input id="target.classes.main.dir"/>
+      <input xsi:type="Selection" id="target.build.test.dir" policy="conditional">
+        <include name="**/*.java"/>
+      </input>
+    </consumes>
+  </process>
+  
+  <process name="setup-junit" class="net.dpml.tools.process.PrepareJUnitProcess"
+      produces="target.test.dir">
+    <dependencies>
+      <dependency id="prepare-test"/>
+    </dependencies>
+    <consumes policy="conditional">
+      <input id="etc.test"/>
+    </consumes>
+  </process>
+  
+  <process name="jar" class="net.dpml.tools.process.JarProcess"
+      produces="target.deliverables.jar">
+    <consumes>
+      <input id="target.deliverables.dir"/>
+      <input id="target.classes.main.dir" policy="conditional"/>
+    </consumes>
+    <validators>
+      <include id="junit"/>
+    </validators>
+    <params xsi:type="this:jar" index="true" compress="true">
+      <include name="**/*.*"/>
+      <exclude name="**/package.html"/>
+    </params>
+  </process>
+  
+  <process name="junit" class="net.dpml.tools.process.JUnitProcess"
+      produces="target.reports.test.dir">
+    <dependencies>
+      <dependency id="jar"/>
+      <dependency id="compile-test"/>
+    </dependencies>
+    <consumes>
+      <input id="target.test.dir"/>
+      <input id="target.classes.test.dir" policy="conditional"/>
+    </consumes>
+    <params xsi:type="this:junit"/>
+  </process>
+  
+  <process name="rmic" class="net.dpml.tools.process.RMICProcess">
+    <dependencies>
+      <dependency id="compile-main"/>
+    </dependencies>
+    <consumes>
+      <input id="target.classes.main.dir" policy="conditional"/>
+    </consumes>
+    <params xsi:type="this:rmic"/>
+  </process>
+  
+  <process name="part" class="net.dpml.tools.process.PartProcess"
+      produces="target.deliverables.part">
+    <consumes>
+      <input id="target.classes.main.dir"/>
+    </consumes>
+  </process>
+  <!--
+  -->
+  
+</configuration>

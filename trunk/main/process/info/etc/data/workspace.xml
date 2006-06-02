@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<workspace name="project" path="." xmlns="@PROJECT-XSD-URI@"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:this="@PROJECT-XSD-URI@"> 
+
+  <!-- project directories -->
+
+  <dir name="src.main" path="src/main">
+    <info title="Project main source directory.">
+      <description>
+      Project source for primary content to be added to the 
+      normalized ${target.build.main.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="src.test" path="src/test">
+    <info title="Project test source director.">
+      <description>
+      Project source for test content to be added to the 
+      normalized ${target.build.test.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="etc.main" path="etc/main">
+    <info title="Project supplimentary main content directory.">
+      <description>
+      Project source for supplimentary content to be added to the 
+      normalized ${target.build.main.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="etc.test" path="etc/test">
+    <info title="Project supplimentary test content directory.">
+      <description>
+      Project source for supplimentary test content to be added to the 
+      normalized ${target.build.test.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="etc.prefs" path="etc/prefs">
+    <info title="Project preferences directory.">
+      <description>
+      Project source directory for preference data.
+      </description>
+    </info>
+  </dir>
+  
+  <dir name="etc.docs" path="etc/docs">
+    <info title="Project supplimentary doc content directory.">
+      <description>
+      Project source for supplimentary documentation content to be added to the 
+      normalized ${target.build.docs.dir} directory.
+      </description>
+    </info>
+  </dir>
+  
+  <workspace name="target" path="target">
+    <workspace name="test" path="test"/>
+    <workspace name="build" path="build">
+      <dir name="main" path="main"/>
+      <dir name="test" path="test"/>
+      <dir name="docs" path="docs"/>
+    </workspace>
+    <workspace name="classes" path="classes">
+      <dir name="main" path="main"/>
+      <dir name="test" path="test"/>
+    </workspace>
+    <workspace name="reports" path="reports">
+      <dir name="test" path="test"/>
+    </workspace>
+    <workspace name="cache" path="cache"/>
+    <workspace name="prefs" path="prefs"/>
+    <workspace name="docs" path="docs"/>
+    <workspace name="bin" path="bin"/>
+  </workspace>
+  
+</workspace>

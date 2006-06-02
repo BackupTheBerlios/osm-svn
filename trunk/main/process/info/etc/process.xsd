@@ -1,0 +1,220 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:this="@PROJECT-XSD-URI@"
+    targetNamespace="@PROJECT-XSD-URI@"
+    elementFormDefault="qualified">
+        
+    <element name="configuration" type="this:ConfigurationType"/>
+    
+    <element name="process" type="this:ProcessType"/>
+    <element name="product" type="this:ProductType"/>
+    
+    <element name="dir" type="this:DirectoryType" substitutionGroup="this:product"/>
+    <element name="file" type="this:FileType" substitutionGroup="this:product"/>
+    <element name="collection" type="this:CollectionType" substitutionGroup="this:product"/>
+    <element name="workspace" type="this:WorkspaceType" substitutionGroup="this:product"/>
+    
+    <!-- top-level configuration definitions -->
+    
+    <complexType name="ConfigurationType">
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="this:product"/>
+        <element ref="this:process"/>
+      </choice>
+    </complexType>
+
+    <!-- abstract base -->
+    
+    <complexType name="DescriptionType">
+      <simpleContent>
+        <extension base="string"/>
+      </simpleContent>
+    </complexType>
+    
+    <complexType name="InfoType">
+      <sequence>
+        <element name="description" type="this:DescriptionType" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="title" type="string"/>
+    </complexType>
+    
+    <complexType name="BaseType" abstract="true">
+      <sequence>
+        <element name="info" type="this:InfoType" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="name" type="string" use="required"/>
+    </complexType>
+    
+    <complexType name="ProductType" abstract="true">
+      <complexContent>
+        <extension base="this:BaseType"/>
+      </complexContent>
+    </complexType>
+    
+    <!-- product definitions -->
+    
+    <complexType name="DirectoryType">
+      <complexContent>
+        <extension base="this:ProductType">
+          <attribute name="path" type="string" use="required"/>
+        </extension>
+      </complexContent>
+    </complexType>
+    
+    <complexType name="WorkspaceType">
+      <complexContent>
+        <extension base="this:DirectoryType">
+          <choice minOccurs="0" maxOccurs="unbounded">
+            <element ref="this:product"/>
+          </choice>
+        </extension>
+      </complexContent>
+    </complexType>
+    
+    <complexType name="FileType">
+      <complexContent>
+        <extension base="this:ProductType">
+          <attribute name="type" type="string" use="required"/>
+          <attribute name="base" type="string" use="required"/>
+        </extension>
+      </complexContent>
+    </complexType>
+    
+    <complexType name="CollectionType">
+      <complexContent>
+        <extension base="this:ProductType">
+          <choice minOccurs="0" maxOccurs="unbounded">
+            <element name="include" type="this:SelectorType"/>
+            <element name="exclude" type="this:SelectorType"/>
+          </choice>
+          <attribute name="defaultIncludes" type="string"/>
+          <attribute name="defaultExcludes" type="string"/>
+          <attribute name="criteria" type="this:criteria" default="any"/>
+        </extension>
+      </complexContent>
+    </complexType>
+
+    <simpleType name="criteria">
+      <restriction base="string">
+        <enumeration value="any"/>
+        <enumeration value="file"/>
+        <enumeration value="dir"/>
+      </restriction>
+    </simpleType>
+
+    <!-- generic process definition -->
+    
+    <complexType name="ProcessType">
+      <complexContent>
+        <extension base="this:BaseType">
+          <sequence>
+            <element name="dependencies" type="this:DependenciesType" minOccurs="0" maxOccurs="1"/>
+            <element name="consumes" type="this:ConsumesType" minOccurs="0" maxOccurs="1"/>
+            <element name="validators" type="this:ValidatorsType" minOccurs="0" maxOccurs="1"/>
+            <element name="params" type="anyType" minOccurs="0" maxOccurs="1"/>
+          </sequence>
+          <attribute name="class" type="string" use="required"/>
+          <attribute name="implicit" type="boolean" default="false"/>
+          <attribute name="produces" type="string" use="optional"/>
+        </extension>
+      </complexContent>
+    </complexType>
+    
+    <complexType name="DependenciesType">
+      <sequence>
+        <element name="dependency" type="this:DependencyType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+    
+    <complexType name="ValidatorsType">
+      <sequence>
+        <element name="include" type="this:DependencyType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+    
+    <complexType name="ConsumesType">
+      <sequence>
+        <element name="input" type="this:InputType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+      <attribute name="policy" type="this:PolicyType"/>
+    </complexType>
+    
+    <complexType name="ProducesType">
+      <attribute name="id" type="string" use="required"/>
+    </complexType>
+    
+    <complexType name="DependencyType">
+      <attribute name="id" type="string" use="required"/>
+    </complexType>
+    
+    <complexType name="InputType">
+      <attribute name="id" type="string" use="required"/>
+      <attribute name="policy" type="this:PolicyType" default="optional"/>
+      <attribute name="filtering" type="boolean" default="false"/>
+    </complexType>
+    
+    <complexType name="Selection">
+      <complexContent>
+        <extension base="this:InputType">
+          <choice minOccurs="0" maxOccurs="unbounded">
+            <element name="include" type="this:SelectorType"/>
+            <element name="exclude" type="this:SelectorType"/>
+          </choice>
+          <attribute name="defaultIncludes" type="string"/>
+          <attribute name="defaultExcludes" type="string"/>
+        </extension>
+      </complexContent>
+    </complexType>
+
+    <complexType name="SelectorType">
+      <attribute name="name" type="string"/>
+    </complexType>
+    
+    <complexType name="OutputType">
+      <attribute name="id" type="string"/>
+    </complexType>
+    
+    <simpleType name="PolicyType">
+      <restriction base="string">
+        <enumeration value="optional"/>
+        <enumeration value="conditional"/>
+      </restriction>
+    </simpleType>
+    
+    <complexType name="SelectionParameters" abstract="true">
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element name="include" type="this:SelectorType"/>
+        <element name="exclude" type="this:SelectorType"/>
+      </choice>
+      <attribute name="defaultIncludes" type="string"/>
+      <attribute name="defaultExcludes" type="string"/>
+    </complexType>
+    
+    <!-- specialized production types -->
+
+    <complexType name="rmic">
+      <complexContent>
+        <extension base="this:SelectionParameters"/>
+      </complexContent>
+    </complexType>
+    
+    <complexType name="junit">
+      <complexContent>
+        <extension base="this:SelectionParameters">
+          <attribute name="fork" type="boolean" use="optional" default="false"/>
+        </extension>
+      </complexContent>
+    </complexType>
+    
+    <complexType name="jar">
+      <complexContent>
+        <extension base="this:SelectionParameters">
+          <attribute name="compress" type="boolean" use="optional" default="true"/>
+          <attribute name="index" type="boolean" use="optional" default="true"/>
+        </extension>
+      </complexContent>
+    </complexType>
+    
+</schema>
+

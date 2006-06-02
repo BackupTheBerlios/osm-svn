@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<module name="process"
+    xmlns="link:xsd:dpml/lang/dpml-module#1.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+
+  <project name="osm-process-info" basedir="info">
+    <types>
+      <type id="xsd"/>
+      <type id="jar"/>
+    </types>
+    <dependencies>
+      <runtime>
+        <include ref="dpml/transit/dpml-transit-main"/>
+      </runtime>
+      <test>
+        <include ref="ant/ant-junit"/>
+      </test>
+    </dependencies>
+    <filters>
+      <feature token="PROJECT-XSD-URI" id="uri" type="xsd"/>
+      <feature token="PART-XSD-URI" id="uri" type="xsd" ref="dpml/lang/dpml-part"/>
+    </filters>
+  </project>
+
+</module>
