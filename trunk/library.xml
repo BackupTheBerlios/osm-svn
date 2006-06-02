@@ -25,11 +25,8 @@
         <property name="project.svn.host" value="svn://svn.berlios.de/osm/trunk"/>
       </properties>
 
-      <types>
-        <type id="module" alias="true"/>
-      </types>
-
       <project name="home" basedir="home"/>
+      
       <module file="main/process/module.xml"/>
    
     </module>

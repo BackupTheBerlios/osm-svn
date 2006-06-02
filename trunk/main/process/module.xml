@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+
 <module name="process"
     xmlns="link:xsd:dpml/lang/dpml-module#1.0" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
 
+  <types>
+    <type id="module" alias="true"/>
+  </types>
+
   <project name="osm-process-info" basedir="info">
     <types>
-      <type id="xsd"/>
+      <type id="xsd" alias="true"/>
       <type id="jar"/>
     </types>
     <dependencies>
@@ -17,9 +22,9 @@
       </test>
     </dependencies>
     <filters>
-      <feature token="PROJECT-XSD-URI" id="uri" type="xsd"/>
-      <feature token="PART-XSD-URI" id="uri" type="xsd" ref="dpml/lang/dpml-part"/>
+      <feature token="PROJECT-XSD-URI" id="uri" type="xsd" alias="true"/>
+      <feature token="PART-XSD-URI" id="uri" type="xsd" ref="dpml/lang/dpml-part" alias="true"/>
     </filters>
   </project>
-
+    
 </module>
