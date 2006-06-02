@@ -56,37 +56,32 @@
         </p>
 
         <source><![CDATA[<?xml version="1.0"?>
-
-<part xmlns="artifact:xsd:dpml/lang/dpml-part#1.0"
+<part xmlns="link:xsd:dpml/lang/dpml-part#1.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-  <info title="Untitled">
-    <description></description>
+  <info title="Metro Container Runtime">
+    <description>DPML Component management platform runtime container.</description>
   </info>
 
-  <strategy xsi:type="plugin" class="net.dpml.metro.runtime.CompositionController"/>
+  <strategy xsi:type="plugin" class="net.dpml.metro.runtime.CompositionController">
+    <param class="net.dpml.component.InitialContext"/>
+  </strategy>
 
   <classpath>
     <public>
-      <uri>artifact:jar:dpml/util/dpml-logging-api#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/util/dpml-logging-api#1.0.0-RC8</uri>
     </public>
     <protected>
-      <uri>artifact:jar:dpml/metro/dpml-state-api#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/util/dpml-job-api#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/transit/dpml-transit-main#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/metro/dpml-metro-component#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/util/dpml-parameters-api#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/util/dpml-configuration-api#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/metro/dpml-metro-model#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/metro/dpml-state-api#1.0.0-RC8</uri>
+      <uri>artifact:jar:dpml/metro/dpml-job-api#1.0.0-RC8</uri>
+      <uri>artifact:jar:dpml/transit/dpml-transit-main#1.0.0-RC8</uri>
+      <uri>artifact:jar:dpml/metro/dpml-metro-component#1.0.0-RC8</uri>
+      <uri>artifact:jar:dpml/metro/dpml-metro-model#1.0.0-RC8</uri>
     </protected>
     <private>
-      <uri>artifact:jar:dpml/util/dpml-parameters-impl#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/util/dpml-configuration-impl#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/util/dpml-job-impl#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/metro/dpml-state-impl#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/depot/dpml-library#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/metro/dpml-metro-builder#1.0.0-RC4</uri>
-      <uri>artifact:jar:dpml/metro/dpml-metro-runtime#1.0.0-RC4</uri>
+      <uri>artifact:jar:dpml/metro/dpml-job-impl#1.0.0-RC8</uri>
+      <uri>artifact:jar:dpml/metro/dpml-state-impl#1.0.0-RC8</uri>
+      <uri>artifact:jar:dpml/metro/dpml-metro-runtime#1.0.0-RC8</uri>
     </private>
   </classpath>
 

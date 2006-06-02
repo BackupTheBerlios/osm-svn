@@ -42,7 +42,7 @@
               project is dependent on the acme-client project.
 <source><![CDATA[
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<library xmlns="artifact:xsd:dpml/lang/dpml-module#1.0">
+<library xmlns="link:xsd:dpml/lang/dpml-module#1.0">
 
   <modules>
 
@@ -250,15 +250,16 @@ $
               followed by the server project (dependent on the client project).</li>
           <li>The builder loads a build tool - in this case its the default 
               Ant-based builder and requests a build of each project in the selection.</li>
-          <li>Control passed to the Ant builder which evaluates the types declared by
-              the supplied project definition and from this information associates
-              build listeners responsible for the creation of declared output artifacts.</li>
+          <li>Control passed to the Ant builder which executes codebase preparation through
+              of process of structure normalization (during which a working structure is 
+              under the <tt>${basedir}/target</tt> directory. The buildfile includes a
+              template which declares a series of standard build phases which invoke 
+              some Depot tasks dealing with type production, validation and installation.</li>
           <li>In this particular example we have not declared a build file as such 
               therfore a default template will be used.</li>
           <li>The build is initiated with a default target which in turn triggers
-              our build listeners in accordance with a series of standard build 
-              phases declared within the template (initialization, code preparation, 
-              build, packaging, testing, and finally instalation).</li>
+              association of any build listeners declared in the depot configuration and 
+              execution of the tasks included in the template.</li>
         </ol>
 
       </subsection>
@@ -269,7 +270,7 @@ $
         If you take a look at each of the projects you will notice a new 
         directory named ${basedir}/target has been created.  This holds working
         content produced during the build process.  The main results are contained
-        in the <tt>${basedir}/target/deliverables</tt> directory.  In case both projects 
+        in the <tt>${basedir}/target/deliverables</tt> directory.  In this example both projects 
         are producing jar files which we can find in ${basedir}/target/deliverables/jars
         and are copies under ${dpml.cache}/acme/jars during the install phase.
         </p>
