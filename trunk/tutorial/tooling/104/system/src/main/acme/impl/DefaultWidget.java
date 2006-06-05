@@ -3,8 +3,16 @@ package acme.impl;
 
 import acme.Widget;
 
-public class DefaultWidget implements Widget
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class DefaultWidget extends UnicastRemoteObject implements Widget
 {
+    public DefaultWidget() throws RemoteException
+    {
+        super();
+    }
+    
     public void process( String color )
     {
         String message = buildMessage( color );

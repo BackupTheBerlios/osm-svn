@@ -1,7 +1,10 @@
 
 package acme;
 
-public interface Widget
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface Widget extends Remote
 {
-    void process( String color );
+    void process( String color ) throws RemoteException;
 }

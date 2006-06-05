@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Source Filtering">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        The objective of this tutorial is to demonstrate the use of 
+        a classic Ant build file to customize the project build.  In the
+        example we will add a classic Ant tasks and to enhance the build process.
+        </p>
+
+      </subsection>
+
+      <subsection name="Adding a buildfile">
+
+        <p>
+        Up to now we have not declared a build.xml file - instead we have 
+        used the default template, however, we are now going to add some 
+        additional build-time processing.  To do this we will need to declare this 
+        information in a build file.  By default the Ant-based builder will
+        execute a build using a file named <tt>build.xml</tt> if present in the 
+        projects basedir.
+        </p>
+
+        <p>
+        The following <tt>build.xml</tt> file is basically doing exactly the 
+        same thing as before except that we are extending the build
+        target with some additional content concerning RMI remote class 
+        generation.
+        </p>
+
+<source><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+<project default="install" 
+    xmlns:transit="antlib:net.dpml.transit">
+
+  <transit:import uri="local:template:dpml/tools/standard"/>
+
+  <target name="build" depends="standard.build">
+    <rmic base="${project.target.classes.main.dir}" classpathref="project.compile.path">
+      <include name="**/DefaultWidget.class"/>
+    </rmic>
+  </target>
+
+</project>
+]]></source>
+
+       <p>
+       Notable items in the build.xml file include:
+       </p>
+
+       <ol>
+         <li>Usage of Transit's import task to include a template from 
+            the DPML preferences directory (via the local protocol).</li>
+         <li>The addition of the Ant RMIC task to suppliment content in 
+            the the generated classes directory.</li>
+         <li>Usage of the <tt>project.compile.path</tt> reference object
+            established by the Depot init task.</li>
+       </ol>
+        
+      </subsection>
+
+      <subsection name="Updates to Widget.java">
+      
+<source>
+package acme;
+
+<font color="darkred">import java.rmi.Remote;
+import java.rmi.RemoteException;</font>
+
+public interface Widget <font color="darkred">extends Remote</font>
+{
+    void process( String color ) <font color="darkred">throws RemoteException</font>;
+}
+</source>
+
+      </subsection>
+      
+      <subsection name="Updates to DefaultWidget.java">
+
+<source>
+package acme.impl;
+
+import acme.Widget;
+
+<font color="darkred">import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;</font>
+
+public class DefaultWidget <font color="darkred">extends UnicastRemoteObject</font> implements Widget
+{
+    <font color="darkred">public DefaultWidget() throws RemoteException
+    {
+        super();
+    }</font>
+    
+    public void process( String color )
+    {
+        String message = buildMessage( color );
+        System.out.println( message );
+    }
+
+    public String buildMessage( String color )
+    {
+        if( null == color )
+        {
+            return "I'm a plain old " + COLOR + " widget named " + NAME + ".";
+        }
+        else
+        {       
+            return "I'm a " + color + " widget named " + NAME;
+        }
+    }
+
+    private static final String NAME = "@NAME@";
+    private static final String COLOR = "@COLOR@";
+ 
+}
+</source>
+
+      </subsection>
+
+      <subsection name="Build Output">
+
+        <pre>
+standard.build:
+    [javac] Created dir: C:\dev\osm\trunk\tutorial\tooling\104\system\target\classes\main
+    [javac] Compiling 1 source file to C:\dev\osm\trunk\tutorial\tooling\104\system\target\classes\main
+    [javac] Created dir: C:\dev\osm\trunk\tutorial\tooling\104\system\target\classes\test
+    [javac] Compiling 1 source file to C:\dev\osm\trunk\tutorial\tooling\104\system\target\classes\test
+
+<font color="darkred">build:
+     [rmic] RMI Compiling 1 class to C:\dev\osm\trunk\tutorial\tooling\104\system\target\classes\main</font>
+        </pre>
+
+      </subsection>
+
+      <subsection name="Tutorial Summary">
+
+        <p>
+        The example demonstrates how you 
+        can easily extend the standard build behaviour using Ant's logic on target 
+        naming - basically it's the convention of referencing an imported template 
+        target with the imported template's declared project name followed by the 
+        name of the target we want to extend.
+        </p>
+        
+        <p><i>
+        Logically speaking the approach to task extension follows the following convention:
+        </i></p>
+<pre><![CDATA[
+<target name="[target-name]" depends="[template-name].[target-name]">
+  <!-- extended content goes here -->
+</target>
+]]></pre>
+
+      </subsection>
+
+      <subsection name="Next Tutorial ...">
+
+        <p>
+        Our next tutorial focussed on the subject of <a href="module.html">
+        creation of a module datastructure</a> that can be used by other projects 
+        within an <tt>import</tt> statement (similar to the way we imported the ant 
+        module definition in our test case example).
+        </p>
+        
+      </subsection>
+
+    </section>
+
+  </body>
+  
+</document>
+

@@ -104,25 +104,39 @@
 
 <pre>
   &lt;project name="dpml-metro-runtime" basedir="runtime"&gt;
+    &lt;info title="Metro Container Runtime"&gt;
+      &lt;description&gt;
+      DPML Component management platform runtime container.
+      &lt;/description&gt;
+    &lt;/info&gt;
     &lt;types&gt;
       &lt;type id="jar"/&gt;
       <font color="darkred">&lt;part:plugin alias="true" class="net.dpml.metro.runtime.CompositionController"/&gt;</font>
     &lt;/types&gt;
     &lt;dependencies&gt;
       &lt;include ref="dpml/util/dpml-logging-api" tag="public"/&gt;
-      &lt;include ref="dpml/util/dpml-parameters-impl"/&gt;
-      &lt;include ref="dpml/util/dpml-configuration-impl"/&gt;
-      &lt;include ref="dpml/util/dpml-job-impl"/&gt;
       &lt;include key="dpml-metro-component" tag="protected"/&gt;
       &lt;include key="dpml-metro-model" tag="protected"/&gt;
+      &lt;include ref="dpml/util/dpml-job-impl"/&gt;
       &lt;include key="dpml-state-impl"/&gt;
-      &lt;include key="dpml-metro-builder" tag="protected"/&gt;
     &lt;/dependencies&gt;
     &lt;dependencies scope="test"&gt;
       &lt;include ref="ant/ant-junit"/&gt;
     &lt;/dependencies&gt;
   &lt;/project&gt;
 </pre>
+
+        <p>
+        Observations concerning the above project definition with respect to 
+        part datastructure creation:
+        </p>
+        
+        <ul>
+          <li>The <tt>info</tt> element is mapped directory to a part info declaration.</li>
+          <li>The <tt>part</tt> type element is mapped to a part deployment <tt>strategy</tt> 
+              definition.</li>
+          <li>All runtime dependencies are fully expanded relative to respective runtime scope</li>
+        </ul>
 
       </subsection>
 
@@ -165,6 +179,19 @@
         handling code wrapping the above code framgment.  The error handling code would typically 
         handle validation of the plugin either prior to instantiation or part of a try catch block, 
         type checking, etc.
+        </p>
+
+      </subsection>
+
+      <subsection name="Summary">
+      
+        <p>
+        In the examples presented above we have demonstrated the usage of Depot's project 
+        definition as the source of information about project runtime dependencies and 
+        deployment information from which a part definition is created and used at runtime
+        within an application.  The next tutorial focussed on the <a href="repositories.html">
+        underlying resource repositories</a> from which artifact uris are resolved in terms of 
+        physical resources.
         </p>
 
       </subsection>

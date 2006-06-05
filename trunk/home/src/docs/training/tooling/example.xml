@@ -250,16 +250,16 @@ $
               followed by the server project (dependent on the client project).</li>
           <li>The builder loads a build tool - in this case its the default 
               Ant-based builder and requests a build of each project in the selection.</li>
-          <li>Control passed to the Ant builder which executes codebase preparation through
-              of process of structure normalization (during which a working structure is 
-              under the <tt>${basedir}/target</tt> directory. The buildfile includes a
-              template which declares a series of standard build phases which invoke 
-              some Depot tasks dealing with type production, validation and installation.</li>
           <li>In this particular example we have not declared a build file as such 
               therfore a default template will be used.</li>
           <li>The build is initiated with a default target which in turn triggers
               association of any build listeners declared in the depot configuration and 
               execution of the tasks included in the template.</li>
+          <li>Control passed to the Ant builder which executes codebase preparation through
+              of process of structure normalization (during which a working structure is 
+              under the <tt>${basedir}/target</tt> directory. Following content normalization
+              a series of tasks are involed delaing with build, packaging, validation,
+              and resource installation.</li>
         </ol>
 
       </subsection>
@@ -277,7 +277,16 @@ $
 
       </subsection>
 
- 
+      <subsection name="Adding a Test Case">
+
+        <p>
+        The <a href="testcase.html">next tutorial</a> adds a testcase to our system 
+        project and covers the updates required within the codebase and out project 
+        definition.
+        </p>
+
+      </subsection>
+
     </section>
 
   </body>

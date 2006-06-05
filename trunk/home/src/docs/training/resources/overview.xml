@@ -67,12 +67,24 @@ URL url = uri.toURL();</source>
 
       <p>
       If you plan on using Transit in a production scenario you will want to take a close 
-      look at the information concerning the setup and configuration of Transit provided 
-      under the <a href="http://www.dpml.net/transit">Transit home page</a>.
+      look at the information concerning the <a href="http://www.dpml.net/transit/config">
+      setup and configuration of Transit</a>.
       </p>
 
       </subsection>
 
+      <subsection name="Summary">
+      
+        <p>
+        This overview has presented Tranist in terms of its role as an abstract protocol handler
+        and the mechanisms used to map transit uris to urls.  The next tutorial goes into
+        more detail concerning the <a href="artifacts.html">usage of the <tt>artifact:</tt> 
+        protocol</a> when handling simple resources such as property files, xml data files, 
+        etc.
+        </p>
+
+      </subsection>
+      
     </section>
   </body>
 </document>

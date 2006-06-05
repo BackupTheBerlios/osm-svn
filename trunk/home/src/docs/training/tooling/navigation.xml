@@ -27,7 +27,8 @@
     <menu>
       <item name="Getting Started" href="example.html"/>
       <item name="Adding a Testcase" href="testcase.html"/>
-      <item name="Build Customization" href="filtering.html"/>
+      <item name="Content Filters" href="filtering.html"/>
+      <item name="Build Customization" href="customization.html"/>
       <item name="Module Creation" href="module.html"/>
       <item name="Versioned Builds" href="versioned.html"/>
     </menu>

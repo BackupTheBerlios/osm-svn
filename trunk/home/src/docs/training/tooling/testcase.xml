@@ -147,7 +147,7 @@ $ build -select acme/system
         </p>
 
         <p>
-        Output from the system projects build during the test pahse should look like 
+        Output from the system projects build during the test phase should look like 
         the following:
         </p>
 <pre>
@@ -160,8 +160,24 @@ test:
     [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
 </pre>
 
+        <p>
+        If a test failure occurs you can eximine the test failure details in 
+        test reports generated under the <tt>${basedir}/target/reports/test</tt>
+        directory.
+        </p>
+        
       </subsection>
 
+      <subsection name="Content Filtering">
+
+        <p>
+        The next tutorial deals with the subject of <a href="filtering.html">
+        codebase content filtering</a> based on filters declared within a project
+        defintition. 
+        </p>
+
+      </subsection>
+      
     </section>
 
   </body>

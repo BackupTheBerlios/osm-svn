@@ -41,7 +41,7 @@
         according to the following rule:
         </p>
 
-        <code>[host-address]/[group]/[name]-[version].[type]</code>
+        <code>[host-address]/[group]/[type]s/[name]-[version].[type]</code>
 
         <p>
         The eclipse layout maps artifacts in accordance with the following scheme:
@@ -64,10 +64,10 @@
         The initial <code>setUp()</code> method handles the declaration of the Artifact protocol handler 
         to the JVM.  This is Transit's hook into the JVM's URL Hander object model.  Within the 
         <code>testPropertyLoading()</code> we construct a new URL using an artifact specification
-        that declares a resource type of "spec", a group named "dpml/test", the name 
+        that declares a resource type of "properties", a group named "dpml/test", the name 
         "example-property-file" and a version equal to "2.2".  We then pass the URLs resource 
         stream to a new Property instance and print out the value of a property declared in the 
-        spec resource.
+        properties resource.
         </p>
 
         <p><i>Source:</i> <tt>trunk/validation/resources/src/test/net/osm/tutorial/TransitTestCase.java</tt></p>
@@ -81,7 +81,7 @@ public class TransitTestCase extends TestCase
 
     public void testPropertyLoading() throws Exception
     {
-        URL url = new URL( "artifact:spec:dpml/test/example-property-file#2.2" );
+        URL url = new URL( "artifact:properties:dpml/test/example-property-file#2.2" );
         InputStream input = url.openStream();
         Properties properties = new Properties();
         properties.load( input );
@@ -96,6 +96,7 @@ public class TransitTestCase extends TestCase
   [x:junit] Running net.osm.tutorial.TransitTestCase
   [x:junit] Welcome to the world of Transit!
   [x:junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.344 sec</pre>
+
 
       </subsection>
 
@@ -129,6 +130,18 @@ public class TransitTestCase extends TestCase
           <li>Artifact structure encorages consistent naming patterns and resource versioning.</li>
           <li>Functionlity is encapsulated with the URL and URLConnection object model.</li>
         </ul>
+
+      </subsection>
+
+      <subsection name="Next Topic - Plugins">
+      
+        <p>
+        This page has presented a more in-depth look at the <tt>artifact</tt> protocol.
+        The <a href="plugins.html">next tutorial</a> introduced a simple datatype called a 
+        <tt>part</tt> that describes an object instantiation strategy with a classloader 
+        chain definition.  This datatype is commonly referred to as a <tt>plugin</tt> and 
+        demonstrates the usage of one artifact to describe the usage of many artifacts.
+        </p>
 
       </subsection>
 
