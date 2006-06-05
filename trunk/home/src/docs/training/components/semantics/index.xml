@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development</title>
+  </properties>
+
+  <body>
+  
+    <section name="Component Type Semantics">
+    
+      <p>
+      A number of factors related to a component implementation class 
+      impact the way in which instance of that class should be handled.
+      These factors include:
+      </p>
+      
+      <ul>
+        <li>
+        the component <a href="lifestyle.html"> lifestyle policy</a> - encapsulating 
+        the capability (or inability) of the implementation class to handle multiple 
+        concurrent threads of activity
+        </li>
+        <li>the component <a href="lifestyle.html">lifecycle policy</a>  - capturing the 
+        sequencing of activities that an instance assumes during commissioning, general 
+        execution, and decommissioning (typically represented by operations
+        such as start, suspend, resume, stop, etc.).
+        </li>
+        <li>the component <a href="collection.html">garbage collection policy</a>  - 
+        reflecting Weak, soft, and hard references maintained by a runtime controller 
+        on a given component instance
+        </li>
+      </li>
+    
+    </section>
+
+  </body>
+
+</document>
+
+
+

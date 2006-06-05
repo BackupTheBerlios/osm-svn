@@ -9,65 +9,13 @@
 
   <body>
   
-    <section name="Overview">
+    <section name="Metro Constructor Parameters">
     
       <p>
-      In the tutorials dealing with <a href="../resources/plugins.html">Transit
-      Plugins</a> we covered the general subject of a description of a deployment 
-      unit based on the association of an object instantiation strategy with a 
-      definition of a classloader chain. The <a href="http://www.dpml.net/metro">
-      Metro component management system</a> extends the <tt>part</tt> deloyment 
-      strategy with a complete context driven 
-      <a href="http://www.dpml.net/metro/concepts/ioc.html">IOC</a> object 
-      instantiation model.
-      </p>
-    
-      <p>
-      Beyond instantiation there are several aspects of a class that 
-      effect its deployment.  These aspects include thread-safety (expressed 
-      via a component lifestyle policy), a component lifecycle (expressed 
-      via a formal state-transition graph), and a component garbage collection
-      policy.  Each of these concerns are expresssed as optional <a href="semantics.html">
-      component type characteristics</a>.
-      </p>
-
-      <subsection name="Metro Type Semantics">
-
-        <table>
-          <tr>
-            <td><a href="semantics/lifestyle.html">Lifestyle</a></td>
-            <td>
-            Overview of different lifestyle policies and the effect that 
-            lifestyle policies have on instantiation and sharing.
-            </td>
-          </tr>
-          <tr>
-            <td><a href="semantics/lifecycle.html">Lifecycle</a></td>
-            <td>
-            Introducing the initialization, execution and termination lifecycle
-            and the supporting state-transition model.
-            </td>
-          </tr>
-          <tr>
-            <td><a href="semantics/collection.html">Collection</a></td>
-            <td>
-            Introducing the available garbage collection policies that can be 
-            associated with a component instance.
-            </td>
-          </tr>
-        </table>
-
-      </subsection>
-
-      <subsection name="Metro Constructor Parameters">
-
-      <p>
-      Generally speaking information can be supplied to a component 
-      as a constructor argument or via setter operations. In the examples 
-      provided here we use a variation of constructor-based injection 
-      wherein information is supplied to a component by a container through 
-      dynamically constructed instances that implement component-defined 
-      contracts.
+      The Metro container extwnds the generic part plugin instantiation 
+      model with support for constructor parameter types supporting logging 
+      channel assignment, provison of context data, and initialization of 
+      intermal parts. 
       </p>
 
         <table>

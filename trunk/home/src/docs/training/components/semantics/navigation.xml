@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- Copyright 2005 Stephen McConnell
+ Copyright 2006 Stephen McConnell
 
  Licensed  under the  Apache License,  Version 2.0  (the "License");
  you may not use  this file  except in  compliance with the License.
@@ -25,9 +25,9 @@
  <body>
 
     <menu>
-      <item name="Logger" href="logger/index.html"/>
-      <item name="Context" href="context/index.html"/>
-      <item name="Parts" href="parts/index.html"/>
+      <item name="Lifestyle" href="lifestyle.html"/>
+      <item name="Lifecycle" href="lifecycle.html"/>
+      <item name="Collection" href="collection.html"/>
     </menu>
 
  </body>

@@ -27,8 +27,8 @@
       effect its deployment.  These aspects include thread-safety (expressed 
       via a component lifestyle policy), a component lifecycle (expressed 
       via a formal state-transition graph), and a component garbage collection
-      policy.  Each of these concerns are expresssed as optional <a href="semantics.html">
-      component type characteristics</a>.
+      policy.  Each of these concerns are expresssed as optional 
+      <a href="semantics/index.html">component type characteristics</a>.
       </p>
 
       <subsection name="Metro Type Semantics">
@@ -72,14 +72,14 @@
 
         <table>
           <tr>
-            <td width="15%"><a href="logger/index.html">Logger</a></td>
+            <td width="15%"><a href="constructors/logger/index.html">Logger</a></td>
             <td>
             Introduction to the semantics concerning the usage of a 
             <tt>Logger</tt> as a common constructor argument.
             </td>
           </tr>
           <tr>
-            <td><a href="context/index.html">Context</a></td>
+            <td><a href="constructors/context/index.html">Context</a></td>
             <td>
             Introduction to <tt>#Context</tt> inner interface wherein a 
             component implemention declares the interface of the context 
@@ -89,7 +89,7 @@
             </td>
           </tr>
           <tr>
-            <td><a href="parts/index.html">Parts</a></td>
+            <td><a href="constructors/parts/index.html">Parts</a></td>
             <td>
             Introducing component composition through encapsulation of
             and management of a collection of internal parts that are 

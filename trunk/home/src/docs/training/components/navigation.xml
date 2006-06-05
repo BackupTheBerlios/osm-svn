@@ -31,46 +31,4 @@
 
  </body>
 
- <!--
-      <subsection name="Semantics">
-
-         <p>
-         But what about implementation semantics?  
-         Is this component thread-safe.  What are the static charateristics of 
-         this component - what are the logging assumptions, the dependencies implied 
-         by the Context argument, configuration and parameter presumations, what 
-         about garbage collection?
-         </p>
-
-         <p>
-         We build information about static semantics using an ant task named "type".  This 
-         tasks grills the component class and creates a serialized object with
-         a bunch of information about the component implementation which it stores 
-         along side the component class.
-         </p>
-
-         <p>
-         Here's an example of static data collection using an Ant build file:
-         </p>
-
-         <pre><![CDATA[  <target name="build" depends="standard.build">
-    <c:type class="net.osm.tutorial.SimpleWidget" threadsafe="true"/>
-  </target>]]></pre>
-
-         <p>And the build output from the above is ..
-         </p>
-         
-         <pre>  [c:type] creating [net.osm.tutorial.SimpleWidget] </pre>
-
-         <p>But more important is the output .. take a look in your <code>
-            ${basedir}/target/classes</code> directory and you will find 
-            an additional resource named <code>[classname].type</code>. This 
-            file contains a serialized representation of you component.  The
-            information it contains will be used by built-time and run-time
-            systems during the prepration and execution phases.
-         </p>
-         
-      </subsection>
-    -->
-
 </project>
