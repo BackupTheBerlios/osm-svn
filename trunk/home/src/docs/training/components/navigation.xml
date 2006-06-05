@@ -25,10 +25,12 @@
  <body>
 
     <menu>
+      <item name="Logger" href="logger/index.html"/>
       <item name="Context" href="context/index.html"/>
       <item name="Parts" href="parts/index.html"/>
       <item name="Lifestyle" href="lifestyle.html"/>
       <item name="Lifecycle" href="lifecycle.html"/>
+      <item name="Collection" href="collection.html"/>
     </menu>
 
  </body>

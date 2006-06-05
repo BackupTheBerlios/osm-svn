@@ -31,24 +31,4 @@
     </m:component>
   </target>
 
-  <target name="checkstyle" depends="prepare">
-    <property name="checkstyle.dir" location="${basedir}/target/reports/checkstyle"/>
-    <property name="checkstyle.data" location="${checkstyle.dir}/checkstyle.xml"/>
-    <x:plugin uri="link:part:dpml/depot/dpml-depot-checkstyle">
-      <task class="net.dpml.tools.checkstyle.CheckstyleTask" name="checkstyle"/>
-    </x:plugin>
-    <mkdir dir="${checkstyle.dir}"/>
-    <checkstyle>
-      <formatter type="xml" toFile="${checkstyle.data}"/>
-      <fileset dir=".">
-        <include name="**/target/build/test/**/*.java"/>
-      </fileset>
-    </checkstyle>
-    <xslt style="${dpml.prefs}/dpml/tools/xsls/checkstyle-frames.xsl"
-        in="${checkstyle.data}" 
-        out="${checkstyle.dir}/checkstyle_report.html">
-      <param name="output.dir" expression="${checkstyle.dir}"/>
-    </xslt>
-  </target>
-
 </project>

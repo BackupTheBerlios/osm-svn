@@ -79,6 +79,5 @@ public class ManagementTestCase extends TestCase
         String user = System.getProperty( "user.name" );
         String expected = "Painting " + user + "'s car blue.";
         assertEquals( "message content", expected, message );
-        widget.process( "red" );
     }
 }
