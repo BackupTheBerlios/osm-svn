@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.acme.tutorial.test;
+package org.acme.logging;
 
 import java.io.File;
 import java.net.URI;
