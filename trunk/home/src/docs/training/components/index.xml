@@ -23,6 +23,45 @@
       </p>
     
       <p>
+      Beyond instantiation there are several aspects of a class that 
+      effect its deployment.  These aspects include thread-safety (expressed 
+      via a component lifestyle policy), a component lifecycle (expressed 
+      via a formal state-transition graph), and a component garbage collection
+      policy.  Each of these concerns are expresssed as optional component 
+      type characteristics.
+      </p>
+
+      <subsection name="Type Semantics">
+
+        <table>
+          <tr>
+            <td><a href="lifestyle.html">Lifestyle</a></td>
+            <td>
+            Overview of different lifestyle policies and the effect that 
+            lifestyle policies have on instantiation and sharing.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="lifecycle.html">Lifecycle</a></td>
+            <td>
+            Introducing the initialization, execution and termination lifecycle
+            and the supporting state-transition model.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="collection.html">Collection</a></td>
+            <td>
+            Introducing the available garbage collection policies that can be 
+            associated with a component instance.
+            </td>
+          </tr>
+        </table>
+
+      </subsection>
+
+      <subsection name="Metro Constructor Parameters">
+
+      <p>
       Generally speaking information can be supplied to a component 
       as a constructor argument or via setter operations. In the examples 
       provided here we use a variation of constructor-based injection 
@@ -30,8 +69,6 @@
       dynamically constructed instances that implement component-defined 
       contracts.
       </p>
-
-      <subsection name="Metro Constructor Parameters">
 
         <table>
           <tr>
@@ -59,42 +96,6 @@
             strongly aggregated to (considered as a part of) the enclosing
             component instance (i.e. destruction of the component implies 
             destruction of all internal parts).
-            </td>
-          </tr>
-        </table>
-
-      </subsection>
-
-      <p>
-      Beyond instantiation there are several aspects of a component that 
-      effect its deployment.  These aspects include thread-safety (expressed 
-      via a component lifestyle policy), a component lifecycle (expressed 
-      via a formal state-transition graph), and a component garbage collection
-      policy.
-      </p>
-
-      <subsection name="Lifestyle and Lifecycle Semantics">
-
-        <table>
-          <tr>
-            <td><a href="lifestyle.html">Lifestyle</a></td>
-            <td>
-            Overview of different lifestyle policies and the effect that 
-            lifestyle policies have on instantiation and sharing.
-            </td>
-          </tr>
-          <tr>
-            <td><a href="lifecycle.html">Lifecycle</a></td>
-            <td>
-            Introducing the initialization, execution and termination lifecycle
-            and the supporting state-transition model.
-            </td>
-          </tr>
-          <tr>
-            <td><a href="collection.html">Collection</a></td>
-            <td>
-            Introducing the available garbage collection policies that can be 
-            associated with a component instance.
             </td>
           </tr>
         </table>

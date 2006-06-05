@@ -58,6 +58,56 @@
         
       </subsection>
 
+      <subsection name="The DPML Logger">
+      
+        <p>
+        The DPML <tt>Logger</tt> interface exposes a set of operations that meet 
+        the requirements of a component implementation.  More specifically - the
+        DPML <tt>Logger</tt> interface does not expose operations dealing with channel
+        management.  A typical usage scenario is demonstrated in the following code 
+        fragment:
+        </p>
+        
+        <source>
+import net.dpml.logging.Logger;
+        
+public class Demo
+{
+    public Demo( <font color="darkred">final Logger logger</font> )
+    {
+        ...
+        
+        if( <font color="darkred">logger.isDebugEnabled()</font> )
+        {
+            <font color="darkred">logger.debug(</font> "Handling object instantiation." <font color="darkred">)</font>;
+        }
+        
+        ...
+        
+        if( <font color="darkred">logger.isInfoEnabled()</font> )
+        {
+            <font color="darkred">logger.info(</font> "Hello." <font color="darkred">)</font>;
+        }
+        
+        ...
+    }
+    
+    ...
+}
+        </source>
+        
+      <subsection name="Channel Management">
+      
+        <p>
+        Irrespect of the logging constructor type you choose, in both cases the underlying
+        log channel management is based on the management utilities provided withing the 
+        <tt>java.util.logging</tt> package.  In particular, this means that the logging 
+        configuration (channel priority, channel targets, etc. may be changed at runtime 
+        by an independent managment application.
+        </p>
+
+      </subsection>
+
     </section>
 
   </body>
