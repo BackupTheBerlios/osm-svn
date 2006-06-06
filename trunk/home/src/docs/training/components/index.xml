@@ -12,94 +12,135 @@
     <section name="Overview">
     
       <p>
-      In the tutorials dealing with <a href="../resources/plugins.html">Transit
-      Plugins</a> we covered the general subject of a description of a deployment 
-      unit based on the association of an object instantiation strategy with a 
-      definition of a classloader chain. The <a href="http://www.dpml.net/metro">
-      Metro component management system</a> extends the <tt>part</tt> deloyment 
-      strategy with a complete context driven 
-      <a href="http://www.dpml.net/metro/concepts/ioc.html">IOC</a> object 
-      instantiation model.
+      In the earlier tutorials dealing with Transit Plugins we covered the general 
+      subject of a deployment unit descriptor that associated an object instantiation 
+      <tt>strategy</tt> with a <tt>classloader</tt> chain definition. The Metro platform 
+      provides an alternative deployment strategy and runtime handler that delivers
+      a complete context driven IOC object instantiation model. 
       </p>
-    
+      
       <p>
-      Beyond instantiation there are several aspects of a class that 
-      effect its deployment.  These aspects include thread-safety (expressed 
-      via a component lifestyle policy), a component lifecycle (expressed 
-      via a formal state-transition graph), and a component garbage collection
-      policy.  Each of these concerns are expresssed as optional 
-      <a href="semantics/index.html">component type characteristics</a>.
+      In addition to instantiation there are several aspects of a class that 
+      effect its deployment.  These aspects include thread-safety, a depoyment and 
+      decommissioning lifecycle, garbage collection policy, etc.  Each of these concerns 
+      are expresssed as well defined semantic features within the Metro component model.
       </p>
 
-      <subsection name="Metro Type Semantics">
+      <subsection name="Totorial Objective">
+      
+        <p>
+        The objective of this tutorial is the demonstration of how we can 
+        introduce a new instantiation strategy into a part deployment descriptor.
+        Subsequent tutorials will use the resource established here as the baseline 
+        for the introduction of the core Metro component model concepts.
+        </p>
+        
+        <p>
+        Supporting classes:
+        </p>
 
         <table>
           <tr>
-            <td><a href="semantics/lifestyle.html">Lifestyle</a></td>
-            <td>
-            Overview of different lifestyle policies and the effect that 
-            lifestyle policies have on instantiation and sharing.
-            </td>
+            <td><a href="001/Demo.java.html">Demo.java</a></td>
+            <td>A minimal component implementation.</td>
           </tr>
           <tr>
-            <td><a href="semantics/lifecycle.html">Lifecycle</a></td>
-            <td>
-            Introducing the initialization, execution and termination lifecycle
-            and the supporting state-transition model.
-            </td>
-          </tr>
-          <tr>
-            <td><a href="semantics/collection.html">Collection</a></td>
-            <td>
-            Introducing the available garbage collection policies that can be 
-            associated with a component instance.
-            </td>
+            <td><a href="001/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td>Testcase that validates component deployment.</td>
           </tr>
         </table>
 
       </subsection>
+      
+      <subsection name="Component Creation">
+      
+        <p>
+        The creation of a new component defintion is basically the same as the procedure
+        used to creation a plugin.  In the following Depot project definition we are declaring 
+        a new project with pablication of a jar and part artifacts.  The significant difference
+        from a regular plugin is the usage of a custom part strategy.
+        </p>
+        
+<source>
+  &lt;project name="acme-demo-001" basedir="001"&gt;
+    &lt;types&gt;
+      &lt;type id="jar"/&gt;
+      <font color="darkred">&lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+         type="org.acme.Demo" 
+         name="demo"/&gt;</font>
+    &lt;/types&gt;
+    &lt;dependencies&gt;
+      &lt;test&gt;
+        &lt;include ref="ant/ant-junit"/&gt;
+        &lt;include ref="dpml/transit/dpml-transit-main"/&gt;
+      &lt;/test&gt;
+    &lt;/dependencies&gt;
+  &lt;/project&gt;
+</source>
 
-      <subsection name="Metro Constructor Parameters">
+        <p>
+        The custom part definition introduced under the <tt>link:xsd:dpml/lang/dpml-component#1.0</tt>
+        namespace is declaring the production of a new <tt>part</tt> datastructure under which 
+        the class <tt>org.acme.Demo</tt> is to handled by the Metro runtime platform. The above 
+        definition also includes the declaration of test phase dependencieswe will need to 
+        launch the component.
+        </p>
+        
+        <p>
+        The generated part datastructure is show below (the custom Metro deployment 
+        strategy is hilighted in red).
+        </p>
+        
+<source>
+&lt;part xmlns="link:xsd:dpml/lang/dpml-part#1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 
-      <p>
-      Generally speaking information can be supplied to a component 
-      as a constructor argument or via setter operations. In the examples 
-      provided here we use a variation of constructor-based injection 
-      wherein information is supplied to a component by a container through 
-      dynamically constructed instances that implement component-defined 
-      contracts.
-      </p>
+  &lt;info/&gt;
 
-        <table>
-          <tr>
-            <td width="15%"><a href="constructors/logger/index.html">Logger</a></td>
-            <td>
-            Introduction to the semantics concerning the usage of a 
-            <tt>Logger</tt> as a common constructor argument.
-            </td>
-          </tr>
-          <tr>
-            <td><a href="constructors/context/index.html">Context</a></td>
-            <td>
-            Introduction to <tt>#Context</tt> inner interface wherein a 
-            component implemention declares the interface of the context 
-            object that to be supplied by the runtime container.  In effect, 
-            the component Context interface is the declaration by a component
-            of it's functional dependencies with the outside world.
-            </td>
-          </tr>
-          <tr>
-            <td><a href="constructors/parts/index.html">Parts</a></td>
-            <td>
-            Introducing component composition through encapsulation of
-            and management of a collection of internal parts that are 
-            strongly aggregated to (considered as a part of) the enclosing
-            component instance (i.e. destruction of the component implies 
-            destruction of all internal parts).
-            </td>
-          </tr>
-        </table>
+  <font color="darkred">&lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+      type="org.acme.Demo"
+      name="demo"
+      collection="system"
+      activation="system"&gt;
+  &lt;/component&gt;</font>
 
+  &lt;classpath&gt;
+    &lt;private&gt;
+      &lt;uri&gt;artifact:jar:org/acme/acme-demo-001#SNAPSHOT&lt;/uri&gt;
+    &lt;/private&gt;
+  &lt;/classpath&gt;
+
+&lt;/part&gt;
+</source>
+
+      </subsection>
+      
+      <subsection name="Summary">
+      
+        <p>
+        In this example the Demo implementation class contains nothing significant - 
+        however, the important point of this initial tutorial is the association of
+        a different runtime handler for the class within our part definition.
+        </p>
+        
+        <p>
+        The next tutorial extends the project
+        with the introduction of <a href="context.html">context management</a> and 
+        in particular, the way in which a component class declares context assumptions, 
+        and the mechanisms used by the Metro runtime to fullfill those requirements.
+        </p>
+        
+      </subsection>
+      
+      <subsection name="Related Links">
+        
+        <ul>
+          <li><a href="../resources/plugins.html">Transit Plugin Tutorial</a></li>
+          <li><a href="http://www.dpml.net/metro">Metro Component Management System</a></li>
+          <li><a href="http://www.dpml.net/metro/concepts/ioc.html">IOC Overview</a></li>
+          <li><a href="http://www.dpml.net/metro/concepts/context.html">Context Awareness</a></li>
+        </ul>
+        
       </subsection>
 
     </section>

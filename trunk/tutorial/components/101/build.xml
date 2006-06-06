@@ -20,7 +20,7 @@
   </target>
 
   <target name="build" depends="standard.build">
-    <m:type class="org.acme.tutorial.SimpleWidget" name="widget"/>
+    <!--<m:type class="org.acme.tutorial.SimpleWidget" name="widget"/>-->
     <m:component dest="target/test/test.part" test="true"
         type="org.acme.tutorial.SimpleWidget">
       <context>

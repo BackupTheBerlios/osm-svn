@@ -25,8 +25,9 @@
  <body>
 
     <menu>
-      <item name="Context Management" href="context.html"/>
-      <item name="Context Examples" href="context-examples.html"/>
+      <item name="Primitive Values" href="primitives.html"/>
+      <item name="Constructed Values" href="construct.html"/>
+      <item name="Value Lookup" href="lookup.html"/>
     </menu>
 
  </body>

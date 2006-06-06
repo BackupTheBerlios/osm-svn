@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project default="install"
+    xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="dpml:depot">
+
+  <transit:import uri="local:template:dpml/tools/standard"/>
+
+  <target name="prepare" depends="standard.prepare">
+    <x:plugin uri="link:part:dpml/depot/dpml-depot-convert">
+      <task name="convert" class="de.java2html.anttasks.Java2HtmlTask"/>
+    </x:plugin>
+    <convert srcdir="target/build/main" destdir="target/reports/src"/>
+    <convert srcdir="target/build/test" destdir="target/reports/src"/>
+  </target>
+
+</project>

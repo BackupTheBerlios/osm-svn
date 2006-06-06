@@ -17,6 +17,34 @@
   </target>
 
   <target name="prepare" depends="standard.prepare">
+  
+    <property name="001.src.dir" location="${basedir}/../tutorial/components/001"/>
+    <property name="local.001.docs.dir" location="target/docs/training/components/001"/>
+    <mkdir dir="${local.001.docs.dir}"/>
+    <copy toDir="${local.001.docs.dir}" flatten="true">
+      <fileset dir="${001.src.dir}/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+    </copy>
+
+    <property name="002.src.dir" location="${basedir}/../tutorial/components/002"/>
+    <property name="local.002.docs.dir" location="target/docs/training/components/002"/>
+    <mkdir dir="${local.002.docs.dir}"/>
+    <copy toDir="${local.002.docs.dir}" flatten="true">
+      <fileset dir="${002.src.dir}/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+    </copy>
+    
+    <property name="003.src.dir" location="${basedir}/../tutorial/components/003"/>
+    <property name="local.003.docs.dir" location="target/docs/training/components/003"/>
+    <mkdir dir="${local.003.docs.dir}"/>
+    <copy toDir="${local.003.docs.dir}" flatten="true">
+      <fileset dir="${003.src.dir}/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+    </copy>
+    
     <property name="101.src.dir" location="${basedir}/../tutorial/components/101"/>
     <property name="local.101.docs.dir" location="target/docs/training/components/context/101"/>
     <mkdir dir="${local.101.docs.dir}"/>

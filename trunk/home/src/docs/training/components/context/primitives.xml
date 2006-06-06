@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Primitive Values</title>
+  </properties>
+
+  <body>
+
+    <section name="Primitive type in a Context">
+
+      <p>
+      The DPML Metro platform provides support for primitive (e.g. <tt>int</tt>, 
+      <tt>long</tt>, <tt>short</tt>, <tt>float</tt>, <tt>boolean</tt>, etc.) 
+      and complex object return types and default arguments within a
+      <tt>#Context</tt> inner interface defintion.
+      definition.
+      </p>
+
+      <subsection name="Examples">
+
+        <p>
+        <tt>tutorial/components/102</tt>:
+        </p>
+
+        <table>
+          <tr>
+            <td><a href="102/ContextTestComponent.java.html">ContextTestComponent</a></td>
+            <td>A component that demonstrates the usage of all primitive types together
+             some basic Java classes.</td>
+          </tr>
+          <tr>
+            <td><a href="102/ContextComponentTestCase.java.html">ContextComponentTestCase</a></td>
+            <td>Example of a testcase that validates the above context model.</td>
+          </tr>
+        </table>
+
+        <p>
+        The defintion of initial defaults for the above test component is declared in the 
+        associated project build file.  The following XML is an extract of the buildfile dealing
+        with component type and deployment directive creation:
+        </p>
+
+         <pre><![CDATA[  <target name="build" depends="standard.build">
+
+    <depot:plugin uri="link:plugin:dpml/metro/dpml-metro-tools" urn="metro"/>
+
+    <type xmlns="metro" 
+        class="org.acme.tutorial.ContextTestComponent" 
+        name="context" 
+        threadsafe="true"/>
+
+    <component xmlns="metro" dest="target/test/context.part" test="true"
+        type="org.acme.tutorial.ContextTestComponent" 
+        name="context" 
+        collection="soft">
+      <context>
+        <entry key="color" method="RED"/>
+        <entry key="integer" value="0"/>
+        <entry key="short" value="0"/>
+        <entry key="long" value="0"/>
+        <entry key="byte" value="0"/>
+        <entry key="double" value="0"/>
+        <entry key="float" value="0.5"/>
+        <entry key="char" value="x"/>
+        <entry key="boolean" value="true"/>
+        <entry key="file" value="$${work}"/>
+        <entry key="tempFile" value="$${temp}"/>
+        <entry key="URI" value="$${uri}"/>
+        <entry key="name" value="$${name}"/>
+        <entry key="path" value="$${path}"/>
+      </context>
+    </component>
+
+  </target>]]></pre>
+
+       <p>
+       The above <tt>&lt;component&gt;</tt> element for the most part contains 
+       direct value assignments in the form of a String.  Variations from this 
+       approach include the reference to a static class vaiable under the <tt>
+       color</tt> entry (referencing <tt>java.awt.Color.RED</tt>), and assignment
+       of container supplied constants via symbolic reference - for example the 
+       <tt>$${name}</tt> statement is equivalent to a symbolic reference to 
+       <tt>${name}</tt> (with an additional $ to escape Ant substitution) which
+       is a reference to the container assigned component name.
+       </p> 
+
+      </subsection>
+
+    </section>
+
+  </body>
+
+</document>
+

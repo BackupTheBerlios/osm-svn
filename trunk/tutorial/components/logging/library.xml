@@ -11,9 +11,6 @@
     <module name="org/acme">
 
       <project name="acme-logging-demo" basedir=".">
-        <properties>
-          <property name="project.test.fork" value="true"/>
-        </properties>
         <types>
           <type id="jar"/>
           <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
@@ -25,7 +22,6 @@
             <include ref="dpml/util/dpml-logging-api"/>
           </runtime>
           <test>
-            <include ref="ant/ant-junit"/>
             <include ref="dpml/metro/dpml-metro-tools"/>
           </test>
         </dependencies>

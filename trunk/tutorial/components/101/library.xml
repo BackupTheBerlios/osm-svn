@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<library xmlns="link:xsd:dpml/lang/dpml-module#1.0" 
-    xmlns:part="link:xsd:dpml/lang/dpml-part#1.0">
+<library xmlns="link:xsd:dpml/lang/dpml-module#1.0">
 
   <imports>
     <import uri="link:module:ant"/>
@@ -14,12 +13,23 @@
       <project name="acme-demo" basedir=".">
         <types>
           <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+              type="org.acme.tutorial.SimpleWidget">
+            <context>
+              <entry key="owner" value="${user.name}"/>
+              <entry key="activity" value="Painting"/>
+              <entry key="target" value="house"/>
+            </context>
+          </component>
         </types>
         <dependencies>
           <test>
             <include ref="dpml/metro/dpml-metro-tools"/>
           </test>
         </dependencies>
+        <filters>
+          <feature id="filename" type="part" token="PATH"/>
+        </filters>
       </project>
     
     </module>

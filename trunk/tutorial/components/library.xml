@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<library xmlns="link:xsd:dpml/lang/dpml-module#1.0">
+
+  <imports>
+    <import uri="link:module:ant"/>
+    <import uri="link:module:dpml"/>
+  </imports>
+
+  <modules>
+
+    <module name="org/acme">
+
+      <properties>
+        <property name="project.publisher.name" value="OSM"/>
+        <property name="project.publisher.url" value="http://www.osm.net"/>
+      </properties>
+      
+      <filters>
+        <filter token="PUBLISHER-NAME" value="${project.publisher.name}"/> 
+        <filter token="PUBLISHER-URL" value="${project.publisher.url}"/> 
+        <feature token="PROJECT-VERSION" id="version"/> 
+      </filters>
+
+      <!-- a minimal component -->
+      
+      <project name="acme-demo-001" basedir="001">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+             type="org.acme.Demo" 
+             name="demo"/>
+        </types>
+        <dependencies>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+    
+      <!-- adding context inner interface -->
+      
+      <project name="acme-demo-002" basedir="002">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+               type="org.acme.Demo" 
+               name="demo">
+            <context>
+              <entry key="owner" value="${user.name}"/>
+              <entry key="activity" value="Painting"/>
+              <entry key="target" value="bike"/>
+              <entry key="color" value="silver"/>
+            </context>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-demo-001"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+      
+      <!-- demonstrating context primitives, arrays, and constructed values -->
+      
+      <project name="acme-demo-003" basedir="003">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+               type="org.acme.Demo" 
+               name="demo">
+            <context>
+              <entry key="color" method="RED"/>
+              <entry key="anotherColor">
+                <param class="int" value="100"/>
+                <param class="int" value="200"/>
+                <param class="int" value="0"/>
+              </entry>
+              <entry key="integer" value="42"/>
+              <entry key="short" value="19"/>
+              <entry key="long" value="1042"/>
+              <entry key="byte" value="9"/>
+              <entry key="double" value="32"/>
+              <entry key="float" value="9.813"/>
+              <entry key="char" value="x"/>
+              <entry key="boolean" value="true"/>
+              <entry key="file" value="${work}"/>
+              <entry key="tempFile" value="${temp}"/>
+              <entry key="URI" value="${uri}"/>
+              <entry key="name" value="${name}"/>
+              <entry key="path" value="${path}"/>
+              <entry key="names">
+                <param value="fred"/>
+                <param value="george"/>
+                <param value="mary"/>
+              </entry>
+            </context>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-demo-002"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+
+    </module>
+
+  </modules>
+
+</library>

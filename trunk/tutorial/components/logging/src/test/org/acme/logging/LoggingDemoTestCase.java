@@ -30,31 +30,16 @@ import net.dpml.component.Component;
 import net.dpml.component.Provider;
 
 /**
- * Validation exception testcase verifies the ValidationException and 
- * ValidationException#Issue class implementations.
+ * Demonstration of test execution with a custom logging configuration.
  *
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
 public class LoggingDemoTestCase extends TestCase
 {
-    private static final File TARGET = new File( System.getProperty( "project.target.dir" ) );
-    private static final File TEST = new File( TARGET, "test" );
-    private static final File LOGGING = new File( TEST, "logging.properties" );
-
-    static
-    {
-        System.setProperty( 
-          "dpml.logging.config", " file:" + LOGGING.toString() );
-        System.out.println( LOGGING.toString() );
-        System.setProperty( 
-          "java.util.logging.config.class", 
-          "net.dpml.util.ConfigurationHandler" );
-    }
-    
     private static final Controller CONTROLLER = Controller.STANDARD;
-    private static final File PARTS = new File( TARGET, "deliverables/parts" );
-    private static final File PATH = new File( PARTS, "@PATH@" );
+    private static final File TARGET = new File( System.getProperty( "project.target.dir" ) );
+    private static final File PART = new File( TARGET, "deliverables/parts/@PATH@" );
     
    /**
     * Test the logging channel.
@@ -62,9 +47,15 @@ public class LoggingDemoTestCase extends TestCase
     */
     public void testLogger() throws Exception
     {
-        URI uri = PATH.toURI();
+        URI uri = PART.toURI();
         Component component = CONTROLLER.createComponent( uri );
         Provider provider = component.getProvider();
         Demo demo = (Demo) provider.getValue( false );
+    }
+
+    static
+    {
+        String properties = new File( TARGET, "test/logging.properties" ).toString();
+        System.setProperty( "dpml.logging.config", "file:" + properties );
     }
 }

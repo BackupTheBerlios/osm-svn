@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Constructed Values</title>
+  </properties>
+
+  <body>
+
+    <section name="Constructed Types">
+
+      <p>
+      Direct assignment of a <tt>String</tt> value to a component entry
+      is frequently suffivient, however, there are occasions where a complex
+      construction criteria is required.  The following example demonstrates
+      the creation of an instance of <tt>java.awt.Color</tt> using three 
+      <tt>int</tt> values (RGB indexes).
+      </p>
+
+      <subsection name="Examples">
+
+        <p>
+        <tt>tutorial/components/102</tt>:
+        </p>
+
+        <table>
+          <tr>
+            <td><a href="103/ExampleComponent.java.html">ExampleComponent</a></td>
+            <td>A component that requires a <tt>java.awt.Color</tt> instance within
+                it's declared context.</td>
+          </tr>
+          <tr>
+            <td><a href="103/ExecutionTestCase.java.html">ExecutionTestCase</a></td>
+            <td>Testcase that validates the context color value.</td>
+          </tr>
+        </table>
+
+        <p>
+        The following fragment form the project build file demonstrates the 
+        creation of a constructed value using a series of explicit constructor
+        arguments.
+        </p>
+
+        <pre><![CDATA[    <component xmlns="metro" 
+        type="org.acme.tutorial.ExampleComponent" 
+        dest="target/test/example.part" 
+        test="true">
+      <context>
+        <entry key="color">
+          <value class="int" value="100"/>
+          <value class="int" value="200"/>
+          <value class="int" value="0"/>
+        </entry>
+      </context>
+    </component>
+]]></pre>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+
