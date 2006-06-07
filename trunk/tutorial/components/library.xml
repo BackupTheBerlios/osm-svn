@@ -112,6 +112,87 @@
         </dependencies>
       </project>
 
+      <project name="acme-demo-004" basedir="004">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+               type="org.acme.Demo" 
+               name="demo">
+            <context>
+              <component key="theWidget" type="org.acme.Widget" name="widget">
+                <context>
+                  <entry key="color" method="BLUE"/>
+                </context>
+              </component>
+            </context>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-demo-003"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+
+      <project name="acme-demo-005" basedir="005">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+               type="org.acme.Demo" 
+               name="demo">
+            <parts>
+              <component key="widget" type="org.acme.Widget" name="widget">
+                <context>
+                  <entry key="color" method="BLUE"/>
+                </context>
+              </component>
+            </parts>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-demo-004"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+
+      <project name="acme-demo-006" basedir="006">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+               type="org.acme.Demo" 
+               name="demo">
+            <parts>
+              <component key="widget" type="org.acme.Widget" name="widget">
+                <context>
+                  <entry key="color" method="BLUE"/>
+                </context>
+              </component>
+            </parts>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-demo-005"/>
+          </build>
+          <runtime>
+            <include ref="dpml/metro/dpml-metro-model"/>
+          </runtime>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+
     </module>
 
   </modules>

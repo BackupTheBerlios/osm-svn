@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component in a Context</title>
+  </properties>
+
+  <body>
+
+    <section name="Component in a Context">
+
+      <p>
+      In addition to privatives, arrays and constructed types, the Metro platform
+      also supports the binding of components as solutions to a context entry values.
+      </p>
+
+      <subsection name="Component Example">
+
+        <p>
+        <tt>tutorial/components/004</tt>:
+        </p>
+
+        <table>
+          <tr>
+            <td><a href="004/Demo.java.html">Demo.java</a></td>
+            <td>A component that that declares a dependency on a 
+                Widget (via its context innner interface).</td>
+          </tr>
+          <tr>
+            <td><a href="004/Widget.java.html">Widget.java</a></td>
+            <td>A test component we will use as the solution to the 
+            demo context criteria.</td>
+          </tr>
+          <tr>
+            <td><a href="004/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td>The testcase.</td>
+          </tr>
+        </table>
+        
+        <p>
+        The deployment solution is presented below.
+        </p>
+        
+<pre>
+  &lt;project name="acme-demo-004" basedir="004"&gt;
+    &lt;types&gt;
+      &lt;type id="jar"/&gt;
+      <font color="darkred">&lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+         type="org.acme.Demo" 
+         name="demo"&gt;
+        &lt;context&gt;
+          &lt;component key="theWidget" type="org.acme.Widget" name="widget"&gt;
+            &lt;context&gt;
+              &lt;entry key="color" method="BLUE"/&gt;
+            &lt;/context&gt;
+          &lt;/component&gt;
+        &lt;/context&gt;
+      &lt;/component&gt;</font>
+    &lt;/types&gt;
+    &lt;dependencies&gt;
+      &lt;test&gt;
+        &lt;include ref="ant/ant-junit"/&gt;
+        &lt;include ref="dpml/transit/dpml-transit-main"/&gt;
+      &lt;/test&gt;
+    &lt;/dependencies&gt;
+  &lt;/project&gt;
+</pre>
+
+      </subsection>
+      
+      <subsection name="Testing the component">
+
+        <p>
+        The following testcase log output demonstrates runtime support for 
+        nested declarations of components as context entry solutions.
+        </p>
+
+<pre>
+test:
+    [junit] Created dir: C:\dev\osm\trunk\tutorial\components\004\target\reports\test
+    [junit] Executing forked test.
+    [junit] Running org.acme.test.DemoTestCase
+    [junit] [11473] [INFO   ] (demo): located the color java.awt.Color[r=0,g=0,b=255]
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.906 sec
+</pre>
+
+      </subsection>
+    </section>
+
+  </body>
+
+</document>
+
