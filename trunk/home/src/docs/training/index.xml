@@ -53,13 +53,6 @@
             and approaches to content publication and version management.
           </td>
         </tr>
-      </table>
-
-      <p>
-      The following tutorials are comming soon.
-      </p>
-      
-      <table>
         <tr>
           <td width="120"><a href="components/index.html">Component Development</a></td>
           <td>
@@ -69,10 +62,10 @@
             DPML Metro container.  It presents a series of 
             examples dealing with context driven IOC of simple though to complex 
             composite components and strategies supporting effective component 
-            reuse.  Feel free to start on this tutorial as it delivers the most 
-            value in terms of potential development productivity.
+            reuse.
           </td>
         </tr>
+        <!--
         <tr>
           <td><a href="applications/index.html">Application Management</a></td>
           <td>
@@ -81,6 +74,7 @@
             to its coverage of remote component management of application clusters.
           </td>
         </tr>
+        -->
       </table>
     
     </section>
