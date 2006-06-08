@@ -6,16 +6,6 @@
 
   <transit:import uri="local:template:dpml/tools/standard"/>
 
-  <target name="init" depends="standard.init">
-    <filter token="JAVA-PRODUCT-VERSION" value="1.4"/>
-    <filter token="JAVA-DOWNLOAD-URL" value="http://java.sun.com/j2se/1.4.2/download.html"/>
-    <x:filter token="ANT-PRODUCT-VERSION" feature="version" ref="ant"/>
-    <x:filter token="TRANSIT-PRODUCT-VERSION" feature="version" ref="dpml/transit"/>
-    <x:filter token="METRO-RUNTIME-URI" feature="uri" type="part" ref="dpml/metro/dpml-metro-runtime" />
-    <x:filter token="DEPOT-PRODUCT-VERSION" feature="version" ref="dpml/depot"/>
-    <x:filter token="METRO-PRODUCT-VERSION" feature="version" ref="dpml/metro"/>
-  </target>
-
   <target name="prepare" depends="standard.prepare">
   
     <property name="001.src.dir" location="${basedir}/../tutorial/components/001"/>

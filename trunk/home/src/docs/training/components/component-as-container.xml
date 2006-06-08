@@ -74,7 +74,8 @@ public class Demo
       <subsection name="Summary">
 
         <p>
-        By using the <tt>PartsManager</tt> interface, our component can 
+        By using the <tt><a href="@API-HOST@/dpml/@DPML-VERSION@/net/dpml/metro/PartsManager.html">
+        PartsManager</a></tt> interface, our component can 
         take complete control over the managment of the components that are included 
         within itself.  It can access the managment model of internal parts, control
         part state and deployment status, in effect - the enclosing component is the 

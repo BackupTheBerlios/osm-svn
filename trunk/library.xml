@@ -21,11 +21,25 @@
         <property name="project.implementation.vendor-id" value="net.osm"/>
         <property name="project.publisher.url" value="http://www.osm.net"/>
         <property name="project.resource.host" value="http://repository.osm.net"/>
-        <property name="project.api.host" value="http://api.osm.net"/>
+        <property name="project.api.host" value="http://api.dpml.net"/>
         <property name="project.svn.host" value="svn://svn.berlios.de/osm/trunk"/>
       </properties>
 
-      <project name="home" basedir="home"/>
+      <project name="home" basedir="home">
+        <filters>
+          <filter token="JAVA-PRODUCT-VERSION" value="1.4"/>
+          <filter token="JAVA-DOWNLOAD-URL" value="http://java.sun.com/j2se/1.4.2/download.html"/>
+          <feature token="ANT-PRODUCT-VERSION" id="version" ref="ant"/>
+          <feature token="TRANSIT-PRODUCT-VERSION" id="version" ref="dpml/transit"/>
+          <feature token="METRO-RUNTIME-URI" id="uri" type="part" ref="dpml/metro/dpml-metro-runtime" />
+          <feature token="DEPOT-PRODUCT-VERSION" id="version" ref="dpml/depot"/>
+          <feature token="METRO-PRODUCT-VERSION" id="version" ref="dpml/metro"/>
+          <feature token="DPML_VERSION" ref="dpml" id="version"/>
+          <filter token="API-HOST" value="${project.api.host}"/>
+          <feature token="DPML-VERSION" ref="dpml" id="version"/>
+        </filters>
+      
+      </project>
       
       <module file="main/process/module.xml"/>
    
