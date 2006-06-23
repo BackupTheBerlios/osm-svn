@@ -29,6 +29,10 @@
             <td>A component that demonstrates the a broad spectrum of 
             context types (primitives, arrays and complex types).</td>
           </tr>
+          <tr>
+            <td><a href="003/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td>The testcase.</td>
+          </tr>
         </table>
         
         <p>
@@ -124,7 +128,21 @@ test:
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.937 sec</pre>
 
       </subsection>
+      
+      <subsection name="Summary">
+
+        <p>
+        This tutorial demonstrates the ability with Metro to map string-based
+        arguments (presented in XML attributes) into primitive, arrays, and constructed
+        values within a context directive.  The next tutorial will introduce the 
+        notion of <a href="composition-by-parts.html">composition</a> of a component
+        which in-turn introduces the potential for references between nested components.
+        </p>
+
+      </subsection>
+
     </section>
+
 
   </body>
 
