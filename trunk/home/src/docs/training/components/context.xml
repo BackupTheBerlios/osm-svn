@@ -209,9 +209,9 @@ test:
         </p>
         
         <p>
-        The next tutorial provides a demonstration of the context contract within which
-        we use primitive and complex types together with examples of optional context 
-        entries.
+        The <a href="context-examples.html">next tutorial</a> provides a demonstration 
+        of the context contract within which we use primitive and complex types together 
+        with examples of optional context entries.
         </p>
         
       </subsection>
