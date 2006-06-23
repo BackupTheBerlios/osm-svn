@@ -11,7 +11,7 @@
     <section name="Component in a Context">
 
       <p>
-      In addition to privatives, arrays and constructed types, the Metro platform
+      In addition to primitives, arrays and constructed types, the Metro platform
       also supports the binding of components as solutions to a context entry values.
       </p>
 
@@ -46,17 +46,17 @@
   &lt;project name="acme-demo-004" basedir="004"&gt;
     &lt;types&gt;
       &lt;type id="jar"/&gt;
-      <font color="darkred">&lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+      &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
          type="org.acme.Demo" 
          name="demo"&gt;
-        &lt;context&gt;
+        <font color="darkred">&lt;context&gt;
           &lt;component key="theWidget" type="org.acme.Widget" name="widget"&gt;
             &lt;context&gt;
               &lt;entry key="color" method="BLUE"/&gt;
             &lt;/context&gt;
           &lt;/component&gt;
-        &lt;/context&gt;
-      &lt;/component&gt;</font>
+        &lt;/context&gt;</font>
+      &lt;/component&gt;
     &lt;/types&gt;
     &lt;dependencies&gt;
       &lt;test&gt;
