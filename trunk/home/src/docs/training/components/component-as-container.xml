@@ -104,6 +104,11 @@ public class Demo
 }
 </pre>
 
+        <p>
+        Our <a href="context-lookup.html">next tutorial</a> examines the use of 
+        context service lookup between nested components.
+        </p>
+
       </subsection>
       
     </section>
