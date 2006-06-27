@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Service Lookup</title>
+  </properties>
+
+  <body>
+
+    <section name="Service Lookup">
+
+      <p>
+      The ability of a component to be container introduces the possibility
+      for the construction of arbitarially complex heirachies of components
+      that make up an application solution.  In practive we need a mechanisms 
+      through which one component can declare a dependency on another component.
+      Unlike our earlier context example that have used new values exclusively, 
+      a service <tt>lookup</tt> enables an enclosing component to mediate a 
+      request for a service.  Typically the enclosing component will evaluate 
+      its internal components and return a reference as required.  If no internal
+      components can fulfill the service request the mediation is handed-off to 
+      the mediating components parent.
+      </p>
+      
+      <subsection name="Component Example">
+
+        <p>
+        <tt>tutorial/components/lookup</tt>:
+        </p>
+
+        <table>
+          <tr>
+            <td><a href="lookup/Demo.java.html">Demo.java</a></td>
+            <td>The demo class updated to use a Gizmo service to locate a Widget.</td>
+          </tr>
+          <tr>
+            <td><a href="lookup/Gizmo.java.html">Gizmo.java</a></td>
+            <td>The Gizmo class including the Wdget dependency declared in its context.</td>
+          </tr>
+          <tr>
+            <td><a href="lookup/Widget.java.html">Widget.java</a></td>
+            <td>The Widget class.</td>
+          </tr>
+        </table>
+        
+        <p>
+        The important update is presented in the our project defintion.  Our demo component
+        part has been updated to include two nested components (widget and gizmo).  In this 
+        example we have associated a reference to the Widget service in the definition of a 
+        gizmo component context via a lookup entry.
+        </p>
+        
+        <p> 
+        <i>project definition:</i>:
+        </p>
+        
+<pre>
+  &lt;project name="acme-lookup-demo" basedir="lookup"&gt;
+    &lt;types&gt;
+      &lt;type id="jar"/&gt;
+      &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+         type="org.acme.Demo" 
+         name="demo"&gt;
+        &lt;parts&gt;
+          &lt;component key="widget" type="org.acme.Widget" name="widget"&gt;
+            &lt;context&gt;
+              &lt;entry key="color" method="BLUE"/&gt;
+            &lt;/context&gt;
+          &lt;/component&gt;
+          &lt;component key="gizmo" type="org.acme.Gizmo" name="gizmo"&gt;
+            &lt;context&gt;
+              <font color="darkred">&lt;entry lookup="org.acme.Widget"/&gt;</font>
+            &lt;/context&gt;
+          &lt;/component&gt;
+        &lt;/parts&gt;
+      &lt;/component&gt;
+    &lt;/types&gt;
+    &lt;dependencies&gt;
+      &lt;test&gt;
+        &lt;include ref="ant/ant-junit"/&gt;
+        &lt;include ref="dpml/transit/dpml-transit-main"/&gt;
+      &lt;/test&gt;
+    &lt;/dependencies&gt;
+  &lt;/project&gt;
+</pre>
+        
+      </subsection>
+      
+      <subsection name="Testing the component">
+
+        <p>
+        The following debug level logging for the demo category provides us with
+        a trace of the internal container activity during the establishment of 
+        our demo component.
+        </p>
+
+<pre>
+test:
+    [junit] Executing forked test.
+    [junit] Running org.acme.test.DemoTestCase
+    [junit] [13031] [FINE   ] (demo): established per-thread lifestyle handler for [org.acme.Demo]
+    [junit] [13031] [FINE   ] (demo): building internal parts
+    [junit] [13031] [FINE   ] (demo.widget): established transient lifestyle handler for [org.acme.Widget]
+    [junit] [13031] [FINE   ] (demo.gizmo): established per-thread lifestyle handler for [org.acme.Gizmo]
+    [junit] [13031] [FINE   ] (demo): commissioning internal parts
+    [junit] [13031] [FINE   ] (demo.gizmo): instantiated [27165481 ]
+    [junit] [13031] [FINE   ] (demo.gizmo): activated [27165481 ]
+    <font color="darkred">[junit] [13031] [FINE   ] (demo): mediating lookup for [org.acme.Widget]</font>
+    [junit] [13031] [FINE   ] (demo.widget): instantiated [849515   ]
+    [junit] [13031] [FINE   ] (demo.widget): activated [849515   ]
+    [junit] [13031] [INFO   ] (demo): located the color java.awt.Color[r=0,g=0,b=255]
+    [junit] [13031] [FINE   ] (demo): instantiated [23438274 ]
+    [junit] [13031] [FINE   ] (demo): activated [23438274 ]
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.937 sec</pre>
+    
+      </subsection>
+      
+      <subsection name="Summary">
+
+      <p>
+      In this tutorial we have updated the Demo component to include two
+      subsidiary components - Widget and Gizmo.  We have declare a context 
+      dependency in Gizmo on a Widget service.  The main purpose is to
+      demonstrate the lookup mechanism used on the Gizmo component definition
+      to resolve a Widget reference.
+      </p>
+      
+      </subsection>
+      
+    </section>
+
+  </body>
+
+</document>
+

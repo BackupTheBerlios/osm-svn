@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="dpml:depot">
+
+  <transit:import uri="local:template:dpml/tools/standard"/>
+  
+  <target name="prepare" depends="standard.prepare">
+    <x:plugin uri="link:part:dpml/depot/dpml-depot-convert">
+      <task name="convert" class="de.java2html.anttasks.Java2HtmlTask"/>
+    </x:plugin>
+    <convert srcdir="target/build/main" destdir="target/reports/src"/>
+    <convert srcdir="target/build/test" destdir="target/reports/src"/>
+  </target>
+
+  <target name="init" depends="standard.init">
+    <x:plugin uri="link:part:dpml/metro/dpml-metro-tools">
+      <task name="state" class="net.dpml.metro.tools.StateTask"/>
+    </x:plugin>
+  </target>
+
+  <target name="build" depends="standard.build">
+    <state class="org.acme.Demo">
+      <trigger event="initialization">
+        <transition name="start" target="started">
+          <operation name="startup" method="start"/>
+        </transition>
+      </trigger>
+      <state name="started">
+        <transition name="stop" target="../stopped">
+          <operation name="stop" method="stop"/>
+        </transition>
+        <trigger event="termination">
+          <apply id="stop"/>
+        </trigger>
+      </state>
+      <state name="stopped">
+        <transition name="start" target="../started">
+          <operation name="start" method="start"/>
+        </transition>
+      </state>
+    </state>
+  </target>
+
+</project>

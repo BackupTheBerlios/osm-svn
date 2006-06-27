@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Lifestyle</title>
+  </properties>
+
+  <body>
+
+    <section name="Lifestyles">
+
+      <p>
+      A component lifestyle policy is used to govern the decision to construct
+      new instances.  Three lifestyle policies are supported by the Metro runtime
+      including <tt>SINGLETON</tt>, <tt>THREAD</tt> and <tt>TRANSIENT</tt>.  In the
+      previouse examples we have not declared a lifestyle and as a consequence the 
+      default per-thread lifestyle is implied.
+      </p>
+      
+      <p>
+      For reference - a brief description of the respective lifestyle is included 
+      in the following table:
+      </p>
+      
+      <table>
+        <tr>
+          <td><tt>SINGLETON</tt></td>
+          <td>A single instance of the component is shared 
+              across all consumers - as such singleton instances must be implemented
+              with the assumption of multiple concurrent requests from different threads.
+              A singleton lifestyle handler may be associated with a HARD, SOFT, WEAK
+              or SYSTEM collection policy.  If the collection policy is SYSTEM and the 
+              compoent is a top-level component, a HARD collection policy is assumed, 
+              otherwise the default SOFT policy is applied.
+          </td>
+        </tr>
+        <tr>
+          <td><tt>THREAD</tt></td>
+          <td>A per-thread policy ensures that a unique instance of the component
+              is established for each unique consumer thread.  As such, per-thread components
+              may assume sequential access.  Per-thread references are maintained as HARD
+              references relative to the associated thread (i.e. finalization of the thread
+              will result in finalization of the instance).</td>
+        </tr>
+        <tr>
+          <td><tt>TRANSIENT</tt></td>
+          <td>The transient policy will establish a new instance per consumer.  All transient 
+              instance references are maintained as WEAK references.</td>
+        </tr>
+      </table>
+      
+      <subsection name="Component Example">
+
+        <p>
+        To demonstrate the impact of the lifestyle policy we can update our project defintition
+        and declare an explicit lifestyle.  In this case we assign the <tt>TRANSIENT</tt> lifestyle
+        policy to the widget component.
+        </p>
+      
+        <p> 
+        <i>project definition:</i>:
+        </p>
+        
+<pre>
+  &lt;project name="acme-lifestyle-demo" basedir="lifestyle"&gt;
+    &lt;types&gt;
+      &lt;type id="jar"/&gt;
+      &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+         type="org.acme.Demo" 
+         name="demo"&gt;
+        &lt;parts&gt;
+          <font color="darkred">&lt;component key="widget" type="org.acme.Widget" name="widget" lifestyle="transient"&gt;
+            &lt;context&gt;
+              &lt;entry key="color" method="BLUE"/&gt;
+            &lt;/context&gt;
+          &lt;/component&gt;</font>
+          &lt;component key="gizmo" type="org.acme.Gizmo" name="gizmo"&gt;
+            &lt;context&gt;
+              &lt;entry lookup="org.acme.Widget"/&gt;
+            &lt;/context&gt;
+          &lt;/component&gt;
+        &lt;/parts&gt;
+      &lt;/component&gt;
+    &lt;/types&gt;
+    &lt;dependencies&gt;
+      &lt;test&gt;
+        &lt;include ref="ant/ant-junit"/&gt;
+        &lt;include ref="dpml/transit/dpml-transit-main"/&gt;
+      &lt;/test&gt;
+    &lt;/dependencies&gt;
+  &lt;/project&gt;
+</pre>
+        
+      </subsection>
+      
+      <subsection name="Testing the component">
+
+        <p>
+        The following debug level logging reflects the establishment of the transient
+        lifestyle policy and automatic disposal of the Widget instance.
+        </p>
+
+<pre>
+test:
+    [junit] Executing forked test.
+    [junit] Running org.acme.test.DemoTestCase
+    [junit] [96928] [FINE   ] (demo): established per-thread lifestyle handler for [org.acme.Demo]
+    [junit] [96928] [FINE   ] (demo): building internal parts
+    <font color="darkred">[junit] [96928] [FINE   ] (demo.widget): established transient lifestyle handler for [org.acme.Widget]</font>
+    [junit] [96928] [FINE   ] (demo.gizmo): established per-thread lifestyle handler for [org.acme.Gizmo]
+    [junit] [96928] [FINE   ] (demo): commissioning internal parts
+    [junit] [96928] [FINE   ] (demo.gizmo): instantiated [27165481 ]
+    [junit] [96928] [FINE   ] (demo.gizmo): activated [27165481 ]
+    [junit] [96928] [FINE   ] (demo): mediating lookup for [org.acme.Widget]
+    [junit] [96928] [FINE   ] (demo.widget): instantiated [849515   ]
+    [junit] [96928] [FINE   ] (demo.widget): activated [849515   ]
+    [junit] [96928] [INFO   ] (demo): located the color java.awt.Color[r=0,g=0,b=255]
+    [junit] [96928] [FINE   ] (demo): instantiated [23438274 ]
+    [junit] [96928] [FINE   ] (demo): activated [23438274 ]
+    <font color="darkred">[junit] [96928] [FINE   ] (demo.widget): instance disposal [849515   ]</font>
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.953 sec
+</pre>
+    
+      </subsection>
+      
+      <subsection name="Summary">
+
+        <p>
+        Lifestyle policies have a direct impact on the availability of services and the extent to 
+        which instances may be shared between components.  The default <tt>THREAD</tt> policy 
+        is suitable for most scenarios, however - applications using a component across multiple
+        threads of execution will need to declare a singleton lifestyle in order to ensure that 
+        a single service instance is maintained.
+        </p>
+      
+      </subsection>
+      
+    </section>
+
+  </body>
+
+</document>
+

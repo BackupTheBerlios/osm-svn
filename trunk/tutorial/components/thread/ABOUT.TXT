@@ -1,0 +1,1 @@
+Demonstrating uniquness of values when access the parts interface with differnet threads when the assigned component is associated with a per-THREAD lifestyle.

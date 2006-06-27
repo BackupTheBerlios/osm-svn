@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Lifestyle</title>
+  </properties>
+
+  <body>
+
+    <section name="Transient Lifestyles">
+
+      <p>
+      This example demonstrates the uniquenes of a singletone instances
+      across multiple threads.  Unlike earlier examples of TRANSIENT and 
+      THREAD lifestyle policy - the instances returned within any given thread
+      and any given part access invocation is the same instance.
+      </p>
+      
+      <subsection name="Component Example (unchanged from thread demo)">
+
+        <p>
+        <tt>tutorial/components/singleton</tt>:
+        </p>
+
+        <table>
+          <tr>
+            <td><a href="../singleton/Demo.java.html">Demo.java</a></td>
+            <td>A component that that established n threads, and makes multiple requests 
+                against the internal parts instance. The number of threads and per-thread 
+                hits is controlled by respective context values.</td>
+          </tr>
+          <tr>
+            <td><a href="../singleton/Gizmo.java.html">Gizmo.java</a></td>
+            <td>A test component we will use as the solution to the 
+            demo context criteria.</td>
+          </tr>
+          <tr>
+            <td><a href="../singleton/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td>The testcase.</td>
+          </tr>
+        </table>
+        
+      </subsection>
+      
+      <subsection name="Deployment Solution">
+        
+<pre>
+  &lt;project name="acme-singleton-demo" basedir="singleton"&gt;
+    &lt;types&gt;
+      &lt;type id="jar"/&gt;
+      &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+         type="org.acme.Demo" 
+         name="demo"&gt;
+        &lt;context&gt;
+          &lt;entry key="threadCount" value="3"/&gt;
+          &lt;entry key="accessCount" value="2"/&gt;
+        &lt;/context&gt;
+        &lt;parts&gt;
+          <font color="darkred">&lt;component key="gizmo" type="org.acme.Gizmo" lifestyle="singleton"/&gt;</font>
+        &lt;/parts&gt;
+      &lt;/component&gt;
+    &lt;/types&gt;
+    &lt;dependencies&gt;
+      &lt;test&gt;
+        &lt;include ref="ant/ant-junit"/&gt;
+        &lt;include ref="dpml/transit/dpml-transit-main"/&gt;
+      &lt;/test&gt;
+    &lt;/dependencies&gt;
+  &lt;/project&gt;
+</pre>
+        
+      </subsection>
+      
+      <subsection name="Testing the component">
+
+        <p>
+        The following debug level logging illustrates the thread name and resolved instance.
+        Analysis of the results demonstrates the resolution of the same instance 
+        irrespective of request and/or thread.
+        </p>
+
+<pre>
+test:
+    [junit] Executing forked test.
+    [junit] Running org.acme.test.DemoTestCase
+    [junit] [13279] [INFO   ] (demo):  gizmo (Thread[0,5,main]) [3916915]
+    [junit] [13279] [INFO   ] (demo):  gizmo (Thread[2,5,main]) [3916915]
+    [junit] [13279] [INFO   ] (demo):  gizmo (Thread[1,5,main]) [3916915]
+    [junit] [13279] [INFO   ] (demo):  gizmo (Thread[1,5,main]) [3916915]
+    [junit] [13279] [INFO   ] (demo):  gizmo (Thread[0,5,main]) [3916915]
+    [junit] [13279] [INFO   ] (demo):  gizmo (Thread[2,5,main]) [3916915]
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.891 sec</pre>
+    
+      </subsection>
+      
+      <subsection name="Summary">
+
+        <p>
+        Components assiated with a singleton sifestyle are shared across 
+        thread boundaries and as such need to deal with schronization concerns
+        when managing internal state.
+        </p>
+      
+      </subsection>
+      
+    </section>
+
+  </body>
+
+</document>
+

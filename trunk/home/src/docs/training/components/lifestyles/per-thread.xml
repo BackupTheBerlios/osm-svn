@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Lifestyle</title>
+  </properties>
+
+  <body>
+
+    <section name="Transient Lifestyles">
+
+      <p>
+      This example demonstrates the uniqueness of instances based on the per-THREAD
+      lifestyle policy. When a component is assiciated with the THREAD lifestyle policy
+      the component instance is assigned as a thread local variable.  As such, any objects
+      accessing the componet instance will do so in a sequential manner.  In the example
+      we deploy a series of seperate threads and for each thread we access the parts 
+      interface n times.  Each access within a given thread returns the same instance but 
+      each thread has a differnet instance allocated to it.
+      </p>
+      
+      <subsection name="Component Example">
+
+        <p>
+        <tt>tutorial/components/thread</tt>:
+        </p>
+
+        <table>
+          <tr>
+            <td><a href="../thread/Demo.java.html">Demo.java</a></td>
+            <td>A component that that established n threads, and makes multiple requests 
+                against the internal parts instance. The number of threads and per-thread 
+                hits is controlled by respective context values.</td>
+          </tr>
+          <tr>
+            <td><a href="../thread/Gizmo.java.html">Gizmo.java</a></td>
+            <td>A test component we will use as the solution to the 
+            demo context criteria.</td>
+          </tr>
+          <tr>
+            <td><a href="../thread/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td>The testcase.</td>
+          </tr>
+        </table>
+        
+      </subsection>
+      
+      <subsection name="Component Example">
+
+        <p>
+        To demonstrate the impact of the lifestyle policy we can update our project defintition
+        and declare an explicit lifestyle.  In this case we assign the <tt>TRANSIENT</tt> lifestyle
+        policy to the widget component.
+        </p>
+      
+        <p> 
+        <i>project definition:</i>:
+        </p>
+        
+<pre>
+  &lt;project name="acme-thread-demo" basedir="thread"&gt;
+    &lt;types&gt;
+      &lt;type id="jar"/&gt;
+      &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+         type="org.acme.Demo" 
+         name="demo"&gt;
+        &lt;context&gt;
+          &lt;entry key="threadCount" value="3"/&gt;
+          &lt;entry key="accessCount" value="2"/&gt;
+        &lt;/context&gt;
+        &lt;parts&gt;
+          <font color="darkred">&lt;component key="gizmo" type="org.acme.Gizmo" lifestyle="thread"/&gt;</font>
+        &lt;/parts&gt;
+      &lt;/component&gt;
+    &lt;/types&gt;
+    &lt;dependencies&gt;
+      &lt;test&gt;
+        &lt;include ref="ant/ant-junit"/&gt;
+        &lt;include ref="dpml/transit/dpml-transit-main"/&gt;
+      &lt;/test&gt;
+    &lt;/dependencies&gt;
+  &lt;/project&gt;
+</pre>
+        
+      </subsection>
+      
+      <subsection name="Testing the component">
+
+        <p>
+        The following debug level logging thread name and resolved instance.
+        Analysis of the results demonstrates the resolution of a single instance 
+        for any given thread.
+        </p>
+
+<pre>
+test:
+    [junit] Executing forked test.
+    [junit] Running org.acme.test.DemoTestCase
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.89 sec
+    [junit] [15100] [INFO   ] (demo):  gizmo (Thread[0,5,main]) [31365828]
+    [junit] [15100] [INFO   ] (demo):  gizmo (Thread[2,5,main]) [25345246]
+    [junit] [15100] [INFO   ] (demo):  gizmo (Thread[1,5,main]) [26530674]
+    [junit] [15100] [INFO   ] (demo):  gizmo (Thread[1,5,main]) [26530674]
+    [junit] [15100] [INFO   ] (demo):  gizmo (Thread[2,5,main]) [25345246]
+    [junit] [15100] [INFO   ] (demo):  gizmo (Thread[0,5,main]) [31365828]</pre>
+    
+      </subsection>
+      
+      <subsection name="Summary">
+
+        <p>
+        Components assiated with a per-thread lifestyle are not shared within a 
+        given thread.  As such all method invocations are sequential and the 
+        component implementation does not need to be concerned with concurreny.
+        </p>
+      
+      </subsection>
+      
+    </section>
+
+  </body>
+
+</document>
+

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Lifecycle</title>
+  </properties>
+
+  <body>
+
+    <section name="Component Lifecycle">
+
+      <p>
+      A component lifecycle deals with the series of actions that an 
+      object assumes that a container will apply following instantiation
+      in order to bring the instance into a working state, and the 
+      corresponding actions dealing with instance decommissioning.  In 
+      the examples presented in the tutorials we have leveraged the principal
+      of constructor based injection of 'smart' implementations of component
+      defined contracts that largely negate the need for supplimentarty 
+      deployment or decommissioning concerns.
+      However - there are many components that use alternative containment 
+      models that depend on formal semantics.  For example the Jetty package 
+      makes extensive use of <tt>start</tt> and <tt>stop</tt> lifecycle 
+      functions.  Earlier container system such as Avalon made use of 
+      interfaces such as <tt>Startable</tt> and <tt>Executable</tt> to express 
+      implementation assumptions.
+      </p>
+      
+      <p>
+      The Metro system includes a generic lifecycle description model that 
+      enables the declaration arbitarily complex deployment and decommissioning 
+      lifecycles expressed as state transitions and management operations.
+      This tutorial present an example of the creation and usage of a state 
+      transition model.
+      </p>
+      
+      <subsection name="The Start/Stop Example">
+      
+        <p>
+        The following Ant build file contains a task that constructs a
+        formal state-transition graph for a component that is initialized
+        via a start method invocation, resulting in the exposure of a stop
+        management operation, and the assertion of a termination criteria
+        involving the invocation of a stop method.
+        </p>
+<source>
+&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+
+&lt;project xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="dpml:depot"&gt;
+
+  &lt;transit:import uri="local:template:dpml/tools/standard"/&gt;
+  
+  &lt;target name="init" depends="standard.init"&gt;
+    &lt;x:plugin uri="link:part:dpml/metro/dpml-metro-tools"&gt;
+      &lt;task name="state" class="net.dpml.metro.tools.StateTask"/&gt;
+    &lt;/x:plugin&gt;
+  &lt;/target&gt;
+  
+  &lt;target name="build" depends="standard.build"&gt;
+    <font color="darkred">&lt;state class="org.acme.Demo"&gt;
+      &lt;trigger event="initialization"&gt;
+        &lt;transition name="start" target="started"&gt;
+          &lt;operation name="startup" method="start"/&gt;
+        &lt;/transition&gt;
+      &lt;/trigger&gt;
+      &lt;state name="started"&gt;
+        &lt;transition name="stop" target="../stopped"&gt;
+          &lt;operation name="stop" method="stop"/&gt;
+        &lt;/transition&gt;
+        &lt;trigger event="termination"&gt;
+          &lt;apply id="stop"/&gt;
+        &lt;/trigger&gt;
+      &lt;/state&gt;
+      &lt;state name="stopped"&gt;
+        &lt;transition name="start" target="../started"&gt;
+          &lt;operation name="start" method="start"/&gt;
+        &lt;/transition&gt;
+      &lt;/state&gt;
+    &lt;/state&gt;</font>
+  &lt;/target&gt;
+
+&lt;/project&gt;</source>
+        
+        <p>
+        The above state task creates a file named <tt>org/acme/Demo.xgraph</tt> which
+        is basically equivalent to the XML content show in red.  This graph declares a 
+        root state containing:
+        </p>
+        
+        <ul>
+          <li>
+            An initialization trigger fired automaticaly following instantiation
+            of the component instance - the trigger declares a state transition as the 
+            triggers action - the transition will move the active state of the object to
+            <tt>started</tt> and the transition definition declares that the <tt>start</tt>
+            operation shall be performed as a precondition to transition completion.
+          </li>
+          
+          <li>
+            The <tt>started</tt> state declaring the availability of the <tt>stop</tt> 
+            transition which is defined to chage the active state to <tt>stopped</tt>.  
+            In addition the <tt>started</tt> state declares a termination trigger which 
+            will be automatically fired if the component is terminated while in the 
+            <tt>started</tt>.  The termination action involes the existing transition 
+            named <tt>stop</tt>.
+          </li>
+          
+          <li>
+            The <tt>stopped</tt> state declares a transition supporting migration to the 
+            <tt>started</tt> state and efficively dissables supplimentary termination actions.
+          </li>
+        </ul>
+        
+        <p>
+        During runtime the Metro container maintains a referrence to the active state.  Any 
+        actions or transitions declared within the active state and any parent state of the 
+        active state become available management operation.
+        </p>
+        
+      </subsection>
+      
+      <subsection name="Test Case Results">
+      
+        <p>
+        In this example the testcase simply deploys the component, releases its reference 
+        and invokes the garbage collector (triggering instance disposal).  With logging for 
+        the demo component set to full trace mode we can see the additional container 
+        functionality dealing with the activation and deactivation lifecycle phases: 
+        </p>
+        
+<pre>
+test:
+    [junit] Executing forked test.
+    [junit] Running org.acme.test.DemoTestCase
+    [junit] [11050] [FINER  ] (demo): creating new component handler [/demo] for class [org.acme.Demo]
+    [junit] [11050] [FINER  ] (demo): adding component model listener [component:/demo (org.acme.Demo)]
+    [junit] [11050] [FINE   ] (demo): established transient lifestyle handler for [org.acme.Demo]
+    [junit] [11050] [FINER  ] (demo): commissioning
+    [junit] [11050] [FINER  ] (demo): creating new provider
+    [junit] [11050] [FINER  ] (demo): provider instantiation
+    [junit] [11050] [FINER  ] (demo): instantiating [org.acme.Demo]
+    [junit] [11050] [FINE   ] (demo): instantiated [5503831]
+    <font color="darkred">[junit] [11050] [FINER  ] (demo): applying transition [start] to [5503831]</font>
+    <font color="blue">[junit] [11050] [INFO   ] (demo): startup</font>
+    <font color="darkred">[junit] [11050] [FINER  ] (demo): transitioning from [root] to [root/started] in [5503831]</font>
+    [junit] [11050] [FINE   ] (demo): activated [5503831]
+    [junit] [11050] [FINER  ] (demo): returning service instance [5503831]
+    [junit] [11050] [FINER  ] (demo): finalizing component handler
+    [junit] [11050] [FINER  ] (demo): initiating finalization in [5503831]
+    [junit] [11050] [FINER  ] (demo): initiating disposal of [5503831]
+    <font color="darkred">[junit] [11050] [FINER  ] (demo): applying transition [stop] to [5503831]</font>
+    <font color="blue">[junit] [11050] [INFO   ] (demo): shutdown</font>
+    <font color="darkred">[junit] [11050] [FINER  ] (demo): transitioning from [root/started] to [root/stopped] in [5503831]</font>
+    [junit] [11050] [FINE   ] (demo): instance disposal [5503831]
+    [junit] [11050] [FINER  ] (demo): finalization completed in [5503831]
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.984 sec
+</pre>
+
+      </subsection>
+      
+      <subsection name="Summary">
+      
+        <p>
+        This tutorial has demonstrated the definition of a custom component lifecycle
+        and the resulting impact on the component runtime during deployment and decommissioning
+        phases. In addition the state graph provides support for the declaration of dynamic
+        management operations, support for transition invocation my management systems and 
+        several other advanced features.
+        </p>
+        
+      </subsection>
+      
+    </section>
+
+  </body>
+
+</document>
+

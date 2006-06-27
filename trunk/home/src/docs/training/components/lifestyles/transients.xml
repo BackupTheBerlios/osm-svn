@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Lifestyle</title>
+  </properties>
+
+  <body>
+
+    <section name="Transient Lifestyles">
+
+      <p>
+      The example presented here focusses on the uniquness of transient 
+      instances and the implied weak collection policy.  The example includes
+      a demo component that contains a nested gizmo component with a transient 
+      lifestyle.  The demo component if configured (via an inner Context) to 
+      request n gizmo instances. The resulting test-case log demonstrates that
+      each request is resolved to a unique instance.
+      </p>
+      
+      <subsection name="Component Example">
+
+        <p>
+        <tt>tutorial/components/transient</tt>:
+        </p>
+
+        <table>
+          <tr>
+            <td><a href="../transient/Demo.java.html">Demo.java</a></td>
+            <td>A component that that makes multiple requests for an internal
+                part. The number of request is controlled by a context value
+                and the assigned part has a transient lifestyle.</td>
+          </tr>
+          <tr>
+            <td><a href="../transient/Gizmo.java.html">Gizmo.java</a></td>
+            <td>A test component we will use as the solution to the 
+            demo context criteria.</td>
+          </tr>
+          <tr>
+            <td><a href="../transient/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td>The testcase.</td>
+          </tr>
+        </table>
+        
+      </subsection>
+      
+      <subsection name="Component Example">
+
+        <p>
+        To demonstrate the impact of the lifestyle policy we can update our project defintition
+        and declare an explicit lifestyle.  In this case we assign the <tt>TRANSIENT</tt> lifestyle
+        policy to the widget component.
+        </p>
+      
+        <p> 
+        <i>project definition:</i>:
+        </p>
+        
+<pre>
+  &lt;project name="acme-transient-demo" basedir="transient"&gt;
+    &lt;types&gt;
+      &lt;type id="jar"/&gt;
+      &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+         type="org.acme.Demo" 
+         name="demo"&gt;
+        &lt;context&gt;
+          &lt;entry key="count" value="5"/&gt;
+        &lt;/context&gt;
+        &lt;parts&gt;
+          <font color="darkred">&lt;component key="gizmo" type="org.acme.Gizmo" lifestyle="transient"/&gt;</font>
+        &lt;/parts&gt;
+      &lt;/component&gt;
+    &lt;/types&gt;
+    &lt;dependencies&gt;
+      &lt;test&gt;
+        &lt;include ref="ant/ant-junit"/&gt;
+        &lt;include ref="dpml/transit/dpml-transit-main"/&gt;
+      &lt;/test&gt;
+    &lt;/dependencies&gt;
+  &lt;/project&gt;
+</pre>
+        
+      </subsection>
+      
+      <subsection name="Testing the component">
+
+        <p>
+        The following debug level logging reflects the request for multiple transient
+        instances where each request is resolved to a new gizmo instance.
+        </p>
+
+<pre>
+test:
+    [junit] Executing forked test.
+    [junit] Running org.acme.test.DemoTestCase
+    [junit] [19582] [INFO   ] (demo):  gizmo [1] 23886295
+    [junit] [19582] [INFO   ] (demo):  gizmo [2] 17547166
+    [junit] [19582] [INFO   ] (demo):  gizmo [3] 26530674
+    [junit] [19582] [INFO   ] (demo):  gizmo [4] 27165481
+    [junit] [19582] [INFO   ] (demo):  gizmo [5] 23860799
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.89 sec</pre>
+    
+      </subsection>
+      
+      <subsection name="Summary">
+
+        <p>
+        Components assiated with a transient lifestyle are not shared.  Each request
+        will be resolved by instantiation of a new instance. In addition, transient
+        instances are maintained via weak references and as such instances will be 
+        automatically finalized by the JVM following instance reference release by 
+        the consuming application.
+        </p>
+      
+      </subsection>
+      
+    </section>
+
+  </body>
+
+</document>
+

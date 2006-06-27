@@ -193,6 +193,205 @@
         </dependencies>
       </project>
 
+      <project name="acme-lookup-demo" basedir="lookup">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+               type="org.acme.Demo" 
+               name="demo">
+            <parts>
+              <component key="widget" type="org.acme.Widget" name="widget">
+                <context>
+                  <entry key="color" method="BLUE"/>
+                </context>
+              </component>
+              <component key="gizmo" type="org.acme.Gizmo" name="gizmo">
+                <context>
+                  <entry key="widget" lookup="org.acme.Widget"/>
+                </context>
+              </component>
+            </parts>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-demo-006"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+
+      <project name="acme-lifestyle-demo" basedir="lifestyle">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+               type="org.acme.Demo" 
+               name="demo">
+            <parts>
+              <component key="widget" type="org.acme.Widget" name="widget" lifestyle="transient">
+                <context>
+                  <entry key="color" method="BLUE"/>
+                </context>
+              </component>
+              <component key="gizmo" type="org.acme.Gizmo" name="gizmo">
+                <context>
+                  <entry key="widget" lookup="org.acme.Widget"/>
+                </context>
+              </component>
+            </parts>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-lookup-demo"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+
+      <project name="acme-transient-demo" basedir="transient">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+               type="org.acme.Demo" 
+               name="demo">
+            <context>
+              <entry key="count" value="5"/>
+            </context>
+            <parts>
+              <component key="gizmo" type="org.acme.Gizmo" lifestyle="transient"/>
+            </parts>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-lifestyle-demo"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+      
+      <project name="acme-thread-demo" basedir="thread">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+               type="org.acme.Demo" 
+               name="demo">
+            <context>
+              <entry key="threadCount" value="3"/>
+              <entry key="accessCount" value="2"/>
+            </context>
+            <parts>
+              <component key="gizmo" type="org.acme.Gizmo" lifestyle="thread"/>
+            </parts>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-transient-demo"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+
+      <project name="acme-singleton-demo" basedir="singleton">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+               type="org.acme.Demo" 
+               name="demo">
+            <context>
+              <entry key="threadCount" value="3"/>
+              <entry key="accessCount" value="2"/>
+            </context>
+            <parts>
+              <component key="gizmo" type="org.acme.Gizmo" lifestyle="singleton"/>
+            </parts>
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-thread-demo"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+      
+      <project name="acme-state-demo" basedir="state">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+               type="org.acme.Demo" 
+               name="demo"
+               lifestyle="transient">
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-singleton-demo"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+      
+      <project name="acme-logging-demo" basedir="logging">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+               type="org.acme.Demo" 
+               name="demo"
+               lifestyle="transient">
+          </component>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-state-demo"/>
+          </build>
+          <runtime>
+            <include ref="dpml/util/dpml-logging-api"/>
+          </runtime>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+      
+      <project name="acme-type-demo" basedir="type">
+        <types>
+          <type id="jar"/>
+          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
+               type="org.acme.Demo"/>
+        </types>
+        <dependencies>
+          <build>
+            <include key="acme-logging-demo"/>
+          </build>
+          <test>
+            <include ref="ant/ant-junit"/>
+            <include ref="dpml/transit/dpml-transit-main"/>
+          </test>
+        </dependencies>
+      </project>
+      
     </module>
 
   </modules>

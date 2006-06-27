@@ -1,0 +1,1 @@
+Demonstrating uniquness of values when access the parts interface when the assigned component is associated with a TRANSIENT lifestyle.

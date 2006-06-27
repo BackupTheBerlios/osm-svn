@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Types</title>
+  </properties>
+
+  <body>
+
+    <section name="Component Types">
+
+      <subsection name="Tutorial Objective">
+
+        <p>
+        All of the component tutorials presented so-far have focussed on 
+        the implementation class and associated deployment data.  In this
+        tutorial we address the subject of component types a their role
+        in providing default information associated with a particular 
+        component class.
+        </p>
+        
+      </subsection>
+      
+      <subsection name="What is a Component Type">
+      
+        <p>
+        The following characteristics of a component class are directly
+        associated with the implementation class:
+        </p>
+        
+        <ul>
+          <li>thread-safety policy</li>
+          <li>lifecycle graph</li>
+          <li>service interface restrictions</li>
+        </ul>
+        
+        <p>
+        In addition, component deployment default and runtime constraints 
+        can be associated with a component type enabling simplification of 
+        deployment data and faster processing during deployment (via build-time
+        preprocessing on constraints).  As such - the following additional
+        features can be associated with a component type:
+        </p>
+        
+        <ul>
+          <li>lifestyle policy</li>
+          <li>collection policy</li>
+          <li>component name</li>
+          <li>context entry criteria</li>
+          <li>bundled part defintions</li>
+          <li>logging channel names</li>
+          <li>default activation policy</li>
+        </ul>
+        
+      </subsection>
+      
+      <subsection name="Type Creation">
+      
+        <p>
+        The following <tt>build.xml</tt> file demonstrates the use of 
+        the Metro <tt>type</tt> task.  The type task handles the creation of an XML
+        document collocated with the component class under the <tt>type</tt> suffix 
+        (e.g. <tt>org/acme/Demo.type</tt>).
+        </p>
+        
+<source>
+&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+
+&lt;project xmlns:transit="antlib:net.dpml.transit" 
+    xmlns:x="dpml:depot"&gt;
+
+  &lt;target name="init" depends="standard.init"&gt;
+    &lt;x:plugin uri="link:part:dpml/metro/dpml-metro-tools" urn="metro"/&gt;
+  &lt;/target&gt;
+
+  &lt;target name="build" depends="standard.build"&gt;
+    <font color="darkred">&lt;type xmlns="metro" class="org.acme.Demo" name="demo" threadsafe="true" collection="soft"&gt;
+      &lt;services&gt;
+        &lt;service class="org.acme.Widget"/&gt;
+      &lt;/services&gt;
+      &lt;state&gt;
+        &lt;trigger event="initialization"&gt;
+          &lt;transition name="start" target="started"&gt;
+            &lt;operation name="startup" method="start"/&gt;
+          &lt;/transition&gt;
+        &lt;/trigger&gt;
+        &lt;state name="started"&gt;
+          &lt;transition name="stop" target="../stopped"&gt;
+            &lt;operation name="stop" method="stop"/&gt;
+          &lt;/transition&gt;
+          &lt;trigger event="termination"&gt;
+            &lt;apply id="stop"/&gt;
+          &lt;/trigger&gt;
+        &lt;/state&gt;
+        &lt;state name="stopped"&gt;
+          &lt;transition name="start" target="../started"&gt;
+            &lt;operation name="start" method="start"/&gt;
+          &lt;/transition&gt;
+        &lt;/state&gt;
+      &lt;/state&gt;
+    &lt;/type&gt;</font>
+  &lt;/target&gt;
+
+&lt;/project&gt;</source>
+
+        <p>
+        In the above type defintion we have requested the creation of a type datastructure 
+        for the class <tt>org.acme.Demo</tt>.  In this definition we have declared that the 
+        component implementation publishes a single service interface (<tt>org.acme.Widget</tt>), 
+        thread-safe capability, a default name and collection policy, and a lifecycle state graph.
+        The component deployment definition within our Depot project declaration can now simplificed 
+        down to the following:
+        </p>
+        
+<pre>
+  &lt;project name="acme-type-demo" basedir="type"&gt;
+    &lt;types&gt;
+      &lt;type id="jar"/&gt;
+      <font color="darkred">&lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" type="org.acme.Demo"/&gt;</font>
+    &lt;/types&gt;
+    &lt;dependencies&gt;
+      &lt;test&gt;
+        &lt;include ref="ant/ant-junit"/&gt;
+        &lt;include ref="dpml/transit/dpml-transit-main"/&gt;
+      &lt;/test&gt;
+    &lt;/dependencies&gt;
+  &lt;/project&gt;
+</pre>
+
+      </subsection>
+
+      <subsection name="Component Example">
+
+        <p>
+        <tt>tutorial/components/type</tt>:
+        </p>
+
+        <table>
+          <tr>
+            <td><a href="../type/Demo.java.html">Demo.java</a></td>
+            <td>The demo component implementing the Widget service interface
+            together with support for a custom lifecycle.</td>
+          </tr>
+          <tr>
+            <td><a href="../type/Widget.java.html">Widget.java</a></td>
+            <td>An example service interface implemented in the Demo class.</td>
+          </tr>
+          <tr>
+            <td><a href="../type/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td>The testcase.</td>
+          </tr>
+        </table>
+        
+        <p>
+        Testcase result reflect the demo component deployment including invocation of an
+        operation against the Widget service interface.
+        </p>
+        
+<pre>test:
+    [junit] Executing forked test.
+    [junit] Running org.acme.test.DemoTestCase
+    <font color="blue">[junit] [14219] [INFO   ] (demo): startup
+    [junit] [14219] [INFO   ] (demo): doing stuff
+    [junit] [14219] [INFO   ] (demo): shutdown</font>
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.047 sec</pre>
+        
+      </subsection>
+      
+      <subsection name="Summary">
+      
+        <p>
+        </p>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+

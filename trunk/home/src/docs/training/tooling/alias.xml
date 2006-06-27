@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="Using alias statements">
+
+        <p>
+        In our previouse example dealing with the creation of a module suitable
+        for external project reference - we have introduced an issue concerning
+        references SNAPSHOT versions.  One should keep in mind that it is bad practive
+        to reference SNAPSHOT versions and it is considered very bad practive 
+        to publish SNAPSHOT artifacts.
+        </p>
+        
+        <p>
+        A solution to this problem is to publish a platform independent symbolic link 
+        to the artifact (a.k.a. an alias).
+        </p>
+
+      <subsection name="Adding an Alias">
+
+        <p>
+        To simplify local management of modules we can use the <tt>alias</tt> attribuite
+        on a type declaration.  This request the creation of a link which is an artifact
+        that references another artifact.  The following example demonstrates the addition
+        of an <tt>alias</tt> attribute to the type production statement in our module 
+        definition.
+        </p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="link:module:ant"/&gt;
+  &lt;/imports&gt;
+
+  &lt;modules&gt;
+
+    &lt;module name="acme" basedir="."&gt;
+
+      &lt;types&gt;
+        &lt;type id="module" <font color="darkred">alias="true"</font>/&gt;
+      &lt;/types&gt;
+
+      ...
+      
+    &lt;/module&gt;
+
+  &lt;/modules&gt;
+
+&lt;/library&gt;
+</source>
+
+        <p>
+        After executing the module build you will find an artifact named 
+        <tt>acme.module.link</tt> in the <tt>target/deliverables/modules</tt>
+        directory.  The link datastructure can be referenced using Transit's 
+        link protocol as show in the following example import statement.
+        </p>
+
+<source>
+&lt;library&gt;
+
+  &lt;imports&gt;
+    &lt;import uri="<font color="darkred">link:module:acme</font>"/&gt;
+  &lt;/imports&gt;
+
+   &lt;modules&gt;
+
+    ...
+
+  &lt;/modules&gt;
+
+&lt;/library>
+</source>
+
+      </subsection>
+
+      <subsection name="Summary">
+
+
+        <p>
+        The link datastructure is simply a reference to a 
+        versioned artifact (similar to a unix symlink for artifacts).  This tutorial
+        has covered the creation of a simple non-versioned alias associated with the 
+        produced module definition. Alias attributes may be used on any resource type
+        production statement.  Also, an alternative form of versioned alias production
+        is available using the <tt>version</tt> attribute a value in place of <tt>alias</tt>.
+        For example - the following statement would result in the generation of a alias
+        artifact associated with the version 1.0.
+        </p>
+        
+<source>
+  &lt;types&gt;
+    &lt;type id="module" <font color="darkred">version="1.0"</font>/&gt;
+  &lt;/types&gt;
+</source>
+
+        <p>
+        Our next subject deals with <a href="versioned.html">versioned builds</a>.
+        </p>
+
+      </subsection>
+
+    </section>
+
+  </body>
+</document>
+

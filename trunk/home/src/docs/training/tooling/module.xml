@@ -79,10 +79,8 @@
 
 <pre>
 $ build -list -select acme
-</pre>
-<source>
-Listing module [acme]
 
+Listing module [acme]
 
 module:acme
 
@@ -93,9 +91,7 @@ module:acme
   resources: (2)
     project:acme/acme-client
     project:acme/acme-system
-
-$
-</source>
+</pre>
 
         <p>
         Building the module will result in the creation of a module resource
@@ -106,33 +102,43 @@ $
 $ build -select acme
 </pre>
 
-<source>
-$ build -select acme
+        <p>
+        The resulting module file is shown below.  The principal differences
+        between the original library file and the generated module is the removal
+        of build-time concerns.  For example, projects are represented as resource, 
+        basedir info has been removed along with build and test pahse dependency 
+        information.
+        </p>
 
--------------------------------------------------------------------------
-acme
--------------------------------------------------------------------------
+<source><![CDATA[
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<module name="acme" version="SNAPSHOT"
+    xmlns="link:xsd:dpml/lang/dpml-module#1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-init:
+  <types>
+    <type id="module" alias="true"/>
+  </types>
 
-prepare:
+  <resource name="acme-client" version="SNAPSHOT">
+    <types>
+      <type id="jar"/>
+    </types>
+  </resource>
 
-build:
-   [module] Exporting module to: C:\dev\target\deliverables\modules\acme-SNAPSHOT.module
-   [module] Creating md5 checksum
+  <resource name="acme-system" version="SNAPSHOT">
+    <types>
+      <type id="jar"/>
+    </types>
+    <dependencies>
+      <runtime>
+        <include ref="acme/acme-client"/>
+      </runtime>
+    </dependencies>
+  </resource>
 
-package:
-
-test:
-
-install:
-[x:install] Copying 2 files to C:\osm\data\cache
-
-BUILD SUCCESSFUL
-Total time: 2 seconds
-
-$
-</source>
+</module>
+]]></source>
 
       </subsection>
 
@@ -141,7 +147,7 @@ $
         <p>
         The contents of the module resources created as an output of the build is
         an encoded XML file.  It contains all module property declarations and our
-        two projects in the form of resource defintions suitable for use by external 
+        two projects in the form of resource definitions suitable for use by external 
         projects in the same way we imported the ant module during the testcase 
         tutorial.
         </p>
@@ -164,83 +170,16 @@ $
 &lt;/library>
 </source>
 
-        <p>
-        However - there are a couple if issue here.  Firstly it is bad practive
-        to reference SNAPSHOT versions and it is generally considered very bad practive 
-        to publish SNAPSHOT artifacts.  There are two things we can use to deal with
-        these concerns:
-        </p>
-
-        <ol>
-          <li>creation of a non-version artifact link</li>
-          <li>building using an explicit version</li>
-        </ol>
-
       </subsection>
 
-      <subsection name="Adding an Alias">
+      <subsection name="Summary">
 
         <p>
-        To simplify local management of modules we can use the <tt>alias</tt> attribuite
-        on a type declaration.  This request the creation of a link which is an artifact
-        that references another artifact.
-        </p>
-
-<source>
-&lt;library&gt;
-
-  &lt;imports&gt;
-    &lt;import uri="link:module:ant"/&gt;
-  &lt;/imports&gt;
-
-  &lt;modules&gt;
-
-    &lt;module name="acme" <font color="darkred">basedir="."</font>&gt;
-
-      &lt;types&gt;
-        &lt;type id="module" <font color="darkred">alias="true"</font>/&gt;
-      &lt;/types&gt;
-
-      ...
-      
-    &lt;/module&gt;
-
-  &lt;/modules&gt;
-
-&lt;/library&gt;
-</source>
-
-        <p>
-        After executing the module build you will fin an artifact named 
-        <tt>acme.module.link</tt> in the <tt>target/deliverables/modules</tt>
-        directory.  The link datastructure can be referenced using Transit's 
-        link protocol as show in the following example import statement.
-        </p>
-
-<source>
-&lt;library&gt;
-
-  &lt;imports&gt;
-    &lt;import uri="<font color="darkred">link:module:acme</font>"/&gt;
-  &lt;/imports&gt;
-
-   &lt;modules&gt;
-
-    ...
-
-  &lt;/modules&gt;
-
-&lt;/library>
-</source>
-
-        <p>
-        In effect the link datastructure is simply a reference to a 
-        versioned artifact (similar to a unix symlink for artifacts).
-        </p>
-
-        <p>
-        The second subject of <a href="versioned.html">versioned builds</a> 
-        is addressed in the following tutorial.
+        This tutorial has demonstrated the creation of a stand-alone module definition
+        suitable for import by external projects - hoewever - the tutorial has introduced
+        an issue in that we have added a SNAPSHOT reference to our library defintion and 
+        that is a bad thing.  Our next torial addresses this issue through the declaration 
+        and usage of <a href="alias.html">platform independent symbolic links</a>.
         </p>
 
       </subsection>

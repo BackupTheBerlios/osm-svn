@@ -1,0 +1,1 @@
+Demonstrating the impact of changing a componet lifestyle to TRANSIENT.

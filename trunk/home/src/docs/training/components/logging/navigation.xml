@@ -20,21 +20,11 @@
 
 <project>
 
- <title>Metro Training Programme</title>
+ <title>Logging</title>
 
  <body>
 
     <menu>
-      <item name="Context Management" href="context.html"/>
-      <item name="Context Examples" href="context-examples.html"/>
-      <!--<item name="Components in a Context" href="context-nesting.html"/>-->
-      <item name="Component Composition" href="composition-by-parts.html"/>
-      <!--<item name="Containment" href="component-as-container.html"/>-->
-      <item name="Service Lookup" href="lookup.html"/>
-      <item name="Lifestyles" href="lifestyles/index.html"/>
-      <item name="Lifecycles" href="lifecycles/index.html"/>
-      <item name="Logging" href="logging/index.html"/>
-      <item name="Component Types" href="types/index.html"/>
     </menu>
 
  </body>
