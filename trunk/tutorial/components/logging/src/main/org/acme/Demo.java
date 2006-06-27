@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.acme.logging;
+package org.acme;
 
 import net.dpml.logging.Logger;
 
@@ -38,9 +38,9 @@ public class Demo
     */
     public Demo( Logger logger )
     {
-        if( logger.isDebugEnabled() )
+        if( logger.isTraceEnabled() )
         {
-            logger.debug( "commencing instantiation cycle" );
+            logger.trace( "commencing instantiation cycle" );
         }
         if( logger.isInfoEnabled() )
         {
