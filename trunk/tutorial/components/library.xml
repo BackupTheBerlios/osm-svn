@@ -336,6 +336,8 @@
           </test>
         </dependencies>
       </project>
+
+      <module file="import/module.xml"/>
       
     </module>
 
