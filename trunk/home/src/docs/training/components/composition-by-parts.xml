@@ -35,12 +35,12 @@
       <subsection name="Component Example">
 
         <p>
-        <tt>tutorial/components/005</tt>:
+        <tt>tutorial/components/parts</tt>:
         </p>
 
         <table>
           <tr>
-            <td><a href="005/Demo.java.html">Demo.java</a></td>
+            <td><a href="parts/Demo.java.html">Demo.java</a></td>
             <td>Our demo component updated to reflect the usage of 
             the inner Parts interface.</td>
           </tr>
@@ -53,7 +53,7 @@
         </p>
         
 <pre>
-  &lt;project name="acme-demo-005" basedir="005"&gt;
+  &lt;project name="acme-demo-parts" basedir="parts"&gt;
     &lt;types&gt;
       &lt;type id="jar"/&gt;
       &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
@@ -91,7 +91,6 @@
 
 <pre>
 test:
-    [junit] Created dir: C:\dev\osm\trunk\tutorial\components\005\target\reports\test
     [junit] Executing forked test.
     [junit] Running org.acme.test.DemoTestCase
     [junit] [18906] [INFO   ] (demo): located the color java.awt.Color[r=0,g=0,b=255]

@@ -23,7 +23,7 @@
 
       <!-- a minimal component -->
       
-      <project name="acme-demo-001" basedir="001">
+      <project name="acme-demo-hello" basedir="hello">
         <types>
           <type id="jar"/>
           <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
@@ -40,7 +40,7 @@
     
       <!-- adding context inner interface -->
       
-      <project name="acme-demo-002" basedir="002">
+      <project name="acme-demo-context" basedir="context">
         <types>
           <type id="jar"/>
           <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
@@ -56,7 +56,7 @@
         </types>
         <dependencies>
           <build>
-            <include key="acme-demo-001"/>
+            <include key="acme-demo-hello"/>
           </build>
           <test>
             <include ref="ant/ant-junit"/>
@@ -67,7 +67,7 @@
       
       <!-- demonstrating context primitives, arrays, and constructed values -->
       
-      <project name="acme-demo-003" basedir="003">
+      <project name="acme-demo-examples" basedir="examples">
         <types>
           <type id="jar"/>
           <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
@@ -103,7 +103,7 @@
         </types>
         <dependencies>
           <build>
-            <include key="acme-demo-002"/>
+            <include key="acme-demo-context"/>
           </build>
           <test>
             <include ref="ant/ant-junit"/>
@@ -112,33 +112,7 @@
         </dependencies>
       </project>
 
-      <project name="acme-demo-004" basedir="004">
-        <types>
-          <type id="jar"/>
-          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
-               type="org.acme.Demo" 
-               name="demo">
-            <context>
-              <component key="theWidget" type="org.acme.Widget" name="widget">
-                <context>
-                  <entry key="color" method="BLUE"/>
-                </context>
-              </component>
-            </context>
-          </component>
-        </types>
-        <dependencies>
-          <build>
-            <include key="acme-demo-003"/>
-          </build>
-          <test>
-            <include ref="ant/ant-junit"/>
-            <include ref="dpml/transit/dpml-transit-main"/>
-          </test>
-        </dependencies>
-      </project>
-
-      <project name="acme-demo-005" basedir="005">
+      <project name="acme-parts-demo" basedir="parts">
         <types>
           <type id="jar"/>
           <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
@@ -155,37 +129,8 @@
         </types>
         <dependencies>
           <build>
-            <include key="acme-demo-004"/>
+            <include key="acme-demo-examples"/>
           </build>
-          <test>
-            <include ref="ant/ant-junit"/>
-            <include ref="dpml/transit/dpml-transit-main"/>
-          </test>
-        </dependencies>
-      </project>
-
-      <project name="acme-demo-006" basedir="006">
-        <types>
-          <type id="jar"/>
-          <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
-               type="org.acme.Demo" 
-               name="demo">
-            <parts>
-              <component key="widget" type="org.acme.Widget" name="widget">
-                <context>
-                  <entry key="color" method="BLUE"/>
-                </context>
-              </component>
-            </parts>
-          </component>
-        </types>
-        <dependencies>
-          <build>
-            <include key="acme-demo-005"/>
-          </build>
-          <runtime>
-            <include ref="dpml/metro/dpml-metro-model"/>
-          </runtime>
           <test>
             <include ref="ant/ant-junit"/>
             <include ref="dpml/transit/dpml-transit-main"/>
@@ -215,7 +160,7 @@
         </types>
         <dependencies>
           <build>
-            <include key="acme-demo-006"/>
+            <include key="acme-parts-demo"/>
           </build>
           <test>
             <include ref="ant/ant-junit"/>

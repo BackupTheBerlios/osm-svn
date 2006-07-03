@@ -24,7 +24,7 @@
 
         <table>
           <tr>
-            <td><a href="002/Demo.java.html">Demo.java</a></td>
+            <td><a href="context/Demo.java.html">Demo.java</a></td>
             <td>A component implementation incorporating a Context inner interface.</td>
           </tr>
         </table>
@@ -150,7 +150,7 @@ public class Demo
         </i></p>
 
 <pre>
-  &lt;project name="acme-demo-002" basedir="002"&gt;
+  &lt;project name="acme-demo-context" basedir="context"&gt;
     &lt;types&gt;
       &lt;type id="jar"/&gt;
       &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
@@ -180,14 +180,13 @@ public class Demo
         <p>
         During execution of the testcases we see the result of logging the 
         a message reflecting configuration and runtime information.  In
-        the <a href="002/DemoTestCase.java.html">DemoTestCase</a> 
+        the <a href="context/DemoTestCase.java.html">DemoTestCase</a> 
         the output is shows the result of concatination of values resolved 
         fro the context implementation supplied by the container to the component instance.
         </p>
 
 <pre>
 test:
-    [junit] Created dir: C:\dev\osm\trunk\tutorial\components\002\target\reports\test
     [junit] Executing forked test.
     [junit] Running org.acme.test.DemoTestCase
     <font color="darkred">[junit] [16245] [INFO   ] (demo): Painting mcconnell's bike silver.</font>

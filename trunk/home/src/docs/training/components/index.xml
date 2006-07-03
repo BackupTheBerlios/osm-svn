@@ -41,11 +41,11 @@
 
         <table>
           <tr>
-            <td><a href="001/Demo.java.html">Demo.java</a></td>
+            <td><a href="hello/Demo.java.html">Demo.java</a></td>
             <td>A minimal component implementation.</td>
           </tr>
           <tr>
-            <td><a href="001/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td><a href="hello/DemoTestCase.java.html">DemoTestCase.java</a></td>
             <td>Testcase that validates component deployment.</td>
           </tr>
         </table>
@@ -62,7 +62,7 @@
         </p>
         
 <source>
-  &lt;project name="acme-demo-001" basedir="001"&gt;
+  &lt;project name="acme-demo-hello" basedir="hello"&gt;
     &lt;types&gt;
       &lt;type id="jar"/&gt;
       <font color="darkred">&lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 

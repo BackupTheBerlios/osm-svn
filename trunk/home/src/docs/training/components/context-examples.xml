@@ -20,17 +20,17 @@
       <subsection name="Component Example">
 
         <p>
-        <tt>tutorial/components/003</tt>:
+        <tt>tutorial/components/examples</tt>:
         </p>
 
         <table>
           <tr>
-            <td><a href="003/Demo.java.html">Demo.java</a></td>
+            <td><a href="examples/Demo.java.html">Demo.java</a></td>
             <td>A component that demonstrates the a broad spectrum of 
             context types (primitives, arrays and complex types).</td>
           </tr>
           <tr>
-            <td><a href="003/DemoTestCase.java.html">DemoTestCase.java</a></td>
+            <td><a href="examples/DemoTestCase.java.html">DemoTestCase.java</a></td>
             <td>The testcase.</td>
           </tr>
         </table>
@@ -42,7 +42,7 @@
         </p>
         
 <pre>
-  &lt;project name="acme-demo-003" basedir="003"&gt;
+  &lt;project name="acme-demo-examples" basedir="examples"&gt;
     &lt;types&gt;
       &lt;type id="jar"/&gt;
       &lt;component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
@@ -108,7 +108,7 @@ test:
     [junit] [25598] [INFO   ] (demo): float: 9.813
     [junit] [25598] [INFO   ] (demo): char: x
     [junit] [25598] [INFO   ] (demo): boolean: true
-    [junit] [25598] [INFO   ] (demo): file: C:\dev\osm\trunk\tutorial\components\003
+    [junit] [25598] [INFO   ] (demo): file: C:\dev\osm\trunk\tutorial\components\examples
     [junit] [25598] [INFO   ] (demo): temp: C:\DOCUME~1\MCCONN~1\LOCALS~1\Temp
     [junit] [25598] [INFO   ] (demo): uri: component:/demo
     [junit] [25598] [INFO   ] (demo): name: demo
@@ -123,8 +123,8 @@ test:
     [junit] [25598] [INFO   ] (demo): optionalFloat: 3.142
     [junit] [25598] [INFO   ] (demo): optionalChar: #
     [junit] [25598] [INFO   ] (demo): optionalBoolean: false
-    [junit] [25598] [INFO   ] (demo): optionalFile: C:\dev\osm\trunk\tutorial\components\003
-    [junit] [25598] [INFO   ] (demo): optionalURI: file:/C:/dev/osm/trunk/tutorial/components/003/
+    [junit] [25598] [INFO   ] (demo): optionalFile: C:\dev\osm\trunk\tutorial\components\examples
+    [junit] [25598] [INFO   ] (demo): optionalURI: file:/C:/dev/osm/trunk/tutorial/components/examples/
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.937 sec</pre>
 
       </subsection>
