@@ -106,6 +106,34 @@
         <include name="**/*.html"/>
       </fileset>
     </copy>
+    
+
+    <property name="import.src.dir" location="${basedir}/../tutorial/components/import"/>
+    <property name="local.import.docs.dir" location="target/docs/training/components/import"/>
+    <mkdir dir="${local.import.docs.dir}"/>
+    <copy toDir="${local.import.docs.dir}" flatten="true">
+      <fileset dir="${import.src.dir}/api/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+      <fileset dir="${import.src.dir}/clock/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+      <fileset dir="${import.src.dir}/demo/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+    </copy>
+    
+    <!--
+    <property name="import.api.src.dir" location="${basedir}/../tutorial/components/import/api"/>
+    <property name="local.import.api.docs.dir" location="target/docs/training/components/import/api"/>
+    <mkdir dir="${local.import.api.docs.dir}"/>
+    <copy toDir="${local.import.api.docs.dir}" flatten="true">
+      <fileset dir="${import.api.src.dir}/target/reports/src">
+        <include name="**/*.html"/>
+      </fileset>
+    </copy>
+    -->
+    
   </target>
 
   <target name="build" depends="standard.build">

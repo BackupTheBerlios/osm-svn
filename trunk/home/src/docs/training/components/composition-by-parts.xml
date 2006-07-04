@@ -3,7 +3,7 @@
 <document>
   <properties>
     <author email="mcconnell@osm.net">Stephen McConnell</author>
-    <title>Component in a Context</title>
+    <title>The Sum of the Parts</title>
   </properties>
 
   <body>
@@ -60,7 +60,7 @@
          type="org.acme.Demo" 
          name="demo"&gt;
         <font color="darkred">&lt;parts&gt;
-          &lt;component key="theWidget" type="org.acme.Widget" name="widget"&gt;
+          &lt;component key="widget" type="org.acme.Widget"&gt;
             &lt;context&gt;
               &lt;entry key="color" method="BLUE"/&gt;
             &lt;/context&gt;

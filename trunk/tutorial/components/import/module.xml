@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <module name="import" xmlns="link:xsd:dpml/lang/dpml-module#1.0" >
 
+  <dependencies>
+    <build>
+      <include ref="org/acme/acme-type-demo"/>
+    </build>
+  </dependencies>
+
   <project name="acme-clock-api" basedir="api">
     <types>
       <type id="jar"/>
@@ -36,7 +42,7 @@
       </build>
       <runtime>
         <include key="acme-clock-api"/>
-        <include uri="link:jar:dpml/util/dpml-logging-api"/>
+        <include ref="dpml/util/dpml-logging-api"/>
       </runtime>
       <test>
         <include ref="ant/ant-junit"/>

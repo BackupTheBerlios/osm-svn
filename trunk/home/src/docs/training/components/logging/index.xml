@@ -31,7 +31,7 @@
         
         <table>
           <tr>
-            <td>java.util.loging.Logger</td>
+            <td>java.util.logging.Logger</td>
             <td>
             This is the defacto logging implementation included within 
             the Java Runtime.  Generally speaking the <tt>Logger</tt> class
