@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <module name="custom" xmlns="link:xsd:dpml/lang/dpml-module#1.0" >
 
-  <dependencies>
-    <build>
-      <include ref="org/acme/acme-type-demo"/>
-    </build>
-  </dependencies>
-
   <project name="acme-simple-clock" basedir="clock">
     <types>
       <type id="jar"/>
@@ -18,6 +12,9 @@
       </component>
     </types>
     <dependencies>
+    <build>
+      <include ref="org/acme/acme-type-demo"/>
+    </build>
       <test>
         <include ref="ant/ant-junit"/>
         <include ref="dpml/transit/dpml-transit-main"/>
