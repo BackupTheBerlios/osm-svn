@@ -28,5 +28,5 @@ import java.util.Date;
  */
 public interface Clock
 {
-    Date getDate();
+    String getTimestamp();
 }

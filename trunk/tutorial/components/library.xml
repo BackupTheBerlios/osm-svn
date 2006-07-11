@@ -337,6 +337,8 @@
         </dependencies>
       </project>
 
+      <module file="customize/module.xml"/>
+
       <module file="import/module.xml"/>
       
     </module>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<module name="custom" xmlns="link:xsd:dpml/lang/dpml-module#1.0" >
+
+  <dependencies>
+    <build>
+      <include ref="org/acme/acme-type-demo"/>
+    </build>
+  </dependencies>
+
+  <project name="acme-simple-clock" basedir="clock">
+    <types>
+      <type id="jar"/>
+      <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+           type="org.acme.clock.SimpleClock">
+        <context>
+          <entry key="format" value="K:mm a, z"/>
+        </context>
+      </component>
+    </types>
+    <dependencies>
+      <test>
+        <include ref="ant/ant-junit"/>
+        <include ref="dpml/transit/dpml-transit-main"/>
+      </test>
+    </dependencies>
+  </project>
+
+  <project name="acme-custom-clock" basedir="custom">
+    <types>
+      <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
+            uri="resource:part:org/acme/custom/acme-simple-clock">
+        <context>
+          <entry key="format" value="h:mm a"/>
+        </context>
+      </component>
+    </types>
+    <dependencies>
+      <test>
+        <include ref="ant/ant-junit"/>
+        <include ref="dpml/transit/dpml-transit-main"/>
+        <include key="acme-simple-clock"/>
+      </test>
+    </dependencies>
+  </project>
+ 
+</module>

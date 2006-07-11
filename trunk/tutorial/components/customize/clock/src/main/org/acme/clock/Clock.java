@@ -16,26 +16,17 @@
  * limitations under the License.
  */
 
-package org.acme.scheduler;
+package org.acme.clock;
 
 import java.util.Date;
 
-import org.acme.Clock;
-
 /**
- * A minimal implementation of a clock.
+ * Clock interface.
  * 
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
-public class DefaultClock implements Clock
+public interface Clock
 {
-    //------------------------------------------------------------------
-    // constructor
-    //------------------------------------------------------------------
-    
-    public Date getDate()
-    {
-        return new Date();
-    }
+    String getTimestamp();
 }

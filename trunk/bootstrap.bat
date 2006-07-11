@@ -20,19 +20,7 @@ IF ERRORLEVEL 1 GOTO :exit
 CALL :build tutorial\tooling\104 %ID%
 IF ERRORLEVEL 1 GOTO :exit
 
-CALL :build tutorial\components\101 %ID%
-IF ERRORLEVEL 1 GOTO :exit
-
-CALL :build tutorial\components\102 %ID%
-IF ERRORLEVEL 1 GOTO :exit
-
-CALL :build tutorial\components\103 %ID%
-IF ERRORLEVEL 1 GOTO :exit
-
-CALL :build tutorial\components\104 %ID%
-IF ERRORLEVEL 1 GOTO :exit
-
-CALL :build tutorial\components\201 %ID%
+CALL :build tutorial\components %ID%
 IF ERRORLEVEL 1 GOTO :exit
 
 CALL :build home %ID%
@@ -58,5 +46,4 @@ CALL build %BUILD_ID% clean install
 set BUILD_ID=""
 POPD
 goto :EOF
-
 

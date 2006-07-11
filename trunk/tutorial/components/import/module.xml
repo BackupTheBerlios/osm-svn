@@ -17,7 +17,7 @@
     <types>
       <type id="jar"/>
       <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" 
-           type="org.acme.scheduler.DefaultClock" alias="true"/>
+           type="org.acme.scheduler.SimpleClock"/>
     </types>
     <dependencies>
       <runtime>
@@ -32,7 +32,11 @@
       <component xmlns="link:xsd:dpml/lang/dpml-component#1.0"
            type="org.acme.demo.Demo">
         <parts>
-          <import key="clock" uri="link:part:org/acme/import/acme-clock-impl"/>
+          <component key="clock" uri="resource:part:org/acme/import/acme-clock-impl">
+            <context>
+              <entry key="format" value="h:mm a"/>
+            </context>
+          </component>
         </parts>
       </component>
     </types>

@@ -18,8 +18,6 @@
 
 package org.acme.demo;
 
-import java.util.Date;
-
 import org.acme.Clock;
 
 import net.dpml.logging.Logger;
@@ -48,10 +46,10 @@ public class Demo
     public Demo( final Logger logger, final Parts parts )
     {
         Clock clock = parts.getClock();
-        if( logger.isInfoEnabled() )
-        {
-            logger.info( "located clock: " + clock.getClass().getName() );
-            logger.info( "current time: " + clock.getDate() );
-        }
+        logger.info( 
+          clock.getTimestamp() 
+          + " (from " + clock.getClass().getName() 
+          + ")"
+        );
     }
 }
