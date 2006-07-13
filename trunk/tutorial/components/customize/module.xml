@@ -12,9 +12,9 @@
       </component>
     </types>
     <dependencies>
-    <build>
-      <include ref="org/acme/acme-type-demo"/>
-    </build>
+      <build>
+        <include ref="org/acme/acme-type-demo"/>
+      </build>
       <test>
         <include ref="ant/ant-junit"/>
         <include ref="dpml/transit/dpml-transit-main"/>
