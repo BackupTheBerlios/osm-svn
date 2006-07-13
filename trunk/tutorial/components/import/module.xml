@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <module name="import" xmlns="link:xsd:dpml/lang/dpml-module#1.0" >
 
-  <dependencies>
-    <build>
-      <include ref="org/acme/acme-type-demo"/>
-    </build>
-  </dependencies>
-
   <project name="acme-clock-api" basedir="api">
     <types>
       <type id="jar"/>
     </types>
+    <dependencies>
+      <build>
+        <include ref="org/acme/acme-type-demo"/>
+      </build>
+    </dependencies>
   </project>
 
   <project name="acme-clock-impl" basedir="clock">
