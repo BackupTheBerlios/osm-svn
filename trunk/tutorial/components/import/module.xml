@@ -7,7 +7,7 @@
     </types>
     <dependencies>
       <build>
-        <include ref="org/acme/custom/acme-custom-clock"/>
+        <include ref="org/acme/custom"/>
       </build>
     </dependencies>
   </project>
