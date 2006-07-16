@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<library xmlns="link:xsd:dpml/lang/dpml-module#1.0" 
+<index xmlns="link:xsd:dpml/lang/dpml-module#1.0" 
     xmlns:part="link:xsd:dpml/lang/dpml-part#1.0">
 
   <imports>
@@ -8,11 +8,7 @@
 
   <modules>
 
-    <module name="acme" basedir=".">
-
-      <types>
-        <type id="module" alias="true"/>
-      </types>
+    <module name="acme">
 
       <project name="acme-client" basedir="client">
         <types>
@@ -42,4 +38,4 @@
 
   </modules>
 
-</library>
+</index>

@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<library xmlns="link:xsd:dpml/lang/dpml-module#1.0" 
+<index xmlns="link:xsd:dpml/lang/dpml-module#1.0" 
     xmlns:part="link:xsd:dpml/lang/dpml-part#1.0">
-
-  <imports>
-    <import uri="link:module:ant"/>
-  </imports>
 
   <modules>
 
@@ -24,18 +20,11 @@
           <runtime>
             <include key="acme-client"/>
           </runtime>
-          <test>
-            <include ref="ant/ant-junit"/>
-          </test>
         </dependencies>
-        <filters>
-          <filter token="COLOR" value="red"/>
-          <feature token="NAME" id="name"/>
-        </filters>
       </project>
       
     </module>
 
   </modules>
 
-</library>
+</index>
