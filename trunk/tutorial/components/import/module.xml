@@ -7,7 +7,7 @@
     </types>
     <dependencies>
       <build>
-        <include ref="org/acme/custom"/>
+        <include ref="org/acme/customize"/>
       </build>
     </dependencies>
   </project>
