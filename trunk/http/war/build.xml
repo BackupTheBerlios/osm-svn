@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ * Copyright 2004-2005 Stephen J. McConnell.
+ * Copyright 2004 Niclas Hedman.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.dpml.net/central/about/legal/
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
+<project default="install"
+    xmlns:transit="antlib:net.dpml.transit" xmlns:depot="dpml:depot" >
+
+  <transit:import uri="local:template:dpml/tools/standard"/>
+
+  <target name="package" depends="standard.package">
+    <property name="war.dir" value="${basedir}/target/deliverables/wars"/>
+    <depot:property feature="filename" name="project.filename" type="war"/>
+    <property name="war.path" value="${war.dir}/${project.filename}"/>
+    <mkdir dir="${war.dir}"/>
+    <war destfile="${war.path}" webxml="target/web.xml">
+      <fileset dir="target/web"/>
+      <classes dir="target/classes/main"/>
+    </war>
+  </target>
+
+</project>

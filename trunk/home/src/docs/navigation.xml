@@ -25,9 +25,8 @@
  <body>
 
     <links>
+      <item name="Home" href="index.html"/>
       <item name="Services" href="services/index.html"/>
-      <item name="Training" href="training/index.html"/>
-      <item name="Downloads" href="download/index.html"/>
     </links>
 
     <menu>

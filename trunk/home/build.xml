@@ -2,144 +2,27 @@
 
 <project name="osm-home" default="install" basedir="." 
     xmlns:transit="antlib:net.dpml.transit"
-    xmlns:x="dpml:depot" >
+    xmlns:x="dpml:depot"
+    xmlns:m="dpml:metro">
 
   <transit:import uri="local:template:dpml/tools/standard"/>
-
-  <target name="prepare" depends="standard.prepare">
-  
-    <property name="hello.src.dir" location="${basedir}/../tutorial/components/hello"/>
-    <property name="local.hello.docs.dir" location="target/docs/training/components/hello"/>
-    <mkdir dir="${local.hello.docs.dir}"/>
-    <copy toDir="${local.hello.docs.dir}" flatten="true">
-      <fileset dir="${hello.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-
-    <property name="context.src.dir" location="${basedir}/../tutorial/components/context"/>
-    <property name="local.context.docs.dir" location="target/docs/training/components/context"/>
-    <mkdir dir="${local.context.docs.dir}"/>
-    <copy toDir="${local.context.docs.dir}" flatten="true">
-      <fileset dir="${context.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="examples.src.dir" location="${basedir}/../tutorial/components/examples"/>
-    <property name="local.examples.docs.dir" location="target/docs/training/components/examples"/>
-    <mkdir dir="${local.examples.docs.dir}"/>
-    <copy toDir="${local.examples.docs.dir}" flatten="true">
-      <fileset dir="${examples.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="parts.src.dir" location="${basedir}/../tutorial/components/parts"/>
-    <property name="local.parts.docs.dir" location="target/docs/training/components/parts"/>
-    <mkdir dir="${local.parts.docs.dir}"/>
-    <copy toDir="${local.parts.docs.dir}" flatten="true">
-      <fileset dir="${parts.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="lookup.src.dir" location="${basedir}/../tutorial/components/lookup"/>
-    <property name="local.lookup.docs.dir" location="target/docs/training/components/lookup"/>
-    <mkdir dir="${local.lookup.docs.dir}"/>
-    <copy toDir="${local.lookup.docs.dir}" flatten="true">
-      <fileset dir="${lookup.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="lifestyle.src.dir" location="${basedir}/../tutorial/components/lifestyle"/>
-    <property name="local.lifestyle.docs.dir" location="target/docs/training/components/lifestyle"/>
-    <mkdir dir="${local.lifestyle.docs.dir}"/>
-    <copy toDir="${local.lifestyle.docs.dir}" flatten="true">
-      <fileset dir="${lifestyle.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="transient.src.dir" location="${basedir}/../tutorial/components/transient"/>
-    <property name="local.transient.docs.dir" location="target/docs/training/components/transient"/>
-    <mkdir dir="${local.transient.docs.dir}"/>
-    <copy toDir="${local.transient.docs.dir}" flatten="true">
-      <fileset dir="${transient.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="thread.src.dir" location="${basedir}/../tutorial/components/thread"/>
-    <property name="local.thread.docs.dir" location="target/docs/training/components/thread"/>
-    <mkdir dir="${local.thread.docs.dir}"/>
-    <copy toDir="${local.thread.docs.dir}" flatten="true">
-      <fileset dir="${thread.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="singleton.src.dir" location="${basedir}/../tutorial/components/singleton"/>
-    <property name="local.singleton.docs.dir" location="target/docs/training/components/singleton"/>
-    <mkdir dir="${local.singleton.docs.dir}"/>
-    <copy toDir="${local.singleton.docs.dir}" flatten="true">
-      <fileset dir="${singleton.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="state.src.dir" location="${basedir}/../tutorial/components/state"/>
-    <property name="local.state.docs.dir" location="target/docs/training/components/state"/>
-    <mkdir dir="${local.state.docs.dir}"/>
-    <copy toDir="${local.state.docs.dir}" flatten="true">
-      <fileset dir="${state.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <property name="type.src.dir" location="${basedir}/../tutorial/components/type"/>
-    <property name="local.type.docs.dir" location="target/docs/training/components/type"/>
-    <mkdir dir="${local.type.docs.dir}"/>
-    <copy toDir="${local.type.docs.dir}" flatten="true">
-      <fileset dir="${type.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-
-    <property name="import.src.dir" location="${basedir}/../tutorial/components/import"/>
-    <property name="local.import.docs.dir" location="target/docs/training/components/import"/>
-    <mkdir dir="${local.import.docs.dir}"/>
-    <copy toDir="${local.import.docs.dir}" flatten="true">
-      <fileset dir="${import.src.dir}/api/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-      <fileset dir="${import.src.dir}/clock/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-      <fileset dir="${import.src.dir}/demo/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    
-    <!--
-    <property name="import.api.src.dir" location="${basedir}/../tutorial/components/import/api"/>
-    <property name="local.import.api.docs.dir" location="target/docs/training/components/import/api"/>
-    <mkdir dir="${local.import.api.docs.dir}"/>
-    <copy toDir="${local.import.api.docs.dir}" flatten="true">
-      <fileset dir="${import.api.src.dir}/target/reports/src">
-        <include name="**/*.html"/>
-      </fileset>
-    </copy>
-    -->
-    
-  </target>
 
   <target name="build" depends="standard.build">
     <x:docs/>
     <copy file="${basedir}/etc/docs/styles/style.css" 
       toFile="${basedir}/target/docs/styles/style.css" overwrite="true"/>
+  </target>
+
+  <target name="catalog" depends="init">
+    <property name="catalog.path" location="${basedir}/target/docs/reports/catalog"/>
+    <mkdir dir="${catalog.path}"/>
+    <x:plugin uri="link:part:dpml/metro/dpml-metro-tools"/>
+    <m:catalog title="OSM Catalog" dest="${catalog.path}">
+      <fileset dir="${basedir}/../main">
+        <include name="**/target/classes/main/**/*.type"/>
+        <exclude name="**/test/**/*.*"/>
+      </fileset>
+    </m:catalog>
   </target>
 
 </project>

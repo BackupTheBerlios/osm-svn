@@ -1,1 +1,0 @@
-Demonstrating the SINGLETON lifestyle.

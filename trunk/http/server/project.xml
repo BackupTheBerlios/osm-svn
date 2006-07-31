@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-http-server" basedir="." 
+  xmlns="link:xsd:dpml/lang/dpml-module#1.0">
+
+  <types>
+    <component xmlns="link:xsd:dpml/lang/dpml-component#1.0" alias="true" 
+        type="net.osm.http.Server" 
+        lifestyle="singleton" 
+        collection="hard">
+      <parts>
+        <component key="threadPool" 
+            type="net.osm.http.BoundedThreadPool" collection="hard" activation="demand">
+          <context>
+            <entry key="min" value="10"/>
+            <entry key="max" value="100"/>
+          </context>
+        </component>
+        <!--
+        Add a select channel connector to 8080.
+        -->
+        <component key="http" type="net.osm.http.SelectChannelConnector" 
+            lifestyle="singleton"
+            collection="hard">
+          <context>
+            <entry key="port" value="8080"/>
+            <entry key="maxIdleTime" value="50000"/>
+            <entry key="acceptors" value="10"/>
+          </context>
+        </component>
+        <!--
+        Add a SSL connector to 8443.
+        -->
+        <component key="https" type="net.osm.http.SslSocketConnector" 
+            lifestyle="singleton"
+            collection="hard">
+          <context>
+            <entry key="port" value="8443"/>
+            <entry key="maxIdleTime" value="30000"/>
+            <entry key="keyStore" value="local:keystore:dpml/planet/http/sample"/>
+            <entry key="keyStorePassword" value="password"/>
+            <entry key="certificatePassword" value="password"/>
+            <entry key="trustStore" value="local:keystore:dpml/planet/http/certs"/>
+            <entry key="trustStorePassword" value="password"/>
+          </context>
+        </component>
+        <!--
+        Add a user realm.
+        -->
+        <component key="realm" type="net.osm.http.HashUserRealm"
+            lifestyle="singleton"
+            collection="hard">
+          <context>
+            <entry key="name" value="Test Realm"/>
+            <entry key="URI" value="local:properties:dpml/planet/http/realm"/>
+          </context>
+        </component>
+        <!--
+        Add handler collection.
+        -->
+        <component key="handlers" type="net.osm.http.HandlerCollection" 
+            lifestyle="singleton"
+            collection="hard">
+            
+          <parts>
+          
+            <component key="contextHandlerCollection" type="net.osm.http.ContextHandlerCollection" 
+              lifestyle="singleton"
+              collection="hard">
+              
+              <parts>
+                <!--
+                Creation of a HTTP context configured to present static content in 
+                the ${dpml.share}/docs directory.
+                -->
+                <component key="docs" type="net.osm.http.ResourceContextHandler"
+                    collection="hard" lifestyle="singleton">
+                  <context>
+                    <entry key="resourceBase" value="${dpml.share}/docs"/>
+                    <entry key="contextPath" value="/docs"/>
+                  </context>
+                </component>
+                <!--
+                Add an experimental servlet context.
+                (Need to add context cloassloader configuration but this requires 
+                per-component threads - currently limited to classes declared within
+                the part classloader).
+                -->
+                <component key="servlets" type="net.osm.http.ServletContextHandler"
+                    collection="hard" lifestyle="singleton">
+                  <context>
+                    <entry key="contextPath" value="/data"/>
+                    <entry key="resourceBase" value="${dpml.data}"/>
+                    <entry key="servletHolders">
+                      <param class="net.osm.http.ServletHolder">
+                        <param value="data"/>
+                        <param value="org.mortbay.jetty.servlet.DefaultServlet"/>
+                      </param>
+                    </entry>
+                    <entry key="servletEntries">
+                      <param class="net.osm.http.ServletEntry">
+                        <param value="data"/>
+                        <param value="/"/>
+                      </param>
+                    </entry>
+                  </context>
+                </component>
+              
+                <!--
+                Add a web application.
+                -->
+                <component key="webapp" type="net.osm.http.WebAppContextHandler"
+                    collection="hard" lifestyle="singleton">
+                  <context>
+                    <entry key="contextPath" value="/"/>
+                    <entry key="war" value="link:war:osm/http/osm-http-app"/>
+                    <entry key="tempDirectory" value="${dpml.data}/work/http"/>
+                  </context>
+                </component>
+              
+              </parts>
+            
+            </component>
+          
+            <!-- 
+            NCSA Request log. 
+            -->
+            <component key="ncsa" 
+                type="net.osm.http.NCSARequestLogHandler" 
+                collection="hard" lifestyle="singleton">
+              <context>
+                <entry key="filename" value="${dpml.data}/logs/http/request.log"/>
+                <entry key="append" value="true"/>
+                <entry key="extended" value="true"/>
+              </context>
+            </component>
+            
+          </parts>
+          
+        </component>
+        
+      </parts>
+      
+    </component>
+    
+  </types>
+
+  <dependencies>
+    <build>
+      <include key="osm-http-app"/>
+    </build>
+    <runtime>
+      <include uri="artifact:jar:org/mortbay/jetty/servlet-api-2.5#${jetty.version}" tag="PUBLIC"/>
+      <include key="osm-http-impl"/>
+    </runtime>
+  </dependencies>
+
+</project>

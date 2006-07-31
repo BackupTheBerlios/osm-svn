@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>OSM Web</title>
+    <link rel="stylesheet" type="text/css" href="styles/style.css"/>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
+    <meta name="description" content="Example Web Application"/>
+    <meta name="author" content="Stephen McConnell"/>
+    <meta name="keywords" content="OSM"/>
+    <meta name="publisher" content="OSM"/>
+    <META http-equiv="Pragma" content="no-cache">
+    <META http-equiv="Cache-Control" content="no-cache,no-store">
+  </head>
+  <body>
+    <table class="logobar">
+      <tr>
+        <td class="panelleft"/>
+        <td class="panelmiddle">
+          <div class="project">OSM</div>
+          <div class="title">OSM Web</div>
+        </td>
+        <td class="panelright"/>
+      </tr>
+    </table>
+    <div class="categorybar" dir="">
+      <a class="homecategory-selected" href="index.html">Home</a>
+    </div>
+    <div class="content">
+
+      <div class="section"><span class="section-header">OSM Web</span>
+
+<P>
+      <div class="subsection"><span class="subsection-header">Welcome to OSM Web on Metro 1.0 and Jetty 6</span>
+
+<p>
+This osm web server component is based on a beta edition of Jetty 6.</p>
+
+<p>
+This is a test context resolved from a WAR file via DPML Transit that serves:
+</p>
+
+<ul>
+<li>static content (
+<a href="d.txt">tiny</a>,
+<a href="da.txt">small</a>,
+<a href="dat.txt">medium</a>,
+<a href="data.txt">large</a>,
+<a href="datax.txt">compressed</a>)</li>
+<li>a <a href="dump/info">Request Dump Servlet</a></li>
+<li>a <a href="session/">Session Dump Servlet</a></li>
+<li>a <a href="snoop.jsp">Request Dump JSP</a></li>
+<li>a <a href="hello">Hello World Servlet</a></li>
+</ul>
+
+<p>
+A static resource handler context provides hooks into the local documentation.
+</p>
+
+<ul>
+<li>a <a href="/docs">Installed DPML site docs</a></li>
+<li>a <a href="/data">DPML Data Directory</a></li>
+</ul>
+</p>
+
+      <div class="subsection"><span class="subsection-header">Technical Note</span>
+<p>
+Improvements within Jetty 6.0.x include:
+</p>
+<ul>
+<li>Totally rearchitected and rebuild relative to JDK1.4</li>
+<li>Improved "dependancy injection" and "inversion of control" design of components</li>
+<li>Improved "interceptor" design of handlers</li>
+<li>Smart split buffer design allows large buffers to only be allocated to active connections.
+The resulting memory savings allow very large buffers to be used, which increases the chance of 
+efficient asynchronous flushing and of avoiding chunking.</li>
+<li>NIO Buffering so that efficient direct buffers and memory mapped files can be used.</li> 
+<li>NIO non-blocking scheduling so that threads are not allocated per connection.</li> 
+<li> NIO gather writes, so that for example a HTTP header and a memory mapped file may be
+sent as sent is a single operation.</li> 
+<li>Continuations for efficient AJAX polling</li>
+</ul>
+
+     </div>
+   </div>
+
+  </div>
+    <div class="footer"><span class="copyright">Copyright 2006, OSM All rights reserved.</span>
+   </div>
+
+ </body>
+</html>

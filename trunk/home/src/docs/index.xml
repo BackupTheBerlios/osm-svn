@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <document>
+
   <properties>
     <author email="mcconnell@osm.net">Stephen McConnell</author>
     <title>Component Development Strategies</title>
@@ -12,48 +13,44 @@
 
       <subsection name="OSM Resources and Services">
 
-      <p>
-      The resource center for component based development.
-      </p>
-
-      <ul>
-
-        <li>software systems architecture for reuse and long-term maintainability </li>
-        <li>training and development programmes dealing with java-based component 
+        <ul>
+          <li>software systems architecture for reuse and long-term maintainability </li>
+          <li>training and development programmes dealing with java-based component 
             development and service oriented design </li>
-        <li>component infrastructure and development tooling </li>
-        <li>application design, development and deployment solutions</li>
-        <li>opensource collaborative development strategies for industry groups</li> 
-        <li>project management</li>
+          <li>component infrastructure and development tooling </li>
+          <li>application design, development and deployment solutions</li>
+        </ul>
 
-      </ul>
+      </subsection>
 
-    </subsection>
+    </section>
+    
+    <section name="About Our Network">
 
-    <subsection name="About the DPML">
+      <subsection name="DPML">
 
-      <p>
-      OSM is affiliated with <a href="http://www.dpml.net">The Digital Product Meta 
-      Library (DPML)</a> - an open community project developing advanced Java-based 
-      component management solutions.
-      </p>
+        <p>
+        OSM is affiliated with the <a href="http://www.dpml.net">DPML</a> - an open source 
+        project developing advanced Java-based component management solutions.
+        </p>
 
-    </subsection>
+      </subsection>
 
-    <subsection name="About Ibiblio">
+      <subsection name="Ibiblio">
 
-      <p>
-      Ibiblio is home to one of the largest "collections of collections" on the Internet, 
-      <a href="http://www.ibiblio.net">ibiblio.org</a> is a conservancy of freely available 
-      information, including software, music, literature, art, history, science, politics, and 
-      cultural studies and host to the OSM collection of component resources and training 
-      material.
-      </p>
+        <p>
+        Ibiblio is home to one of the largest "collections of collections" on the Internet, 
+        <a href="http://www.ibiblio.net">ibiblio.org</a> is a conservancy of freely available 
+        information, including software, music, literature, art, history, science, politics, and 
+        cultural studies and host to the OSM collection of component resources and training 
+        material.
+        </p>
 
-    </subsection>
+      </subsection>
 
     </section>
 
   </body>
+  
 </document>
 
