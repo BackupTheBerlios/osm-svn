@@ -51,7 +51,7 @@ public class Server extends org.mortbay.jetty.Server
         * @param uri the default uri
         * @return a uri referencing a Jetty configuration profile
         */
-        //URI getConfiguration( URI uri );
+        URI getConfiguration( URI uri );
         
        /**
         * Get the assigned thread pool. If no thread pool is 
