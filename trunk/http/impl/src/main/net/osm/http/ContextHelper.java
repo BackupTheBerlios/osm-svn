@@ -63,7 +63,7 @@ class ContextHelper
         String[] hosts = context.getConnectors( null );
         if( null != hosts )
         {
-            handler.setConnectors( hosts );
+            handler.setConnectorNames( hosts );
         }
         
         String[] virtual = context.getVirtualHosts( null );

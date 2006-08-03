@@ -87,7 +87,7 @@ public abstract class AbstractContextHandlerTestCase extends TestCase
     */
     public void testConnectors() throws Exception
     {
-        String[] connectors = getContextHandler().getConnectors();
+        String[] connectors = getContextHandler().getConnectorNames();
         if( !Arrays.equals( CONNECTORS, connectors ) )
         {
             final String error =

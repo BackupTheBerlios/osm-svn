@@ -43,7 +43,7 @@ public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelC
         * @param flag implementation defined default value
         * @return the supplied policy unless overriden in the deployment configuration
         */
-        boolean getAssumeShortDispatch( boolean flag );
+        boolean getDelaySelectKeyUpdate( boolean flag );
     }
 
    /**
@@ -99,7 +99,7 @@ public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelC
         
         // SelectChannelConnector$Context
         
-        boolean flag = context.getAssumeShortDispatch( ASSUME_SHORT_DISPATCH );
-        setAssumeShortDispatch( flag );
+        boolean flag = context.getDelaySelectKeyUpdate( ASSUME_SHORT_DISPATCH );
+        setDelaySelectKeyUpdate( flag );
     }
 }

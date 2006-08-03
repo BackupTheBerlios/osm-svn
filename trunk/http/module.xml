@@ -22,10 +22,10 @@
         <include ref="dpml/metro/dpml-metro-model"/>
         <include ref="dpml/util/dpml-logging-api"/>
         <include ref="dpml/transit/dpml-transit-main"/>
-        <include uri="artifact:jar:org/mortbay/jetty/servlet-api-2.5#${jetty.version}" tag="PUBLIC"/>
-        <include uri="artifact:jar:org/mortbay/jetty/jetty-util#${jetty.version}"/>
-        <include uri="artifact:jar:org/mortbay/jetty/jsp-api-2.0#${jetty.version}"/>
-        <include uri="artifact:jar:org/mortbay/jetty/jetty#${jetty.version}"/>
+        <include ref="org/mortbay/jetty/servlet-api-2.5" tag="PUBLIC"/>
+        <include ref="org/mortbay/jetty/jetty-util"/>
+        <include ref="org/mortbay/jetty/jsp-api-2.0"/>
+        <include ref="org/mortbay/jetty/jetty"/>
         <include uri="artifact:jar:tomcat/jasper-runtime#${jasper.version}"/>
         <include uri="artifact:jar:tomcat/jasper-compiler#${jasper.version}"/>
         <include uri="artifact:jar:tomcat/jasper-compiler-jdt#${jasper.version}"/>

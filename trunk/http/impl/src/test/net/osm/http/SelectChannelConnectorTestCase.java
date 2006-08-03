@@ -43,7 +43,7 @@ public class SelectChannelConnectorTestCase extends AbstractConnectorContextTest
     {
         Map map = createMap();
         
-        map.put( "assumeShortDispatch", new Boolean( ASSUME_SHORT_DISPATH_POLICY ) );
+        map.put( "delaySelectKeyUpdate", new Boolean( ASSUME_SHORT_DISPATH_POLICY ) );
         
         Class clazz = Context.class;
         Context context = (Context) ContextInvocationHandler.getProxiedInstance( clazz, map );
@@ -65,7 +65,7 @@ public class SelectChannelConnectorTestCase extends AbstractConnectorContextTest
     */
     public void testAssumeShortDispatch() throws Exception
     {
-        assertEquals( "assumeShortDispatch", ASSUME_SHORT_DISPATH_POLICY, m_connector.getAssumeShortDispatch() );
+        assertEquals( "delaySelectKeyUpdate", ASSUME_SHORT_DISPATH_POLICY, m_connector.getDelaySelectKeyUpdate() );
     }
 
 }
