@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+  <properties>
+    <author email="mcconnell@osm.net">Stephen McConnell</author>
+    <title>Component Development Strategies</title>
+  </properties>
+
+  <body>
+
+    <section name="About Our Network">
+
+      <subsection name="DPML">
+
+        <p>
+        OSM is affiliated with the <a href="http://www.dpml.net">DPML</a> - an open source 
+        project developing advanced Java-based component management solutions.
+        </p>
+
+      </subsection>
+
+      <subsection name="Ibiblio">
+
+        <p>
+        Ibiblio is home to one of the largest "collections of collections" on the Internet, 
+        <a href="http://www.ibiblio.net">ibiblio.org</a> is a conservancy of freely available 
+        information, including software, music, literature, art, history, science, politics, and 
+        cultural studies and host to the OSM collection of component resources and training 
+        material.
+        </p>
+
+      </subsection>
+
+    </section>
+
+  </body>
+  
+</document>
+

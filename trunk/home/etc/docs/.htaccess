@@ -1,0 +1,6 @@
+
+RedirectMatch ^/training/resources/* http://www.dpml.net/transit/tutorials/index.html
+RedirectMatch ^/training/tooling/* http://www.dpml.net/depot/tutorials/index.html
+RedirectMatch ^/training/components/* http://www.dpml.net/metro/tutorials/index.html
+RedirectMatch ^/download/* http://www.dpml.net/about/download/index.html
+RedirectMatch ^/services/* http://www.osm.net/index.html

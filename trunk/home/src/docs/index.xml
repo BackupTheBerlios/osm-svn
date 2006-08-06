@@ -1,56 +1,39 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <document>
-
   <properties>
     <author email="mcconnell@osm.net">Stephen McConnell</author>
-    <title>Component Development Strategies</title>
+    <title>OSM Professional Services</title>
   </properties>
 
   <body>
 
-    <section name="About OSM">
+    <section name="Professional Services">
 
-      <subsection name="OSM Resources and Services">
+      <p>
+      OSM provides professional services related to Java based component 
+      management solutions.
+      </p>
 
-        <ul>
-          <li>software systems architecture for reuse and long-term maintainability </li>
-          <li>training and development programmes dealing with java-based component 
-            development and service oriented design </li>
-          <li>component infrastructure and development tooling </li>
-          <li>application design, development and deployment solutions</li>
-        </ul>
+      <p>
+      These services include:
+      </p>
 
-      </subsection>
+      <ul>
+        <li>dedicated product support</li>
+        <li>product architecture and planning</li>
+        <li>migration strategy development</li>
+        <li>branch management and maintenance</li>
+        <li>project mentoring</li>
+        <li>collaboration</li>
+      </ul>
 
-    </section>
-    
-    <section name="About Our Network">
-
-      <subsection name="DPML">
-
-        <p>
-        OSM is affiliated with the <a href="http://www.dpml.net">DPML</a> - an open source 
-        project developing advanced Java-based component management solutions.
-        </p>
-
-      </subsection>
-
-      <subsection name="Ibiblio">
-
-        <p>
-        Ibiblio is home to one of the largest "collections of collections" on the Internet, 
-        <a href="http://www.ibiblio.net">ibiblio.org</a> is a conservancy of freely available 
-        information, including software, music, literature, art, history, science, politics, and 
-        cultural studies and host to the OSM collection of component resources and training 
-        material.
-        </p>
-
-      </subsection>
-
+      <p>
+      For additional information you can reach OSM on <a href="info@osm.net">info@osm.net</a>.
+      </p>
+ 
     </section>
 
   </body>
-  
 </document>
 
