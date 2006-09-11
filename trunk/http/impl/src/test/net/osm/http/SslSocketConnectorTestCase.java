@@ -33,7 +33,7 @@ import org.mortbay.jetty.AbstractConnector;
  */
 public class SslSocketConnectorTestCase extends AbstractConnectorContextTestCase
 {
-    private static final String[] CIPHER_SUITES = new String[0];
+    //private static final String[] CIPHER_SUITES = new String[0];
     private static final String ALGORITHM = "QWERTY";
     private static final String PROTOCOL = "XYZ";
     private static final URI KEYSTORE_URI = createKeystoreURI();
@@ -53,7 +53,7 @@ public class SslSocketConnectorTestCase extends AbstractConnectorContextTestCase
     {
         Map map = createMap();
         
-        map.put( "cipherSuites", CIPHER_SUITES );
+        //map.put( "cipherSuites", CIPHER_SUITES );
         map.put( "algorithm", ALGORITHM );
         map.put( "protocol", PROTOCOL );
         map.put( "keyStore", KEYSTORE_URI );
@@ -81,10 +81,10 @@ public class SslSocketConnectorTestCase extends AbstractConnectorContextTestCase
     * Test min-thread assignment integrity.
     * @throws Exception if an error occurs during test execution
     */
-    public void testCipherSuites() throws Exception
-    {
-        assertEquals( "cipherSuites", CIPHER_SUITES, m_connector.getCipherSuites() );
-    }
+    //public void testCipherSuites() throws Exception
+    //{
+    //    assertEquals( "cipherSuites", CIPHER_SUITES, m_connector.getCipherSuites() );
+    //}
 
    /**
     * Test algorithm assignment integrity.
@@ -92,7 +92,7 @@ public class SslSocketConnectorTestCase extends AbstractConnectorContextTestCase
     */
     public void testAlgorith() throws Exception
     {
-        assertEquals( "algorith", ALGORITHM, m_connector.getAlgorithm() );
+        assertEquals( "algorith", ALGORITHM, m_connector.getSecureRandomAlgorithm() );
     }
     
    /**

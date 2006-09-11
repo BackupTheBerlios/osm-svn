@@ -6,7 +6,7 @@
     <import uri="link:module:junit"/>
     <import uri="link:module:ant"/>
     <import uri="link:module:dpml"/>
-    <import uri="artifact:module:org/mortbay/jetty#6.0.0-RC0"/>
+    <import uri="artifact:module:org/mortbay/jetty#6.0.0"/>
   </imports>
 
   <properties>

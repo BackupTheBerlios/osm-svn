@@ -71,7 +71,7 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         * @param suites the default suites argument
         * @return the cipher suites
         */
-        String[] getCipherSuites( String[] suites );
+        //String[] getCipherSuites( String[] suites );
 
        /**
         * Return the keystore password.
@@ -238,7 +238,7 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         }
         
         String algorithm = context.getAlgorithm( ALGORITHM );
-        setAlgorithm( algorithm );
+        setSecureRandomAlgorithm( algorithm );
         
         String protocol = context.getProtocol( PROTOCOL );
         setProtocol( protocol );
@@ -265,11 +265,11 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         boolean needClientAuth = context.getNeedClientAuth( false );
         setNeedClientAuth( needClientAuth );
         
-        String[] suites = context.getCipherSuites( (String[]) null );
-        if( null != suites )
-        {
-            setCipherSuites( suites );
-        }
+        //String[] suites = context.getCipherSuites( (String[]) null );
+        //if( null != suites )
+        //{
+        //    setCipherSuites( suites );
+        //}
     }
 
    /**
@@ -290,7 +290,7 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
     
     private KeyManager[] getKeyManagers() throws Exception
     {
-        final String algorithm = getAlgorithm();
+        final String algorithm = getSecureRandomAlgorithm();
         final KeyManagerFactory factory = KeyManagerFactory.getInstance( algorithm );
         final KeyStore store = loadKeyStore();
         final char[] password = toCharArray( m_certificatePassword );

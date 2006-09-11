@@ -2,7 +2,6 @@
 <module name="http" xmlns="link:xsd:dpml/lang/dpml-module#1.0">
 
   <properties>
-    <property name="jetty.version" value="6.0.0-R534"/>
     <property name="jasper.version" value="5.5.15"/>
     <property name="sl4j.version" value="1.0.1"/>
     <property name="project.major.version" value="0"/>
@@ -46,7 +45,7 @@
     </types>
     <dependencies>
       <runtime>
-        <include uri="artifact:jar:org/mortbay/jetty/servlet-api-2.5#${jetty.version}" tag="PUBLIC"/>
+        <include ref="org/mortbay/jetty/servlet-api-2.5" tag="PUBLIC"/>
       </runtime>
     </dependencies>
   </project>
