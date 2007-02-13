@@ -22,7 +22,7 @@ import java.net.URI;
 
 import junit.framework.TestCase;
 
-import net.dpml.lang.Part;
+import net.dpml.lang.Strategy;
 
 /**
  * Server component testcase.
@@ -39,8 +39,8 @@ public class ServerTestCase extends TestCase
     public void testServerDeployment() throws Exception
     {
         URI uri = new URI( "link:part:osm/http/osm-http-server" );
-        Part part = Part.load( uri );
-        Object object = part.instantiate( new Object[0] );
-        assertEquals( "class", "net.osm.http.Server", object.getClass().getName() );
+        Strategy strategy = Strategy.load( uri );
+        Object object = strategy.getInstance( Object.class );
+        assertEquals( "class", "net.osm.http.StandardServer", object.getClass().getName() );
     }
 }

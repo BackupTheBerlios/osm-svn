@@ -15,9 +15,10 @@
  */
 package net.osm.http;
 
-import net.dpml.logging.Logger;
+import dpml.util.ExceptionHelper;
 
-import net.dpml.util.ExceptionHelper;
+import net.dpml.util.Logger;
+
 
 /**
  * Wrapper to redirect Jetty logging to DPML logging.
@@ -70,7 +71,7 @@ public class LoggerAdapter implements org.mortbay.log.Logger
     */
     public boolean isDebugEnabled()
     {
-        return m_logger.isDebugEnabled();
+        return m_logger.isTraceEnabled();
     }
     
    /**
@@ -108,12 +109,12 @@ public class LoggerAdapter implements org.mortbay.log.Logger
         {
             if( null == cause )
             {
-                m_logger.debug( message );
+                m_logger.trace( message );
             }
             else
             {
                 String error = ExceptionHelper.packException( message, cause, false );
-                m_logger.debug( error );
+                m_logger.trace( error );
             }
         }
     }
@@ -129,7 +130,7 @@ public class LoggerAdapter implements org.mortbay.log.Logger
         if( isDebugEnabled() )
         {
             String message = format( msg, arg0, arg1 );
-            m_logger.debug( message );
+            m_logger.trace( message );
         }
     }
     
@@ -225,7 +226,7 @@ public class LoggerAdapter implements org.mortbay.log.Logger
     */
     public String toString()
     {
-        return "net.dpml.logging.Logger";
+        return "net.dpml.util.Logger";
     }
 
 }

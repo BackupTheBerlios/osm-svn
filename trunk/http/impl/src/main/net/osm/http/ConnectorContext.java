@@ -33,7 +33,7 @@ public interface ConnectorContext
     * Return the connector port. 
     * @return the assigned connector port
     */
-    int getPort();
+    int getPort( int port );
     
    /**
     * Return the connector header buffer size.

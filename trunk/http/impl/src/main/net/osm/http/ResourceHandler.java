@@ -15,35 +15,86 @@
  */
 package net.osm.http;
 
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.servlet.ServletMapping;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+
+import net.dpml.util.Logger;
+
+import net.dpml.annotation.Context;
+import net.dpml.annotation.Component;
+import net.dpml.annotation.Services;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+
+import org.mortbay.io.Buffer;
+import org.mortbay.jetty.Request;
+import org.mortbay.resource.Resource;
+import org.mortbay.jetty.HttpConnection;
+import org.mortbay.jetty.HttpMethods;
+import org.mortbay.jetty.HttpHeaders;
+import org.mortbay.io.WriterOutputStream;
+import org.mortbay.util.TypeUtil;
 
 /**
- * Default implementation of a static resource handler.
+ * Servlet context handler. 
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
-public class ResourceHandler extends org.mortbay.jetty.servlet.ServletHandler
+@Component( name="resource", lifestyle=SINGLETON )
+public class ResourceHandler extends org.mortbay.jetty.handler.ResourceHandler
 {
    /**
-    * Creation of a new resource handler.
-    * @param name the resource handler name
-    * @param path the resourdce path
+    * HTTP static resource vontext handler parameters.
     */
-    public ResourceHandler( String name, String path )
+    @Context
+    public interface Configuration
+    {
+       /**
+        * Get the http context resource base.  The value may contain symbolic
+        * property references and should resolve to a local directory.
+        *
+        * @return the resource base
+        */
+        String getResourceBase();
+
+       /**
+        * Get the array of welcome files.
+        * @param values the default welcome file values
+        * @return the resolved array of welcome files
+        */
+        String[] getWelcomeFiles( String[] values );
+    }
+    
+   /**
+    * Creation of a new servlet context handler.
+    * @param logger the assigned logging channel
+    * @param config the deployment context
+    * @exception Exception if an instantiation error occurs
+    */
+    public ResourceHandler( Logger logger, Configuration config ) throws Exception
     {
         super();
-       
-        ServletHolder holder = new ServletHolder();
-        holder.setName( name );
-        holder.setClassName( "org.mortbay.jetty.servlet.DefaultServlet" );
-        ServletHolder[] servlets = new ServletHolder[]{holder};
-        setServlets( servlets );
         
-        ServletMapping mapping = new ServletMapping();
-        mapping.setPathSpec( path );
-        mapping.setServletName( name );
-        ServletMapping[] mappings = new ServletMapping[]{mapping};
-        setServletMappings( mappings );
+        String base = config.getResourceBase();
+        
+        File file = new File( base );
+        String path = file.getCanonicalPath();
+        if( logger.isTraceEnabled() )
+        {
+            logger.trace( "setting resource base to: " + path );
+        }
+        
+        super.setResourceBase( path );
+        
+        String[] welcome = config.getWelcomeFiles( null );
+        if( null != welcome )
+        {
+            super.setWelcomeFiles( welcome );
+        }
     }
 }

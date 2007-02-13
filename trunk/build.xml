@@ -1,28 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <project name="osm" default="install" basedir="." 
-    xmlns:transit="antlib:net.dpml.transit"
-    xmlns:x="dpml:depot"
-    xmlns:c="dpml:metro">
+    xmlns:x="antlib:dpml.tools">
 
-  <transit:import uri="local:template:dpml/tools/standard"/>
+  <x:import uri="local:template:dpml/tools/standard"/>
 
-  <target name="init" depends="standard.init">
-    <x:plugin uri="link:part:dpml/metro/dpml-metro-tools"/>
-  </target>
-  
-  <target name="build" depends="standard.build,javadoc,catalog"/>
-
-  <target name="catalog" depends="prepare">
-    <property name="catalog.path" location="${basedir}/target/docs/reports/catalog"/>
-    <mkdir dir="${catalog.path}"/>
-    <c:catalog title="OSM Catalog" dest="${catalog.path}">
-      <fileset dir="${basedir}">
-        <include name="**/target/classes/main/**/*.type"/>
-        <exclude name="**/test/**/*.*"/>
-      </fileset>
-    </c:catalog>
-  </target>
+  <target name="build" depends="standard.build,javadoc"/>
 
   <target name="javadoc" depends="prepare">
     <x:javadoc title="OSM Components" access="protected">

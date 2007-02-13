@@ -17,6 +17,8 @@ package net.osm.http;
 
 import java.util.Map;
 
+import net.dpml.annotation.Context;
+
 import org.mortbay.jetty.handler.ErrorHandler;
 
 /**
@@ -24,8 +26,18 @@ import org.mortbay.jetty.handler.ErrorHandler;
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
-public interface ContextHandlerContext
+ @Context
+public interface ContextConfiguration
 {
+   /**
+    * Get the http context resource base.  The value may contain symbolic
+    * property references and should resolve to a local directory.
+    *
+    * @param base the default base value
+    * @return the resource base
+    */
+    String getResourceBase( String base );
+    
    /**
     * Get the array of virtual hosts.
     * @param hosts the default virtual host array

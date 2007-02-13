@@ -15,11 +15,21 @@
  */
 package net.osm.http;
 
+import net.dpml.annotation.Context;
+import net.dpml.annotation.Component;
+import net.dpml.annotation.Services;
+
+import org.mortbay.jetty.Connector;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+
 /**
- * Thread pool implementation.
+ * NIO select chanel connector.
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
+@Component( name="select", lifestyle=SINGLETON )
+@Services( Connector.class )
 public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelConnector
 {
     private static final int HEADER_BUFFER_SIZE = 4*1024;
@@ -36,7 +46,8 @@ public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelC
    /**
     * Select channel context definition.
     */
-    public interface Context extends ConnectorContext
+    @Context
+    public interface SelectChannelContext extends ConnectorContext
     {
        /**
         * Return the policy concerning short dispatch. 
@@ -51,7 +62,7 @@ public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelC
     * @param context the component context
     * @exception Exception if a component configuration error occurs
     */
-    public SelectChannelConnector( Context context ) throws Exception
+    public SelectChannelConnector( SelectChannelContext context ) throws Exception
     {
         super();
         
@@ -61,7 +72,7 @@ public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelC
             setHost( host );
         }
     
-        int port = context.getPort();
+        int port = context.getPort( 8080 );
         setPort( port );
         
         int headerBufferSize = context.getHeaderBufferSize( HEADER_BUFFER_SIZE );
@@ -88,14 +99,14 @@ public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelC
         int confidentialPort = context.getConfidentialPort( CONFIDENTIAL_PORT );
         setConfidentialPort( confidentialPort );
         
-        Scheme confidentialScheme = Scheme.parse( context.getConfidentialScheme( "https" ) );
-        setConfidentialScheme( confidentialScheme.getName() );
+        Scheme confidentialScheme = Scheme.valueOf( context.getConfidentialScheme( "HTTPS" ).toUpperCase() );
+        setConfidentialScheme( confidentialScheme.name().toLowerCase() );
         
         int integralPort = context.getIntegralPort( INTEGRAL_PORT );
         setIntegralPort( integralPort );
         
-        Scheme integralScheme = Scheme.parse( context.getIntegralScheme( "https" ) );
-        setIntegralScheme( integralScheme.getName() );
+        Scheme integralScheme = Scheme.valueOf( context.getIntegralScheme( "HTTPS" ).toUpperCase() );
+        setIntegralScheme( integralScheme.name().toLowerCase() );
         
         // SelectChannelConnector$Context
         

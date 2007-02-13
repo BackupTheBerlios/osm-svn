@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<appliance xmlns="dpml:appliance">
+
+  <info name="http"/>
+  
+  <codebase uri="link:part:osm/http/osm-http-server"/>
+
+</appliance>

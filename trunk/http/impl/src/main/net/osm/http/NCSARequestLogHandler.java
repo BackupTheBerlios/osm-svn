@@ -17,7 +17,13 @@ package net.osm.http;
 
 import java.io.File;
 
-import net.dpml.util.PropertyResolver;
+import net.dpml.annotation.Context;
+import net.dpml.annotation.Component;
+import net.dpml.annotation.Services;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+
+import dpml.util.PropertyResolver;
 
 import org.mortbay.jetty.handler.RequestLogHandler;
 import org.mortbay.jetty.NCSARequestLog;
@@ -27,12 +33,15 @@ import org.mortbay.jetty.NCSARequestLog;
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
+@Component( name="ncsa", lifestyle=SINGLETON )
+//@Services( RequestLogHandler.class )
 public class NCSARequestLogHandler extends RequestLogHandler
 {
    /**
     * Component context.
     */
-    public interface Context
+    @Context
+    public interface NCSAContext
     {
        /**
         * Get the array of ignore paths.
@@ -113,7 +122,7 @@ public class NCSARequestLogHandler extends RequestLogHandler
     * Creation of a new NCSA request log.
     * @param context the deployment context
     */
-    public NCSARequestLogHandler( Context context )
+    public NCSARequestLogHandler( NCSAContext context )
     {
         m_ncsa = new NCSARequestLog();
         

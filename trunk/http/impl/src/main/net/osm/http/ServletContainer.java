@@ -35,31 +35,15 @@ import org.mortbay.jetty.servlet.ServletHandler;
  * @version @PROJECT-VERSION@
  */
 @Component( name="servlet", lifestyle=SINGLETON )
-public class ServletEntry
+public class ServletContainer extends org.mortbay.jetty.servlet.Context
 {
-   /**
-    * HTTP static resource vontext handler parameters.
-    */
-    @Context
-    public interface ServletEntryContext
-    {
-       /**
-        * Return the path associated with the servlet.
-        *
-        * @return the resource base
-        */
-        String getPath();
-    }
-    
     @Parts
-    public interface ServletEntryParts
+    public interface ServletContainerParts
     {
-        Servlet[] getServlets();
+        ServletEntry[] getServletEntries();
     }
     
     private final Logger m_logger;
-    private final ServletEntryContext m_context;
-    private final ServletEntryParts m_parts;
     
    /**
     * Creation of a new servlet context handler.
@@ -68,23 +52,29 @@ public class ServletEntry
     * @param parts the internal comparts
     * @exception Exception if an instantiation error occurs
     */
-    public ServletEntry( 
-      Logger logger, ServletEntryContext context, ServletEntryParts parts ) throws Exception
+    public ServletContainer( 
+      Logger logger, ContextConfiguration context, ServletContainerParts parts ) throws Exception
     {
         super();
         
         m_logger = logger;
-        m_context = context;
-        m_parts = parts;
-    }
-    
-    public String getPath()
-    {
-        return m_context.getPath();
-    }
-    
-    public Servlet[] getServlets()
-    {
-        return m_parts.getServlets();
+        
+        ContextHelper helper = new ContextHelper( logger );
+        helper.contextualize( this, context );
+        
+        for( ServletEntry entry : parts.getServletEntries() )
+        {
+            if( m_logger.isDebugEnabled() )
+            {
+                m_logger.debug( "adding servlet " + entry );
+            }
+            String path = entry.getPath();
+            Servlet[] servlets = entry.getServlets();
+            for( Servlet servlet : servlets )
+            {
+                ServletHolder holder = new ServletHolder( servlet );
+                super.addServlet( holder , path );
+            }
+        }
     }
 }

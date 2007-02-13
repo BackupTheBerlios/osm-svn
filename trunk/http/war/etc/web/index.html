@@ -28,25 +28,21 @@
     </div>
     <div class="content">
 
-      <div class="section"><span class="section-header">OSM Web</span>
+      <div class="section">
+        <span class="section-header">OSM Web</span>
 
-<P>
-      <div class="subsection"><span class="subsection-header">Welcome to OSM Web on Metro 1.0 and Jetty 6</span>
+          <P>
+            <div class="subsection">
+              <span class="subsection-header">Welcome to OSM Web on Metro 1.0 and Jetty 6</span>
+              
+
+<p>The OSM web server component is based on a Jetty 6.1.0</p>
 
 <p>
-This osm web server component is based on a beta edition of Jetty 6.</p>
-
-<p>
-This is a test context resolved from a WAR file via DPML Transit that serves:
+This is a test context resolved from a WAR file via DPML Transit:
 </p>
 
 <ul>
-<li>static content (
-<a href="d.txt">tiny</a>,
-<a href="da.txt">small</a>,
-<a href="dat.txt">medium</a>,
-<a href="data.txt">large</a>,
-<a href="datax.txt">compressed</a>)</li>
 <li>a <a href="dump/info">Request Dump Servlet</a></li>
 <li>a <a href="session/">Session Dump Servlet</a></li>
 <li>a <a href="snoop.jsp">Request Dump JSP</a></li>
@@ -54,38 +50,31 @@ This is a test context resolved from a WAR file via DPML Transit that serves:
 </ul>
 
 <p>
-A static resource handler context provides hooks into the local documentation.
+Static resource handlers provide hooks into the local documentation.
 </p>
 
-<ul>
-<li>a <a href="/docs">Installed DPML site docs</a></li>
-<li>a <a href="/data">DPML Data Directory</a></li>
-</ul>
-</p>
-
-      <div class="subsection"><span class="subsection-header">Technical Note</span>
 <p>
-Improvements within Jetty 6.0.x include:
-</p>
 <ul>
-<li>Totally rearchitected and rebuild relative to JDK1.4</li>
-<li>Improved "dependancy injection" and "inversion of control" design of components</li>
-<li>Improved "interceptor" design of handlers</li>
-<li>Smart split buffer design allows large buffers to only be allocated to active connections.
-The resulting memory savings allow very large buffers to be used, which increases the chance of 
-efficient asynchronous flushing and of avoiding chunking.</li>
-<li>NIO Buffering so that efficient direct buffers and memory mapped files can be used.</li> 
-<li>NIO non-blocking scheduling so that threads are not allocated per connection.</li> 
-<li> NIO gather writes, so that for example a HTTP header and a memory mapped file may be
-sent as sent is a single operation.</li> 
-<li>Continuations for efficient AJAX polling</li>
+<li>a <a href="/docs">Installed docs</a></li>
+<li>a <a href="/api">Installed Javadoc</a></li>
+<li>a <a href="/data">Generated docs</a></li>
 </ul>
+</p>
 
-     </div>
+<p>
+A servlet container component handles deployment of components implemeting the servlet specification.
+</p>
+
+<p>
+<ul>
+<li>a <a href="/test">Servlet container test page</a></li>
+</ul>
+</p>
+
    </div>
 
   </div>
-    <div class="footer"><span class="copyright">Copyright 2006, OSM All rights reserved.</span>
+    <div class="footer"><span class="copyright">Copyright 2006-2007, OSM All rights reserved.</span>
    </div>
 
  </body>

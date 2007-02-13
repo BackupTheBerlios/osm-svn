@@ -32,14 +32,23 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import net.dpml.transit.Artifact;
 
+import net.dpml.annotation.Context;
+import net.dpml.annotation.Component;
+import net.dpml.annotation.Services;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+
 import org.mortbay.resource.Resource;
 import org.mortbay.jetty.security.Password;
+import org.mortbay.jetty.Connector;
 
 /**
  * SSL socket connector.
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
+@Component( name="ssl", lifestyle=SINGLETON )
+@Services( Connector.class )
 public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConnector
 {
     private static final int HEADER_BUFFER_SIZE = 4*1024;
@@ -56,7 +65,7 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
     private static final String PROTOCOL = "TLS";
     private static final String ALGORITHM = "SunX509";
     
-    private transient Context m_context;
+    private transient HttpsContext m_context;
     private transient Password m_certificatePassword;
     private transient Password m_keystorePassword;
     private transient Password m_trustPassword;
@@ -64,7 +73,8 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
    /**
     * SSL connector context definition.
     */
-    public interface Context extends ConnectorContext
+    @Context
+    public interface HttpsContext extends ConnectorContext
     {
        /**
         * Set the cipher suites.
@@ -172,7 +182,7 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
     * @param context the deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public SslSocketConnector( Context context ) throws Exception
+    public SslSocketConnector( HttpsContext context ) throws Exception
     {
         super();
         
@@ -184,7 +194,7 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
             setHost( host );
         }
     
-        int port = context.getPort();
+        int port = context.getPort( 8443 );
         setPort( port );
         
         int headerBufferSize = context.getHeaderBufferSize( HEADER_BUFFER_SIZE );
@@ -211,14 +221,14 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         int confidentialPort = context.getConfidentialPort( CONFIDENTIAL_PORT );
         setConfidentialPort( confidentialPort );
         
-        Scheme confidentialScheme = Scheme.parse( context.getConfidentialScheme( "https" ) );
-        setConfidentialScheme( confidentialScheme.getName() );
+        Scheme confidentialScheme = Scheme.valueOf( context.getConfidentialScheme( "HTTPS" ).toUpperCase() );
+        setConfidentialScheme( confidentialScheme.name().toLowerCase() );
         
         int integralPort = context.getIntegralPort( INTEGRAL_PORT );
         setIntegralPort( integralPort );
         
-        Scheme integralScheme = Scheme.parse( context.getIntegralScheme( "https" ) );
-        setIntegralScheme( integralScheme.getName() );
+        Scheme integralScheme = Scheme.valueOf( context.getIntegralScheme( "HTTPS" ).toUpperCase() );
+        setIntegralScheme( integralScheme.name().toLowerCase() );
         
         // SslSocketConnector$Context
         
@@ -305,8 +315,19 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         final char[] password = toCharArray( m_keystorePassword );
         final String keyStorePath = getKeystore();
         final InputStream input = Resource.newResource( keyStorePath ).getInputStream();
-        keyStore.load( input, password );
-        return keyStore;
+        if( null == input )
+        {
+            final String error = 
+              "Keystore path ["
+              + keyStorePath
+              + "] does not exist.";
+            throw new IllegalStateException( error );
+        }
+        else
+        {
+            keyStore.load( input, password );
+            return keyStore;
+        }
     }
     
     private KeyStore loadTrustStore() throws Exception

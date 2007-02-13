@@ -21,10 +21,10 @@ package net.osm.http;
 import java.util.Map;
 import java.util.Hashtable;
 
-import net.osm.http.NCSARequestLogHandler.Context;
+import net.osm.http.NCSARequestLogHandler.NCSAContext;
 import org.mortbay.jetty.NCSARequestLog;
 
-import net.dpml.util.ContextInvocationHandler;
+import dpml.lang.ContextInvocationHandler;
 
 import junit.framework.TestCase;
 
@@ -65,8 +65,8 @@ public class NCSARequestLogTestCase extends TestCase
         map.put( "logLatency", new Boolean( LATENCY_POLICY ) );
         map.put( "logCookies", new Boolean( COOKIE_POLICY ) );
         
-        Class clazz = Context.class;
-        Context context = (Context) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Class clazz = NCSAContext.class;
+        NCSAContext context = (NCSAContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_handler = new NCSARequestLogHandler( context );
         m_logger = (NCSARequestLog) m_handler.getRequestLog(); 
     }

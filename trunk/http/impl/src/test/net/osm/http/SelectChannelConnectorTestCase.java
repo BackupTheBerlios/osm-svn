@@ -20,9 +20,9 @@ package net.osm.http;
 
 import java.util.Map;
 
-import net.osm.http.SelectChannelConnector.Context;
+import net.osm.http.SelectChannelConnector.SelectChannelContext;
 
-import net.dpml.util.ContextInvocationHandler;
+import dpml.lang.ContextInvocationHandler;
 
 import org.mortbay.jetty.AbstractConnector;
 
@@ -45,8 +45,8 @@ public class SelectChannelConnectorTestCase extends AbstractConnectorContextTest
         
         map.put( "delaySelectKeyUpdate", new Boolean( ASSUME_SHORT_DISPATH_POLICY ) );
         
-        Class clazz = Context.class;
-        Context context = (Context) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Class clazz = SelectChannelContext.class;
+        SelectChannelContext context = (SelectChannelContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_connector = new SelectChannelConnector( context );
     }
     

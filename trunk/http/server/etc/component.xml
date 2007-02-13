@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<component xmlns="dpml:metro" type="net.osm.http.StandardServer" 
+    lifestyle="singleton" 
+    collection="hard">
+    
+  <context>
+    <entry key="min" value="10"/>
+    <entry key="max" value="100"/>
+  </context>
+    
+  <parts>
+    
+    <!--
+    Add a select channel connector to 8080.
+    -->
+    <component key="http" type="net.osm.http.SelectChannelConnector" 
+        lifestyle="singleton"
+        collection="hard">
+      <context>
+        <entry key="port" value="8080"/>
+        <entry key="maxIdleTime" value="50000"/>
+        <entry key="acceptors" value="10"/>
+      </context>
+    </component>
+    
+    <!--
+    Add a SSL connector to 8443.
+    -->
+    <component key="https" type="net.osm.http.SslSocketConnector" 
+        lifestyle="singleton"
+        collection="hard">
+      <context>
+        <entry key="port" value="8443"/>
+        <entry key="maxIdleTime" value="30000"/>
+        <entry key="keyStore" value="local:keystore:dpml/planet/http/sample"/>
+        <entry key="keyStorePassword" value="password"/>
+        <entry key="certificatePassword" value="password"/>
+        <entry key="trustStore" value="local:keystore:dpml/planet/http/certs"/>
+        <entry key="trustStorePassword" value="password"/>
+      </context>
+    </component>
+    
+    <!--
+    Add a user realm.
+    -->
+    <component key="realm" type="net.osm.http.HashUserRealm"
+        lifestyle="singleton"
+        collection="hard">
+      <context>
+        <entry key="name" value="Test Realm"/>
+        <entry key="URI" value="local:properties:dpml/planet/http/realm"/>
+      </context>
+    </component>
+    
+    <!--
+    Add context handlers.
+    -->
+    
+    <!--
+    Creation of a HTTP context configured to resond to urls on the path '/docs'
+    and delegation of these requests to the request handlers included in the component 
+    parts.  In this case we are including a simple directory navigator to present
+    the contents of the ${dpml.share}/docs directory.
+    -->
+    <component key="docs" type="net.osm.http.ContextHandler">
+      <context>
+        <entry key="contextPath" value="/docs"/>
+      </context>
+      <parts>
+        <component name="handler" type="net.osm.http.ResourceHandler">
+          <context>
+            <entry key="resourceBase" value="$${dpml.share}/docs"/>
+          </context>
+        </component>
+      </parts>
+    </component>
+    
+    <component key="api" type="net.osm.http.ContextHandler">
+      <context>
+        <entry key="contextPath" value="/api"/>
+      </context>
+      <parts>
+        <component type="net.osm.http.ResourceHandler">
+          <context>
+            <entry key="resourceBase" value="$${dpml.share}/docs/api/dpml/@DPML-VERSION@"/>
+          </context>
+        </component>
+      </parts>
+    </component>
+
+    <component key="data" type="net.osm.http.ContextHandler">
+      <context>
+        <entry key="contextPath" value="/data"/>
+      </context>
+      <parts>
+        <component type="net.osm.http.ResourceHandler">
+          <context>
+            <entry key="resourceBase" value="$${dpml.data}/docs"/>
+          </context>
+        </component>
+      </parts>
+    </component>
+
+    <component key="test" type="net.osm.http.ServletContainer">
+      <context>
+        <entry key="contextPath" value="/test"/>
+      </context>
+      <parts>
+        <component type="net.osm.http.ServletEntry">
+          <context>
+            <entry key="path" value="/*"/>
+          </context>
+          <parts>
+            <component name="demo" type="osm.http.sample.SampleServlet"/>
+          </parts>
+        </component>
+      </parts>
+    </component>
+    
+    <!--
+    Add a web application.
+    -->
+    <component key="webapp" type="net.osm.http.WebAppContextHandler"
+        collection="hard" lifestyle="singleton" priority="-100">
+      <context>
+        <entry key="contextPath" value="/"/>
+        <entry key="war" value="link:war:osm/http/osm-http-app"/>
+        <entry key="tempDirectory" value="$${dpml.data}/work/http"/>
+      </context>
+    </component>
+    
+    <!-- 
+    NCSA Request log. 
+    -->
+    <component key="ncsa" 
+        type="net.osm.http.NCSARequestLogHandler" 
+        collection="hard" lifestyle="singleton">
+      <context>
+        <entry key="filename" value="$${dpml.data}/logs/http/request.log"/>
+        <entry key="append" value="true"/>
+        <entry key="extended" value="true"/>
+      </context>
+    </component>
+            
+  </parts>
+          
+</component>

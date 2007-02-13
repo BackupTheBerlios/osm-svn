@@ -1,28 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <project name="osm-home" default="install" basedir="." 
-    xmlns:transit="antlib:net.dpml.transit"
-    xmlns:x="dpml:depot"
-    xmlns:m="dpml:metro">
+    xmlns:x="antlib:dpml.tools">
 
-  <transit:import uri="local:template:dpml/tools/standard"/>
+  <x:import uri="local:template:dpml/tools/standard"/>
 
   <target name="build" depends="standard.build">
     <x:docs/>
     <copy file="${basedir}/etc/docs/styles/style.css" 
       toFile="${basedir}/target/docs/styles/style.css" overwrite="true"/>
-  </target>
-
-  <target name="catalog" depends="init">
-    <property name="catalog.path" location="${basedir}/target/docs/reports/catalog"/>
-    <mkdir dir="${catalog.path}"/>
-    <x:plugin uri="link:part:dpml/metro/dpml-metro-tools"/>
-    <m:catalog title="OSM Catalog" dest="${catalog.path}">
-      <fileset dir="${basedir}/../main">
-        <include name="**/target/classes/main/**/*.type"/>
-        <exclude name="**/test/**/*.*"/>
-      </fileset>
-    </m:catalog>
   </target>
 
 </project>

@@ -17,10 +17,11 @@
 -->
 
 <project default="install"
-    xmlns:transit="antlib:net.dpml.transit" xmlns:depot="dpml:depot">
+    xmlns:x="antlib:dpml.tools">
 
-  <transit:import uri="local:template:dpml/tools/standard"/>
+  <x:import uri="local:template:dpml/tools/standard"/>
 
+  <!--
   <target name="build" depends="standard.build">
 
     <depot:plugin uri="link:part:dpml/metro/dpml-metro-tools" urn="metro"/>
@@ -112,6 +113,7 @@
     </type>
 
   </target>
-
+  -->
+  
 </project>
 

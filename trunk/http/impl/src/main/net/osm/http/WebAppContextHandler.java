@@ -20,7 +20,13 @@ import java.util.Map;
 import java.security.PermissionCollection;
 import java.io.File;
 
-import net.dpml.logging.Logger;
+import net.dpml.annotation.Context;
+import net.dpml.annotation.Component;
+import net.dpml.annotation.Services;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+
+import net.dpml.util.Logger;
 
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.SessionHandler;
@@ -31,12 +37,15 @@ import org.mortbay.jetty.servlet.ServletHandler;
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
+@Component( name="webapp", lifestyle=SINGLETON )
+//@Services( WebAppContextHandler.class )
 public class WebAppContextHandler extends org.mortbay.jetty.webapp.WebAppContext
 {
    /**
     * HTTP static resource vontext handler parameters.
     */
-    public interface Context extends ContextHandlerContext
+    @Context
+    public interface WebConfiguration extends ContextConfiguration
     {
        /**
         * Get the war artifact uri.
@@ -102,7 +111,7 @@ public class WebAppContextHandler extends org.mortbay.jetty.webapp.WebAppContext
     * @param context the deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public WebAppContextHandler( Logger logger, Context context ) throws Exception
+    public WebAppContextHandler( Logger logger, WebConfiguration context ) throws Exception
     {
         ContextHelper helper = new ContextHelper( logger );
         helper.contextualize( this, context );

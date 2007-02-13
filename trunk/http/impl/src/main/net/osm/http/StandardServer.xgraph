@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<state xmlns="dpml:state"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <trigger event="initialization">
+    <transition name="start" target="started">
+      <operation name="startup" method="start"/>
+    </transition>
+  </trigger>
+
+  <state name="started">
+    <trigger event="termination">
+      <apply id="stop"/>
+    </trigger>
+    <transition name="stop" target="../stopped">
+      <operation name="stop" method="stop"/>
+    </transition>
+  </state>
+
+  <state name="stopped">
+    <transition name="start" target="../started">
+      <operation name="start" method="start"/>
+    </transition>
+  </state>
+
+</state>

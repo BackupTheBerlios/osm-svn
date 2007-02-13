@@ -17,17 +17,28 @@ package net.osm.http;
 
 import java.net.URI;
 
+import net.dpml.annotation.Context;
+import net.dpml.annotation.Component;
+import net.dpml.annotation.Services;
+
+import org.mortbay.jetty.security.UserRealm;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+
 /**
  * Hash user realm with enhanced keystore resolution semantics.
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
+@Component( name="realm", lifestyle=SINGLETON )
+@Services( UserRealm.class )
 public class HashUserRealm extends org.mortbay.jetty.security.HashUserRealm
 {
    /**
     * HTTP Context handler context defintion.
     */
-    public interface Context
+    @Context
+    public interface RealmContext
     {
        /**
         * Get the user realm name.
@@ -49,7 +60,7 @@ public class HashUserRealm extends org.mortbay.jetty.security.HashUserRealm
     * @param context the deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public HashUserRealm( Context context ) throws Exception
+    public HashUserRealm( RealmContext context ) throws Exception
     {
         String name = context.getName();
         super.setName( name );

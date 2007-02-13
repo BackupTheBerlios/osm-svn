@@ -15,74 +15,29 @@
  */
 package net.osm.http;
 
+import net.dpml.annotation.Context;
+import net.dpml.annotation.Component;
+import net.dpml.annotation.Services;
+
+import org.mortbay.thread.ThreadPool;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+
 /**
  * Thread pool implementation.
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
+@Component( name="pool", lifestyle=SINGLETON )
+@Services( ThreadPool.class )
 public class BoundedThreadPool extends org.mortbay.thread.BoundedThreadPool
 {
-   /**
-    * HTTP Context handler context defintion.
-    */
-    public interface Context
-    {
-       /**
-        * Get the minimum thread level.
-        *
-        * @param min the default minimum value
-        * @return the minimum thread level
-        */
-        int getMin( int min );
-        
-       /**
-        * Return maximum thread level.
-        *
-        * @param max the default maximum value
-        * @return the maximum thread level
-        */
-        int getMax( int max );
-        
-       /**
-        * Return the deamon flag.
-        *
-        * @param flag true if a damon thread 
-        * @return the deamon thread policy
-        */
-        boolean getDaemon( boolean flag );
-        
-       /**
-        * Get the thread pool name.
-        *
-        * @param name the pool name
-        * @return the name
-        */
-        String getName( String name );
-        
-       /**
-        * Get the thread pool priority.
-        *
-        * @param priority the thread pool priority
-        * @return the priority
-        */
-        int getPriority( int priority );
-        
-       /**
-        * Get the maximum idle time.
-        *
-        * @param idle the default maximum idle time
-        * @return the maximum idle time in milliseconds
-        */
-        int getIdle( int idle );
-        
-    }
-
    /**
     * Creation of a new blocking thread pool.
     * @param context the component context
     * @exception Exception if an instantiation error occurs
     */
-    public BoundedThreadPool( Context context ) throws Exception
+    public BoundedThreadPool( PoolConfiguration context ) throws Exception
     {
         super();
         

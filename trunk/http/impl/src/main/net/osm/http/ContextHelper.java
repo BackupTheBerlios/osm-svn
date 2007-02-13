@@ -17,7 +17,7 @@ package net.osm.http;
 
 import java.util.Map;
 
-import net.dpml.logging.Logger;
+import net.dpml.util.Logger;
 
 import org.mortbay.jetty.MimeTypes;
 import org.mortbay.jetty.handler.ContextHandler;
@@ -42,7 +42,7 @@ class ContextHelper
     * @param handler the handler to contextualize
     * @param context the context instance
     */
-    void contextualize( ContextHandler handler, ContextHandlerContext context ) throws Exception
+    void contextualize( ContextHandler handler, ContextConfiguration context ) throws Exception
     {
         String path = context.getContextPath();
         handler.setContextPath( path );
@@ -52,6 +52,13 @@ class ContextHelper
         if( null != classloader )
         {
             handler.setClassLoader( classloader );
+        }
+        
+        String base = context.getResourceBase( null );
+        if( null != base )
+        {
+            getLogger().info( "RESOURCE BASE: " + path );
+            handler.setResourceBase( base );
         }
         
         String name = context.getDisplayName( null );

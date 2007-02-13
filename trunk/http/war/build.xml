@@ -16,14 +16,13 @@
  * limitations under the License.
 -->
 
-<project default="install"
-    xmlns:transit="antlib:net.dpml.transit" xmlns:depot="dpml:depot" >
+<project default="install" xmlns:x="antlib:dpml.tools">
 
-  <transit:import uri="local:template:dpml/tools/standard"/>
+  <x:import uri="local:template:dpml/tools/standard"/>
 
   <target name="package" depends="standard.package">
     <property name="war.dir" value="${basedir}/target/deliverables/wars"/>
-    <depot:property feature="filename" name="project.filename" type="war"/>
+    <x:property feature="filename" name="project.filename" type="war"/>
     <property name="war.path" value="${war.dir}/${project.filename}"/>
     <mkdir dir="${war.dir}"/>
     <war destfile="${war.path}" webxml="target/web.xml">

@@ -23,9 +23,9 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Hashtable;
 
-import net.osm.http.HashUserRealm.Context;
+import net.osm.http.HashUserRealm.RealmContext;
 
-import net.dpml.util.ContextInvocationHandler;
+import dpml.lang.ContextInvocationHandler;
 
 import junit.framework.TestCase;
 
@@ -50,8 +50,8 @@ public class HashUserRealmTestCase extends TestCase
         URI uri = properties.toURI();
         m_config = uri.toASCIIString();
         map.put( "URI", uri );
-        Class clazz = Context.class;
-        Context context = (Context) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Class clazz = RealmContext.class;
+        RealmContext context = (RealmContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_realm = new HashUserRealm( context );
     }
     

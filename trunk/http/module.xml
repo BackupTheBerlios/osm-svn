@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<module name="http" xmlns="link:xsd:dpml/lang/dpml-module#1.0">
+<module name="http" xmlns="dpml:library">
 
   <properties>
     <property name="jasper.version" value="5.5.15"/>
@@ -18,22 +18,22 @@
     </types>
     <dependencies>
       <runtime>
-        <include ref="dpml/metro/dpml-metro-model"/>
-        <include ref="dpml/util/dpml-logging-api"/>
-        <include ref="dpml/transit/dpml-transit-main"/>
-        <include ref="org/mortbay/jetty/servlet-api-2.5" tag="PUBLIC"/>
+        <include ref="dpml/metro/dpml-metro-part"/>
+        <include uri="artifact:jar:javax/servlet/servlet-api#2.5"/>
         <include ref="org/mortbay/jetty/jetty-util"/>
-        <include ref="org/mortbay/jetty/jsp-api-2.0"/>
+        <include ref="org/mortbay/jetty/jsp-api-2.1"/>
         <include ref="org/mortbay/jetty/jetty"/>
+        <!--
         <include uri="artifact:jar:tomcat/jasper-runtime#${jasper.version}"/>
         <include uri="artifact:jar:tomcat/jasper-compiler#${jasper.version}"/>
         <include uri="artifact:jar:tomcat/jasper-compiler-jdt#${jasper.version}"/>
         <include uri="artifact:jar:commons-el/commons-el#1.0"/>
         <include uri="artifact:jar:org/slf4j/jcl104-over-slf4j#${sl4j.version}"/>
         <include uri="artifact:jar:org/slf4j/slf4j-jdk14#${sl4j.version}"/>
+        -->
       </runtime>
       <test>
-        <include ref="ant/ant-junit"/>
+        <include ref="org/apache/ant/ant-junit"/>
       </test>
     </dependencies>
   </project>
@@ -45,7 +45,7 @@
     </types>
     <dependencies>
       <runtime>
-        <include ref="org/mortbay/jetty/servlet-api-2.5" tag="PUBLIC"/>
+        <include uri="artifact:jar:javax/servlet/servlet-api#2.5" tag="PUBLIC"/>
       </runtime>
     </dependencies>
   </project>
@@ -56,15 +56,21 @@
     <properties>
       <property name="project.javadoc.exclude" value="true"/>
     </properties>
+    <types>
+      <type id="jar" test="true"/>
+    </types>
     <dependencies>
       <build>
         <include key="osm-http-server"/>
       </build>
       <test>
-        <include ref="dpml/transit/dpml-transit-main"/>
-        <include ref="ant/ant-junit"/>
+        <include ref="dpml/metro/dpml-metro-part"/>
+        <include ref="org/apache/ant/ant-junit"/>
       </test>
     </dependencies>
   </project>
+
+  <project file="express/project.xml"/>
+  <project file="demo/project.xml"/>
 
 </module>

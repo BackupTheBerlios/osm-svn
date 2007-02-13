@@ -26,11 +26,12 @@ import java.util.Hashtable;
 import java.security.Permission;
 import java.security.PermissionCollection;
 
-import net.osm.http.WebAppContextHandler.Context;
+import net.osm.http.WebAppContextHandler.WebConfiguration;
 
-import net.dpml.util.ContextInvocationHandler;
+import dpml.lang.ContextInvocationHandler;
 
-import net.dpml.logging.Logger;
+import net.dpml.util.Logger;
+import dpml.util.DefaultLogger;
 
 import org.mortbay.jetty.handler.ContextHandler;
 import org.mortbay.jetty.security.SecurityHandler;
@@ -70,9 +71,9 @@ public class WebAppContextHandlerTestCase extends AbstractContextHandlerTestCase
         map.put( "sessionHandler", SESSIONS_HANDLER );
         map.put( "servletHandler", SERVLET_HANDLER );
         
-        Class clazz = Context.class;
-        Context context = (Context) ContextInvocationHandler.getProxiedInstance( clazz, map );
-        Logger logger = new StandardLogger( "test" );
+        Class clazz = WebConfiguration.class;
+        WebConfiguration context = (WebConfiguration) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Logger logger = new DefaultLogger( "test" );
         m_handler = new WebAppContextHandler( logger, context );
     }
     

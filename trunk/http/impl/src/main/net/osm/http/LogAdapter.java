@@ -50,7 +50,7 @@ public class LogAdapter implements org.mortbay.log.Logger
     */
     public boolean isDebugEnabled()
     {
-        return m_logger.isLoggable( Level.FINE );
+        return m_logger.isLoggable( Level.FINEST );
     }
     
    /**
@@ -85,7 +85,7 @@ public class LogAdapter implements org.mortbay.log.Logger
     {
         if( isDebugEnabled() )
         {
-            m_logger.log( Level.FINE, message, cause );
+            m_logger.log( Level.FINEST, message, cause );
         }
     }
     
@@ -100,7 +100,7 @@ public class LogAdapter implements org.mortbay.log.Logger
         if( isDebugEnabled() )
         {
             String message = format( msg, arg0, arg1 );
-            m_logger.log( Level.FINE, message );
+            m_logger.log( Level.FINEST, message );
         }
     }
     

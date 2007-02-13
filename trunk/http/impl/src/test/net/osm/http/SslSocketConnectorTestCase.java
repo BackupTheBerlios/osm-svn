@@ -22,9 +22,9 @@ import java.io.File;
 import java.net.URI;
 import java.util.Map;
 
-import net.osm.http.SslSocketConnector.Context;
+import net.osm.http.SslSocketConnector.HttpsContext;
 
-import net.dpml.util.ContextInvocationHandler;
+import dpml.lang.ContextInvocationHandler;
 
 import org.mortbay.jetty.AbstractConnector;
 
@@ -63,8 +63,8 @@ public class SslSocketConnectorTestCase extends AbstractConnectorContextTestCase
         map.put( "provider", PROVIDER );
         map.put( "trustAlgorithm", TRUST_ALGORITHM );
         
-        Class clazz = Context.class;
-        Context context = (Context) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Class clazz = HttpsContext.class;
+        HttpsContext context = (HttpsContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_connector = new SslSocketConnector( context );
     }
     
