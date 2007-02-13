@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.osm.http;
+package net.osm.http.impl;
 
 /**
  * HTTP scheme enumeration.

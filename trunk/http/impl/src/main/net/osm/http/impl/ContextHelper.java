@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.util.Map;
 
@@ -47,6 +47,10 @@ class ContextHelper
         String path = context.getContextPath();
         handler.setContextPath( path );
         getLogger().debug( "setting context path: " + path );
+        
+        ErrorHandler defaultErrorHandler = new net.osm.http.impl.ErrorHandler();
+        ErrorHandler errorHandler = context.getErrorHandler( defaultErrorHandler );
+        handler.setErrorHandler( errorHandler );
         
         ClassLoader classloader = context.getClassLoader( null );
         if( null != classloader )
@@ -91,12 +95,6 @@ class ContextHelper
             MimeTypes types = new MimeTypes();
             types.setMimeMap( map );
             handler.setMimeTypes( types );
-        }
-        
-        ErrorHandler errorHandler = context.getErrorHandler( null );
-        if( null != errorHandler )
-        {
-            handler.setErrorHandler( errorHandler );
         }
     }
     

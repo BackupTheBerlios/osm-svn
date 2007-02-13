@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.net.URI;
 import java.net.URL;
@@ -43,7 +43,7 @@ import org.mortbay.jetty.handler.HandlerCollection;
 public class StandardServer extends org.mortbay.jetty.Server
 {
    /**
-    * Internal parts managemwent interface.
+    * Internal parts management interface.
     */
     public interface Parts
     {

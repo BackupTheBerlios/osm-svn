@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.net.URI;
 import java.util.Map;

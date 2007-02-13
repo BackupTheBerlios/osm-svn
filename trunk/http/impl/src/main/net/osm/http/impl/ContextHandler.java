@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.io.IOException;
 import java.util.Map;
@@ -89,6 +89,10 @@ public class ContextHandler extends org.mortbay.jetty.handler.ContextHandler
         String path = context.getContextPath();
         super.setContextPath( path );
         
+        ErrorHandler defaultErrorHandler = new net.osm.http.impl.ErrorHandler();
+        ErrorHandler errorHandler = context.getErrorHandler( defaultErrorHandler );
+        super.setErrorHandler( errorHandler );
+        
         ClassLoader classloader = context.getClassLoader( null );
         if( null != classloader )
         {
@@ -127,10 +131,5 @@ public class ContextHandler extends org.mortbay.jetty.handler.ContextHandler
             super.setMimeTypes( types );
         }
         
-        ErrorHandler errorHandler = context.getErrorHandler( null );
-        if( null != errorHandler )
-        {
-            super.setErrorHandler( errorHandler );
-        }
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http;
+package net.osm.http.impl;
 
 import dpml.lang.ContextInvocationHandler;
 
@@ -25,6 +25,7 @@ import java.util.Hashtable;
 import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
+import net.dpml.annotation.Parts;
 
 import static net.dpml.annotation.LifestylePolicy.SINGLETON;
 
@@ -42,10 +43,10 @@ import org.mortbay.jetty.security.UserRealm;
 import org.mortbay.thread.ThreadPool;
 import org.mortbay.xml.XmlConfiguration;
 
-import net.osm.http.SelectChannelConnector.SelectChannelContext;
-import net.osm.http.SslSocketConnector.HttpsContext;
-import net.osm.http.HashUserRealm.RealmContext;
-import net.osm.http.NCSARequestLogHandler.NCSAContext;
+import net.osm.http.impl.SelectChannelConnector.SelectChannelContext;
+import net.osm.http.impl.SslSocketConnector.HttpsContext;
+import net.osm.http.impl.HashUserRealm.RealmContext;
+import net.osm.http.impl.NCSARequestLogHandler.NCSAContext;
 
 /**
  * HTTP server implementation.
@@ -69,9 +70,19 @@ public class DefaultServer extends org.mortbay.jetty.Server
         NCSAContext getLog( NCSAContext context );
     }
     
+   /**
+    * Internal parts management interface.
+    */
+    @Parts
+    public interface ServerConfiguration
+    {
+        ContextHandler[] getContextHandlers();
+    }
+    
     private final Logger m_logger;
-    private final ContextHandlerCollection m_contextHandlers = new ContextHandlerCollection();
-    private final org.mortbay.jetty.servlet.Context m_root;
+    private final ContextHandlerCollection m_contextHandlers = 
+      new ContextHandlerCollection();
+    private final ServerConfiguration m_parts;
 
    /**
     * Creation of a new HTTP server implementation.
@@ -79,11 +90,12 @@ public class DefaultServer extends org.mortbay.jetty.Server
     * @param context the assigned deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public DefaultServer( Logger logger, ServerContext context ) throws Exception
+    public DefaultServer( Logger logger, ServerContext context, ServerConfiguration config ) throws Exception
     {
         super();
         
         m_logger = logger;
+        m_parts = config;
         
         if( getLogger().isDebugEnabled() )
         {
@@ -150,29 +162,27 @@ public class DefaultServer extends org.mortbay.jetty.Server
         NCSARequestLogHandler requestLogHandler = new NCSARequestLogHandler( logContext );
         
         //
-        // setup root context "/" with an error handler
-        // 
-        
-        m_root = 
-          new org.mortbay.jetty.servlet.Context( 
-            this, "/", org.mortbay.jetty.servlet.Context.SESSIONS );
-        ErrorHandler handler = new ErrorHandler();
-        m_root.setErrorHandler( handler );
-        m_contextHandlers.addHandler( m_root );
-        
-        //
-        // declare the handler collection (containing our root context and request log)
+        // populate the context handler collection with the set of context
+        // handler components declared under the component parts definition
         //
         
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(
+        ContextHandler[] contextHandlers = config.getContextHandlers();
+        m_contextHandlers.setHandlers( contextHandlers );
+        
+        //
+        // declare the handler collection containing our root context and request log
+        // within which all handlers will be invoked irrespective of response status
+        //
+        
+        HandlerCollection handlerCollection = new HandlerCollection();
+        handlerCollection.setHandlers(
           new Handler[]
           { 
             m_contextHandlers,
             requestLogHandler
           } );
         
-        super.setHandler( handlers );
+        super.setHandler( handlerCollection );
         
         //
         // notify completion of the setup process
@@ -184,9 +194,18 @@ public class DefaultServer extends org.mortbay.jetty.Server
         }
     }
     
-    org.mortbay.jetty.servlet.Context getRootContext()
+    public ContextHandler getContextHandler( String path )
     {
-        return m_root;
+        ContextHandler[] handlers = m_parts.getContextHandlers();
+        for( ContextHandler handler : handlers )
+        {
+            String spec = handler.getContextPath();
+            if( path.equals( spec ) )
+            {
+                return handler;
+            }
+        }
+        return null;
     }
     
     private Logger getLogger()

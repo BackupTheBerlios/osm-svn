@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.io.Writer;
 import java.io.IOException;
@@ -69,5 +69,10 @@ public class ErrorHandler extends org.mortbay.jetty.handler.ErrorHandler
             s = StringUtil.replace( s, ">", "&gt;" );
         }
         return s;
+    }
+    
+    public String toString()
+    {
+        return getClass().getName() + "@" + System.identityHashCode( this );
     }
 }
