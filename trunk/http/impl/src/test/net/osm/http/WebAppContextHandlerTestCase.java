@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.io.File;
 import java.io.FilePermission;
@@ -26,7 +26,7 @@ import java.util.Hashtable;
 import java.security.Permission;
 import java.security.PermissionCollection;
 
-import net.osm.http.WebAppContextHandler.WebConfiguration;
+import net.osm.http.impl.WebAppContextHandler.WebConfiguration;
 
 import dpml.lang.ContextInvocationHandler;
 

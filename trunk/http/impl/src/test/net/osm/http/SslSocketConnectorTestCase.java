@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.io.File;
 import java.net.URI;
 import java.util.Map;
 
-import net.osm.http.SslSocketConnector.HttpsContext;
+import net.osm.http.impl.SslSocketConnector.HttpsContext;
 
 import dpml.lang.ContextInvocationHandler;
 

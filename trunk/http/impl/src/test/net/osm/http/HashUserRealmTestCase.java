@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.io.File;
 import java.net.URI;
 import java.util.Map;
 import java.util.Hashtable;
 
-import net.osm.http.HashUserRealm.RealmContext;
+import net.osm.http.impl.HashUserRealm.RealmContext;
 
 import dpml.lang.ContextInvocationHandler;
 

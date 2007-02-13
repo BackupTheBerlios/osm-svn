@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.util.Map;
 import java.util.Hashtable;
 
-import net.osm.http.NCSARequestLogHandler.NCSAContext;
+import net.osm.http.impl.NCSARequestLogHandler.NCSAContext;
 import org.mortbay.jetty.NCSARequestLog;
 
 import dpml.lang.ContextInvocationHandler;

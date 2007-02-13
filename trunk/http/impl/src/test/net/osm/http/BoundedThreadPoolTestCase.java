@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.util.Map;
 import java.util.Hashtable;
 
-import net.osm.http.BoundedThreadPool;
-import net.osm.http.PoolConfiguration;
+import net.osm.http.impl.BoundedThreadPool;
+import net.osm.http.impl.PoolConfiguration;
 
 import dpml.lang.ContextInvocationHandler;
 

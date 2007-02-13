@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.util.Map;
 
-import net.osm.http.SelectChannelConnector.SelectChannelContext;
+import net.osm.http.impl.SelectChannelConnector.SelectChannelContext;
 
 import dpml.lang.ContextInvocationHandler;
 

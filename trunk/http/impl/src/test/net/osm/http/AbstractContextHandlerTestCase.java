@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.osm.http;
+package net.osm.http.impl;
 
 import java.util.Arrays;
 import java.util.Map;
