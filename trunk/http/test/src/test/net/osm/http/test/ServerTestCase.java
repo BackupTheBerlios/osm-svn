@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.osm.http.test;
+package net.osm.http.impl.test;
 
 import java.net.URI;
 
@@ -41,6 +41,6 @@ public class ServerTestCase extends TestCase
         URI uri = new URI( "link:part:osm/http/osm-http-server" );
         Strategy strategy = Strategy.load( uri );
         Object object = strategy.getInstance( Object.class );
-        assertEquals( "class", "net.osm.http.StandardServer", object.getClass().getName() );
+        assertEquals( "class", "net.osm.http.impl.StandardServer", object.getClass().getName() );
     }
 }

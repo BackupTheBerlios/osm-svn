@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<component xmlns="dpml:metro" type="net.osm.http.StandardServer" 
+<component xmlns="dpml:metro" type="net.osm.http.impl.StandardServer" 
     lifestyle="singleton" 
     collection="hard">
     
@@ -13,7 +13,7 @@
     <!--
     Add a select channel connector to 8080.
     -->
-    <component key="http" type="net.osm.http.SelectChannelConnector" 
+    <component key="http" type="net.osm.http.impl.SelectChannelConnector" 
         lifestyle="singleton"
         collection="hard">
       <context>
@@ -26,7 +26,7 @@
     <!--
     Add a SSL connector to 8443.
     -->
-    <component key="https" type="net.osm.http.SslSocketConnector" 
+    <component key="https" type="net.osm.http.impl.SslSocketConnector" 
         lifestyle="singleton"
         collection="hard">
       <context>
@@ -43,7 +43,7 @@
     <!--
     Add a user realm.
     -->
-    <component key="realm" type="net.osm.http.HashUserRealm"
+    <component key="realm" type="net.osm.http.impl.HashUserRealm"
         lifestyle="singleton"
         collection="hard">
       <context>
@@ -62,12 +62,12 @@
     parts.  In this case we are including a simple directory navigator to present
     the contents of the ${dpml.share}/docs directory.
     -->
-    <component key="docs" type="net.osm.http.ContextHandler">
+    <component key="docs" type="net.osm.http.impl.ContextHandler">
       <context>
         <entry key="contextPath" value="/docs"/>
       </context>
       <parts>
-        <component name="handler" type="net.osm.http.ResourceHandler">
+        <component name="handler" type="net.osm.http.impl.ResourceHandler">
           <context>
             <entry key="resourceBase" value="$${dpml.share}/docs"/>
           </context>
@@ -75,12 +75,12 @@
       </parts>
     </component>
     
-    <component key="api" type="net.osm.http.ContextHandler">
+    <component key="api" type="net.osm.http.impl.ContextHandler">
       <context>
         <entry key="contextPath" value="/api"/>
       </context>
       <parts>
-        <component type="net.osm.http.ResourceHandler">
+        <component type="net.osm.http.impl.ResourceHandler">
           <context>
             <entry key="resourceBase" value="$${dpml.share}/docs/api/dpml/@DPML-VERSION@"/>
           </context>
@@ -88,12 +88,12 @@
       </parts>
     </component>
 
-    <component key="data" type="net.osm.http.ContextHandler">
+    <component key="data" type="net.osm.http.impl.ContextHandler">
       <context>
         <entry key="contextPath" value="/data"/>
       </context>
       <parts>
-        <component type="net.osm.http.ResourceHandler">
+        <component type="net.osm.http.impl.ResourceHandler">
           <context>
             <entry key="resourceBase" value="$${dpml.data}/docs"/>
           </context>
@@ -101,12 +101,12 @@
       </parts>
     </component>
 
-    <component key="test" type="net.osm.http.ServletContainer">
+    <component key="test" type="net.osm.http.impl.ServletContainer">
       <context>
         <entry key="contextPath" value="/test"/>
       </context>
       <parts>
-        <component type="net.osm.http.ServletEntry">
+        <component type="net.osm.http.impl.ServletEntry">
           <context>
             <entry key="path" value="/*"/>
           </context>
@@ -120,7 +120,7 @@
     <!--
     Add a web application.
     -->
-    <component key="webapp" type="net.osm.http.WebAppContextHandler"
+    <component key="webapp" type="net.osm.http.impl.WebAppContextHandler"
         collection="hard" lifestyle="singleton" priority="-100">
       <context>
         <entry key="contextPath" value="/"/>
@@ -133,7 +133,7 @@
     NCSA Request log. 
     -->
     <component key="ncsa" 
-        type="net.osm.http.NCSARequestLogHandler" 
+        type="net.osm.http.impl.NCSARequestLogHandler" 
         collection="hard" lifestyle="singleton">
       <context>
         <entry key="filename" value="$${dpml.data}/logs/http/request.log"/>
