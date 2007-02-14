@@ -25,7 +25,6 @@ import java.util.Hashtable;
 import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
-import net.dpml.annotation.Parts;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -67,8 +66,8 @@ public class ExpressServer extends org.mortbay.jetty.Server
    /**
     * Internal parts management interface.
     */
-    @Parts
-    public interface ServerParts
+    @net.dpml.annotation.Parts
+    public interface Parts
     {
         ContextHandler[] getContextHandlers();
         UserRealm[] getUserRealms();
@@ -77,7 +76,7 @@ public class ExpressServer extends org.mortbay.jetty.Server
     private final Logger m_logger;
     private final ContextHandlerCollection m_contextHandlers = 
       new ContextHandlerCollection();
-    private final ServerParts m_parts;
+    private final Parts m_parts;
     
    /**
     * Creation of a new HTTP server implementation.
@@ -85,7 +84,7 @@ public class ExpressServer extends org.mortbay.jetty.Server
     * @param context the assigned deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public ExpressServer( Logger logger, ServerContext context, ServerParts parts ) throws Exception
+    public ExpressServer( Logger logger, ServerContext context, Parts parts ) throws Exception
     {
         super();
         
@@ -139,13 +138,6 @@ public class ExpressServer extends org.mortbay.jetty.Server
         //
         
         setUserRealms( parts.getUserRealms() );
-        
-        //RealmContext realmConfig = context.getRealm( null );
-        //if( null != realmConfig )
-        //{
-        //    HashUserRealm realm = new HashUserRealm( realmConfig );
-        //    super.addUserRealm( realm );
-        //}
         
         //
         // setup the request log handler
