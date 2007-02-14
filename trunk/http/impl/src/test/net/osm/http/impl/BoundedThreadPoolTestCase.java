@@ -21,8 +21,8 @@ package net.osm.http.impl;
 import java.util.Map;
 import java.util.Hashtable;
 
+import net.osm.http.spi.ThreadContext;
 import net.osm.http.impl.BoundedThreadPool;
-import net.osm.http.impl.PoolConfiguration;
 
 import dpml.lang.ContextInvocationHandler;
 
@@ -54,8 +54,8 @@ public class BoundedThreadPoolTestCase extends TestCase
         map.put( "name", NAME );
         map.put( "priority", new Integer( PRIORITY ) );
         map.put( "idle", new Integer( IDLE ) );
-        Class clazz = PoolConfiguration.class;
-        PoolConfiguration context = (PoolConfiguration) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Class clazz = ThreadContext.class;
+        ThreadContext context = (ThreadContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_pool = new BoundedThreadPool( context );
     }
     

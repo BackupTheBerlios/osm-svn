@@ -33,6 +33,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.dpml.util.Logger;
 
+import net.osm.http.spi.ThreadContext;
+import net.osm.http.spi.NCSAContext;
+import net.osm.http.spi.HttpConnectionContext;
+import net.osm.http.spi.HttpsConnectionContext;
+
+import net.osm.http.impl.HashUserRealm.RealmContext;
+
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.handler.HandlerCollection;
@@ -42,11 +49,6 @@ import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.security.UserRealm;
 import org.mortbay.thread.ThreadPool;
 import org.mortbay.xml.XmlConfiguration;
-
-import net.osm.http.impl.SelectChannelConnector.SelectChannelContext;
-import net.osm.http.impl.SslSocketConnector.HttpsContext;
-import net.osm.http.impl.HashUserRealm.RealmContext;
-import net.osm.http.impl.NCSARequestLogHandler.NCSAContext;
 
 /**
  * HTTP server implementation.
@@ -59,11 +61,11 @@ public class DefaultServer extends org.mortbay.jetty.Server
     @Context
     public interface ServerContext
     {
-        PoolConfiguration getThreads( PoolConfiguration context );
+        ThreadContext getThreads( ThreadContext context );
         
-        SelectChannelContext getHttp( SelectChannelContext context );
+        HttpConnectionContext getHttp( HttpConnectionContext context );
         
-        HttpsContext getHttps( HttpsContext context );
+        HttpsConnectionContext getHttps( HttpsConnectionContext context );
         
         RealmContext getRealm( RealmContext context );
         
@@ -109,11 +111,11 @@ public class DefaultServer extends org.mortbay.jetty.Server
         // setup the thread pool
         //
         
-        PoolConfiguration defaultPool = 
+        ThreadContext defaultPool = 
           ContextInvocationHandler.getProxiedInstance( 
-            PoolConfiguration.class, 
+            ThreadContext.class, 
             new Hashtable() );
-        PoolConfiguration poolConfig = context.getThreads( defaultPool );
+        ThreadContext poolConfig = context.getThreads( defaultPool );
         BoundedThreadPool pool = new BoundedThreadPool( poolConfig );
         super.setThreadPool( pool );
         
@@ -121,7 +123,7 @@ public class DefaultServer extends org.mortbay.jetty.Server
         // setup the http connector
         //
         
-        SelectChannelContext httpConfig = context.getHttp( null );
+        HttpConnectionContext httpConfig = context.getHttp( null );
         if( null != httpConfig )
         {
             SelectChannelConnector http = new SelectChannelConnector( httpConfig );
@@ -132,7 +134,7 @@ public class DefaultServer extends org.mortbay.jetty.Server
         // setup the ssl connector
         //
         
-        HttpsContext sslConfig = context.getHttps( null );
+        HttpsConnectionContext sslConfig = context.getHttps( null );
         if( null != sslConfig )
         {
             SslSocketConnector ssl = new SslSocketConnector( sslConfig );

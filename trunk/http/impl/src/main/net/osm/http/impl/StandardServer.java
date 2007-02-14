@@ -27,6 +27,9 @@ import static net.dpml.annotation.LifestylePolicy.SINGLETON;
 
 import net.dpml.util.Logger;
 
+import net.osm.http.spi.ThreadContext;
+import net.osm.http.spi.NCSAContext;
+
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.security.UserRealm;
@@ -70,7 +73,7 @@ public class StandardServer extends org.mortbay.jetty.Server
     * @param parts the parts manager
     * @exception Exception if an instantiation error occurs
     */
-    public StandardServer( Logger logger, PoolConfiguration context, Parts parts ) throws Exception
+    public StandardServer( Logger logger, ThreadContext context, Parts parts ) throws Exception
     {
         super();
         

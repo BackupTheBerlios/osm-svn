@@ -20,7 +20,7 @@ package net.osm.http.impl;
 
 import java.util.Map;
 
-import net.osm.http.impl.SelectChannelConnector.SelectChannelContext;
+import net.osm.http.spi.HttpConnectionContext;
 
 import dpml.lang.ContextInvocationHandler;
 
@@ -45,8 +45,9 @@ public class SelectChannelConnectorTestCase extends AbstractConnectorContextTest
         
         map.put( "delaySelectKeyUpdate", new Boolean( ASSUME_SHORT_DISPATH_POLICY ) );
         
-        Class clazz = SelectChannelContext.class;
-        SelectChannelContext context = (SelectChannelContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Class clazz = HttpConnectionContext.class;
+        HttpConnectionContext context = 
+          (HttpConnectionContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_connector = new SelectChannelConnector( context );
     }
     

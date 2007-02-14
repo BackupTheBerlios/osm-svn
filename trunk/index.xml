@@ -31,6 +31,13 @@
       <type id="module"/>
     </types>
 
+    <filters>
+      <filter token="PUBLISHER-NAME" value="${project.publisher.name}"/> 
+      <filter token="PUBLISHER-URL" value="${project.publisher.url}"/> 
+      <feature token="PROJECT-VERSION" id="decimal"/> 
+      <feature token="BUILD-VERSION" id="version"/> 
+    </filters>
+
     <project name="home" basedir="home">
       <filters>
         <filter token="JAVA-PRODUCT-VERSION" value="1.4"/>

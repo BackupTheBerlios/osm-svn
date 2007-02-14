@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http.impl;
+package net.osm.http.spi;
+
+import net.dpml.annotation.Context;
 
 /**
  * Common connector context contract.
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
-public interface ConnectorContext
+@Context
+public interface ConnectionContext
 {
    /**
     * Return the connector host name. 

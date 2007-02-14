@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-http-impl" basedir="." xmlns="dpml:library">
+
+  <types>
+    <type id="jar"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include ref="osm/http/osm-http-spi"/>
+      <include uri="artifact:jar:javax/servlet/servlet-api#2.5"/>
+      <include ref="org/mortbay/jetty/jetty-util"/>
+      <include ref="org/mortbay/jetty/jsp-api-2.1"/>
+      <include ref="org/mortbay/jetty/jetty"/>
+    </runtime>
+    <test>
+      <include ref="org/apache/ant/ant-junit"/>
+    </test>
+  </dependencies>
+
+</project>

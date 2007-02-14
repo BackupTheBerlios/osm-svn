@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http.impl;
+package net.osm.http.spi;
 
 import net.dpml.annotation.Context;
 
@@ -21,7 +21,7 @@ import net.dpml.annotation.Context;
 * Bounded thread pool configuration.
 */
 @Context
-public interface PoolConfiguration
+public interface ThreadContext
 {
    /**
     * Get the minimum thread level.

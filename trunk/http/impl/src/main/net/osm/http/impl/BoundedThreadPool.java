@@ -15,9 +15,10 @@
  */
 package net.osm.http.impl;
 
-import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
+
+import net.osm.http.spi.ThreadContext;
 
 import org.mortbay.thread.ThreadPool;
 
@@ -37,7 +38,7 @@ public class BoundedThreadPool extends org.mortbay.thread.BoundedThreadPool
     * @param context the component context
     * @exception Exception if an instantiation error occurs
     */
-    public BoundedThreadPool( PoolConfiguration context ) throws Exception
+    public BoundedThreadPool( ThreadContext context ) throws Exception
     {
         super();
         

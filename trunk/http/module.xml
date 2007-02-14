@@ -9,6 +9,10 @@
     <property name="project.micro.version" value="0"/>
   </properties>
 
+  <project file="spi/project.xml"/>
+  <project file="impl/project.xml"/>
+
+  <!--
   <project name="osm-http-impl" basedir="impl">
     <info title="OSM HTTP">
       <description>Metro-based wrapped to the Jetty HTTP server.</description>
@@ -23,20 +27,20 @@
         <include ref="org/mortbay/jetty/jetty-util"/>
         <include ref="org/mortbay/jetty/jsp-api-2.1"/>
         <include ref="org/mortbay/jetty/jetty"/>
-        <!--
+
         <include uri="artifact:jar:tomcat/jasper-runtime#${jasper.version}"/>
         <include uri="artifact:jar:tomcat/jasper-compiler#${jasper.version}"/>
         <include uri="artifact:jar:tomcat/jasper-compiler-jdt#${jasper.version}"/>
         <include uri="artifact:jar:commons-el/commons-el#1.0"/>
         <include uri="artifact:jar:org/slf4j/jcl104-over-slf4j#${sl4j.version}"/>
         <include uri="artifact:jar:org/slf4j/slf4j-jdk14#${sl4j.version}"/>
-        -->
       </runtime>
       <test>
         <include ref="org/apache/ant/ant-junit"/>
       </test>
     </dependencies>
   </project>
+  -->
 
   <project name="osm-http-app" basedir="war">
     <types>

@@ -21,12 +21,14 @@ import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
 
-import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+import net.osm.http.spi.NCSAContext;
 
 import dpml.util.PropertyResolver;
 
 import org.mortbay.jetty.handler.RequestLogHandler;
 import org.mortbay.jetty.NCSARequestLog;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
 
 /** 
  * Wrapper for the Jetty NCSA request logger.
@@ -37,85 +39,6 @@ import org.mortbay.jetty.NCSARequestLog;
 //@Services( RequestLogHandler.class )
 public class NCSARequestLogHandler extends RequestLogHandler
 {
-   /**
-    * Component context.
-    */
-    @Context
-    public interface NCSAContext
-    {
-       /**
-        * Get the array of ignore paths.
-        * @param value the default value
-        * @return the ignore path array
-        */
-        String[] getIgnorePaths( String[] value );
-        
-       /**
-        * Return the append policy.
-        * @param value the default policy value
-        * @return the resolved value
-        */
-        boolean getAppend( boolean value );
-        
-       /**
-        * Return the extended policy.
-        * @param value the default policy value
-        * @return the resolved value
-        */
-        boolean getExtended( boolean value );
-        
-       /**
-        * Return the prefer-proxy-for-address policy.
-        * @param value the default policy value
-        * @return the resolved value
-        */
-        boolean getPreferProxiedForAddress( boolean value );
-        
-       /**
-        * Return the log filename.
-        * @param value the default filename value (may include symbolic
-        *   references to system properties)
-        * @return the resolved filename
-        */
-        String getFilename( String value );
-        
-       /**
-        * Return the log date format.
-        * @param value the default value
-        * @return the resolved value
-        */
-        String getLogDateFormat( String value );
-        
-       /**
-        * Return the log time zone.
-        * @param value the default value
-        * @return the resolved value
-        */
-        String getLogTimeZone( String value );
-        
-       /**
-        * Return the retain days value.
-        * @param value the default value
-        * @return the resolved value
-        */
-        int getRetainDays( int value );
-        
-       /**
-        * Get the log latency policy. Ig true the request processing latency will
-        * included in the reqwuest log messages.
-        * @param flag the log latency default value
-        * @return the resulted log latency policy
-        */
-        boolean getLogLatency( boolean flag );
-        
-       /**
-        * Get the log cookies policy.
-        * @param flag the default policy
-        * @return the resolved policy
-        */
-        boolean getLogCookies( boolean flag );
-    }
-    
     private final NCSARequestLog m_ncsa;
 
    /**

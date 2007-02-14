@@ -18,15 +18,16 @@
 
 package net.osm.http.impl;
 
+import dpml.lang.ContextInvocationHandler;
+
 import java.util.Map;
 import java.util.Hashtable;
 
-import net.osm.http.impl.NCSARequestLogHandler.NCSAContext;
-import org.mortbay.jetty.NCSARequestLog;
-
-import dpml.lang.ContextInvocationHandler;
-
 import junit.framework.TestCase;
+
+import net.osm.http.spi.NCSAContext;
+
+import org.mortbay.jetty.NCSARequestLog;
 
 /**
  * NCSARequestLog test case.

@@ -22,7 +22,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.Map;
 
-import net.osm.http.impl.SslSocketConnector.HttpsContext;
+import net.osm.http.spi.HttpsConnectionContext;
 
 import dpml.lang.ContextInvocationHandler;
 
@@ -63,8 +63,9 @@ public class SslSocketConnectorTestCase extends AbstractConnectorContextTestCase
         map.put( "provider", PROVIDER );
         map.put( "trustAlgorithm", TRUST_ALGORITHM );
         
-        Class clazz = HttpsContext.class;
-        HttpsContext context = (HttpsContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Class clazz = HttpsConnectionContext.class;
+        HttpsConnectionContext context = 
+          (HttpsConnectionContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_connector = new SslSocketConnector( context );
     }
     

@@ -19,6 +19,8 @@ import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
 
+import net.osm.http.spi.HttpConnectionContext;
+
 import org.mortbay.jetty.Connector;
 
 import static net.dpml.annotation.LifestylePolicy.SINGLETON;
@@ -44,25 +46,11 @@ public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelC
     private static final boolean ASSUME_SHORT_DISPATCH = false;
     
    /**
-    * Select channel context definition.
-    */
-    @Context
-    public interface SelectChannelContext extends ConnectorContext
-    {
-       /**
-        * Return the policy concerning short dispatch. 
-        * @param flag implementation defined default value
-        * @return the supplied policy unless overriden in the deployment configuration
-        */
-        boolean getDelaySelectKeyUpdate( boolean flag );
-    }
-
-   /**
     * Creation of a new <tt>SelectChannelConnector</tt>.
     * @param context the component context
     * @exception Exception if a component configuration error occurs
     */
-    public SelectChannelConnector( SelectChannelContext context ) throws Exception
+    public SelectChannelConnector( HttpConnectionContext context ) throws Exception
     {
         super();
         

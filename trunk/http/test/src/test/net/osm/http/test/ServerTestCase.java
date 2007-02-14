@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.osm.http.impl.test;
+package net.osm.http.test;
 
 import java.net.URI;
 

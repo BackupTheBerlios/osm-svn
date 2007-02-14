@@ -36,11 +36,13 @@ import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
 
-import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+import net.osm.http.spi.HttpsConnectionContext;
 
 import org.mortbay.resource.Resource;
 import org.mortbay.jetty.security.Password;
 import org.mortbay.jetty.Connector;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
 
 /**
  * SSL socket connector.
@@ -65,124 +67,17 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
     private static final String PROTOCOL = "TLS";
     private static final String ALGORITHM = "SunX509";
     
-    private transient HttpsContext m_context;
+    private transient HttpsConnectionContext m_context;
     private transient Password m_certificatePassword;
     private transient Password m_keystorePassword;
     private transient Password m_trustPassword;
-    
-   /**
-    * SSL connector context definition.
-    */
-    @Context
-    public interface HttpsContext extends ConnectorContext
-    {
-       /**
-        * Set the cipher suites.
-        * @param suites the default suites argument
-        * @return the cipher suites
-        */
-        //String[] getCipherSuites( String[] suites );
-
-       /**
-        * Return the keystore password.
-        * @param password implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getKeyStorePassword( String password );
-        
-       /**
-        * Return the certificate password.
-        * @param password implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getCertificatePassword( String password );
-        
-       /**
-        * Return the keystore algorithm.
-        * @param algorithm implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getAlgorithm( String algorithm );
-        
-       /**
-        * Return the keystore type.
-        * @param type implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getKeyStoreType( String type );
-        
-       /**
-        * Return the SSL protocol.
-        * @param protocol implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getProtocol( String protocol );
-        
-       /**
-        * Return the keystore location uri.
-        * @param keystore implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        URI getKeyStore( URI keystore );
-        
-       /**
-        * Return the 'want-client-authentication' policy.
-        * @param flag implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        boolean getWantClientAuth( boolean flag );
-        
-       /**
-        * Return the 'need-client-authentication' policy.
-        * @param flag implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        boolean getNeedClientAuth( boolean flag );
-        
-       /**
-        * Return the SSL context provider.
-        * @param provider implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getProvider( String provider );
-        
-        // extras
-        
-       /**
-        * Return the keystore algorithm.
-        * @param algorithm implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getTrustAlgorithm( String algorithm );
-        
-       /**
-        * Return the keystore location uri.
-        * @param uri implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        URI getTrustStore( URI uri );
-        
-       /**
-        * Return the keystore type.
-        * @param type implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getTrustStoreType( String type );
-        
-       /**
-        * Return the trust store password.
-        * @param password implementation defined default value
-        * @return the supplied value unless overriden in the deployment configuration
-        */
-        String getTrustStorePassword( String password );
-    }
     
    /**
     * Creation of a new ssl connector.
     * @param context the deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public SslSocketConnector( HttpsContext context ) throws Exception
+    public SslSocketConnector( HttpsConnectionContext context ) throws Exception
     {
         super();
         

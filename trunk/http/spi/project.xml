@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-http-spi" basedir="." xmlns="dpml:library">
+
+  <types>
+    <type id="jar"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include ref="dpml/metro/dpml-metro-part"/>
+    </runtime>
+  </dependencies>
+
+</project>
