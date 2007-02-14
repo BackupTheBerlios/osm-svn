@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<component xmlns="dpml:metro" type="osm.http.express.ExpressServer" 
+    lifestyle="singleton" 
+    collection="hard">
+  
+  <context>
+    <context key="threads">
+      <entry key="min" value="10"/>
+      <entry key="max" value="100"/>
+    </context>
+    <context key="http">
+      <entry key="port" value="8080"/>
+      <entry key="maxIdleTime" value="50000"/>
+      <entry key="acceptors" value="10"/>
+    </context>
+    <context key="https">
+      <entry key="port" value="8443"/>
+      <entry key="maxIdleTime" value="30000"/>
+      <entry key="keyStore" value="local:keystore:osm/http/sample"/>
+      <entry key="keyStorePassword" value="password"/>
+      <entry key="certificatePassword" value="password"/>
+      <entry key="trustStore" value="local:keystore:osm/http/certs"/>
+      <entry key="trustStorePassword" value="password"/>
+    </context>
+    <context key="log">
+      <entry key="filename" value="$${dpml.data}/logs/http/request.log"/>
+      <entry key="append" value="true"/>
+      <entry key="extended" value="true"/>
+    </context>
+  </context>
+  
+  <parts>
+    <component key="realm" type="net.osm.http.impl.HashUserRealm"
+        lifestyle="singleton"
+        collection="hard">
+      <context>
+        <entry key="name" value="User Realm"/>
+        <entry key="URI" value="local:properties:osm/http/realm"/>
+      </context>
+    </component>
+    <!-- add a context handler for the '/' path -->
+    <component key="root" type="net.osm.http.impl.ServletContainer">
+      <context>
+        <entry key="contextPath" value="/"/>
+      </context>
+    </component>
+  </parts>
+  
+</component>

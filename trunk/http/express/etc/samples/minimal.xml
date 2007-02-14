@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<component xmlns="dpml:metro" type="osm.http.express.ExpressServer" 
+    lifestyle="singleton" 
+    collection="hard">
+  
+  <context>
+    <context key="http">
+      <entry key="port" value="8080"/>
+      <entry key="maxIdleTime" value="50000"/>
+      <entry key="acceptors" value="10"/>
+    </context>
+  </context>
+  
+</component>

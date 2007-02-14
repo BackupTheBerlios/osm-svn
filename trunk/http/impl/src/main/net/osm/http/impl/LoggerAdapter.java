@@ -29,7 +29,7 @@ public class LoggerAdapter implements org.mortbay.log.Logger
 {    
     private static Logger m_LOGGER;
     
-    static void setRootLogger( Logger logger )
+    public static void setRootLogger( Logger logger )
     {
         if( null == m_LOGGER )
         {

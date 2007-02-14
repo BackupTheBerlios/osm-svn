@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.osm.http.impl;
+package osm.http.express;
 
 import dpml.lang.ContextInvocationHandler;
 
@@ -27,8 +27,6 @@ import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
 import net.dpml.annotation.Parts;
 
-import static net.dpml.annotation.LifestylePolicy.SINGLETON;
-
 import javax.servlet.http.HttpServletRequest;
 
 import net.dpml.util.Logger;
@@ -37,8 +35,14 @@ import net.osm.http.spi.ThreadContext;
 import net.osm.http.spi.NCSAContext;
 import net.osm.http.spi.HttpConnectionContext;
 import net.osm.http.spi.HttpsConnectionContext;
+import net.osm.http.spi.ServerContext;
 
 import net.osm.http.impl.HashUserRealm.RealmContext;
+import net.osm.http.impl.LoggerAdapter;
+import net.osm.http.impl.BoundedThreadPool;
+import net.osm.http.impl.SelectChannelConnector;
+import net.osm.http.impl.SslSocketConnector;
+import net.osm.http.impl.NCSARequestLogHandler;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -50,54 +54,43 @@ import org.mortbay.jetty.security.UserRealm;
 import org.mortbay.thread.ThreadPool;
 import org.mortbay.xml.XmlConfiguration;
 
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
+
 /**
  * HTTP server implementation.
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
 @Component( name="server", lifestyle=SINGLETON )
-public class DefaultServer extends org.mortbay.jetty.Server
+public class ExpressServer extends org.mortbay.jetty.Server
 {
-    @Context
-    public interface ServerContext
-    {
-        ThreadContext getThreads( ThreadContext context );
-        
-        HttpConnectionContext getHttp( HttpConnectionContext context );
-        
-        HttpsConnectionContext getHttps( HttpsConnectionContext context );
-        
-        RealmContext getRealm( RealmContext context );
-        
-        NCSAContext getLog( NCSAContext context );
-    }
-    
    /**
     * Internal parts management interface.
     */
     @Parts
-    public interface ServerConfiguration
+    public interface ServerParts
     {
         ContextHandler[] getContextHandlers();
+        UserRealm[] getUserRealms();
     }
     
     private final Logger m_logger;
     private final ContextHandlerCollection m_contextHandlers = 
       new ContextHandlerCollection();
-    private final ServerConfiguration m_parts;
-
+    private final ServerParts m_parts;
+    
    /**
     * Creation of a new HTTP server implementation.
     * @param logger the assigned logging channel
     * @param context the assigned deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public DefaultServer( Logger logger, ServerContext context, ServerConfiguration config ) throws Exception
+    public ExpressServer( Logger logger, ServerContext context, ServerParts parts ) throws Exception
     {
         super();
         
         m_logger = logger;
-        m_parts = config;
+        m_parts = parts;
         
         if( getLogger().isDebugEnabled() )
         {
@@ -145,12 +138,14 @@ public class DefaultServer extends org.mortbay.jetty.Server
         // setup the user realm
         //
         
-        RealmContext realmConfig = context.getRealm( null );
-        if( null != realmConfig )
-        {
-            HashUserRealm realm = new HashUserRealm( realmConfig );
-            super.addUserRealm( realm );
-        }
+        setUserRealms( parts.getUserRealms() );
+        
+        //RealmContext realmConfig = context.getRealm( null );
+        //if( null != realmConfig )
+        //{
+        //    HashUserRealm realm = new HashUserRealm( realmConfig );
+        //    super.addUserRealm( realm );
+        //}
         
         //
         // setup the request log handler
@@ -168,7 +163,7 @@ public class DefaultServer extends org.mortbay.jetty.Server
         // handler components declared under the component parts definition
         //
         
-        ContextHandler[] contextHandlers = config.getContextHandlers();
+        ContextHandler[] contextHandlers = parts.getContextHandlers();
         m_contextHandlers.setHandlers( contextHandlers );
         
         //
@@ -214,7 +209,7 @@ public class DefaultServer extends org.mortbay.jetty.Server
     {
         return m_logger;
     }
-
+    
    /**
     * Jetty lifecycle start operation.
     * @exception Exception if a startup error occurs
@@ -224,7 +219,7 @@ public class DefaultServer extends org.mortbay.jetty.Server
         getLogger().info( "starting" );
         super.doStart();
     }
-
+    
    /**
     * Jetty lifecycle stop operation.
     * @exception Exception if a shutdown error occurs

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-http-express" basedir="." xmlns="dpml:library">
+
+  <types>
+    <type id="jar"/>
+    <type id="part" source="target/component.xml" alias="true"/>
+    <type id="part" source="target/samples/test.xml" name="test" test="true"/>
+    <type id="part" source="target/samples/minimal.xml" name="minimal" test="true"/>
+    <type id="appliance" source="target/appliance.xml" alias="true"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include ref="org/mortbay/jetty/jsp-api-2.1"/>
+      <include ref="org/mortbay/jetty/jsp-2.1"/>
+      <include uri="artifact:jar:javax/servlet/servlet-api#2.5" tag="PUBLIC"/>
+      <include key="osm-http-impl"/>
+    </runtime>
+  </dependencies>
+
+  <filters>
+    <feature token="DPML-VERSION" id="version" ref="dpml"/>
+  </filters>
+  
+</project>

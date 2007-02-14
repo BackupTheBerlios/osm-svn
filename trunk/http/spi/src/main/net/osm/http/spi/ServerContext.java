@@ -31,7 +31,5 @@ public interface ServerContext
     
     HttpsConnectionContext getHttps( HttpsConnectionContext context );
     
-    //RealmContext getRealm( RealmContext context );
-    
     NCSAContext getLog( NCSAContext context );
 }
