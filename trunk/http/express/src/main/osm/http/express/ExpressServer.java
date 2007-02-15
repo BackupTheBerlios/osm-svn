@@ -118,6 +118,7 @@ public class ExpressServer extends org.mortbay.jetty.Server
         HttpConnectionContext httpConfig = context.getHttp( null );
         if( null != httpConfig )
         {
+            getLogger().info( "adding HTTP connector on port: " + httpConfig.getPort( 0 ) );
             SelectChannelConnector http = new SelectChannelConnector( httpConfig );
             super.addConnector( http );
         }
@@ -129,6 +130,7 @@ public class ExpressServer extends org.mortbay.jetty.Server
         HttpsConnectionContext sslConfig = context.getHttps( null );
         if( null != sslConfig )
         {
+            getLogger().info( "adding SSL connector on port: " + sslConfig.getPort( 0 ) );
             SslSocketConnector ssl = new SslSocketConnector( sslConfig );
             super.addConnector( ssl );
         }

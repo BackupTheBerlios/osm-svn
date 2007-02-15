@@ -92,38 +92,64 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         int port = context.getPort( 8443 );
         setPort( port );
         
-        int headerBufferSize = context.getHeaderBufferSize( HEADER_BUFFER_SIZE );
-        setHeaderBufferSize( headerBufferSize );
+        int headerBufferSize = context.getHeaderBufferSize( -1 );
+        if( headerBufferSize > -1 )
+        {
+            setHeaderBufferSize( headerBufferSize );
+        }
         
-        int requestBufferSize = context.getRequestBufferSize( REQUEST_BUFFER_SIZE );
-        setRequestBufferSize( requestBufferSize );
+        int requestBufferSize = context.getRequestBufferSize( -1 );
+        if( requestBufferSize > -1 )
+        {
+            setRequestBufferSize( requestBufferSize );
+        }
         
-        int responseBufferSize = context.getResponseBufferSize( RESPONSE_BUFFER_SIZE );
-        setResponseBufferSize( responseBufferSize );
+        int responseBufferSize = context.getResponseBufferSize( -1 );
+        if( responseBufferSize > -1 )
+        {
+            setResponseBufferSize( responseBufferSize );
+        }
         
-        int maxIdle = context.getMaxIdleTime( MAXIMUM_IDLE_TIME );
-        setMaxIdleTime( maxIdle );
+        int maxIdle = context.getMaxIdleTime( -1 );
+        if( maxIdle > -1 )
+        {
+            setMaxIdleTime( maxIdle );
+        }
         
-        int queueSize = context.getAcceptQueueSize( ACCEPT_QUEUE_SIZE );
-        setAcceptQueueSize( queueSize );
+        int queueSize = context.getAcceptQueueSize( -1 );
+        if( queueSize > -1 )
+        {
+            setAcceptQueueSize( queueSize );
+        }
         
-        int acceptCount = context.getAcceptors( ACCEPTORS );
-        setAcceptors( acceptCount );
+        int acceptCount = context.getAcceptors( -1 );
+        if( acceptCount > -1 )
+        {
+            setAcceptors( acceptCount );
+        }
         
-        int linger = context.getSoLingerTime( SO_LINGER_TIME );
-        setSoLingerTime( linger );
+        int linger = context.getSoLingerTime( -1 );
+        if( linger > -1 )
+        {
+            setSoLingerTime( linger );
+        }
         
-        int confidentialPort = context.getConfidentialPort( CONFIDENTIAL_PORT );
-        setConfidentialPort( confidentialPort );
+        int confidentialPort = context.getConfidentialPort( -1 );
+        if( confidentialPort > -1 )
+        {
+            setConfidentialPort( confidentialPort );
+            Scheme confidentialScheme = Scheme.valueOf( context.getConfidentialScheme( "HTTPS" ).toUpperCase() );
+            setConfidentialScheme( confidentialScheme.name().toLowerCase() );
+        }
         
-        Scheme confidentialScheme = Scheme.valueOf( context.getConfidentialScheme( "HTTPS" ).toUpperCase() );
-        setConfidentialScheme( confidentialScheme.name().toLowerCase() );
         
-        int integralPort = context.getIntegralPort( INTEGRAL_PORT );
-        setIntegralPort( integralPort );
-        
-        Scheme integralScheme = Scheme.valueOf( context.getIntegralScheme( "HTTPS" ).toUpperCase() );
-        setIntegralScheme( integralScheme.name().toLowerCase() );
+        int integralPort = context.getIntegralPort( -1 );
+        if( integralPort > -1 )
+        {
+            setIntegralPort( integralPort );
+            Scheme integralScheme = Scheme.valueOf( context.getIntegralScheme( "HTTPS" ).toUpperCase() );
+            setIntegralScheme( integralScheme.name().toLowerCase() );
+        }
         
         // SslSocketConnector$Context
         
@@ -142,11 +168,11 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
             setPassword( keystorePassword );
         }
         
-        String algorithm = context.getAlgorithm( ALGORITHM );
-        setSecureRandomAlgorithm( algorithm );
-        
-        String protocol = context.getProtocol( PROTOCOL );
-        setProtocol( protocol );
+        String protocol = context.getProtocol( null );
+        if( null != protocol )
+        {
+            setProtocol( protocol );
+        }
         
         URI keystore = context.getKeyStore( null );
         if( null != keystore )
@@ -161,14 +187,23 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
             setProvider( provider );
         }
         
-        String keystoreType = context.getKeyStoreType( KEYSTORE_TYPE );
-        setKeystoreType( keystoreType );
+        String keystoreType = context.getKeyStoreType( null );
+        if( null != keystoreType )
+        {
+            setKeystoreType( keystoreType );
+        }
         
         boolean wantClientAuth = context.getWantClientAuth( false );
         setWantClientAuth( wantClientAuth );
         
         boolean needClientAuth = context.getNeedClientAuth( false );
         setNeedClientAuth( needClientAuth );
+        
+        String algorithm = context.getAlgorithm( null );
+        if( null != algorithm )
+        {
+            setSecureRandomAlgorithm( algorithm );
+        }
         
         //String[] suites = context.getCipherSuites( (String[]) null );
         //if( null != suites )
@@ -182,6 +217,7 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
     * @return the factory
     * @exception Exception if an error occurs during factory creation
     */
+    /*
     protected SSLServerSocketFactory createFactory() 
         throws Exception
     {
@@ -192,7 +228,8 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         context.init( keyManagers, trustManagers, random );
         return context.getServerSocketFactory();
     }
-    
+    */
+    /*
     private KeyManager[] getKeyManagers() throws Exception
     {
         final String algorithm = getSecureRandomAlgorithm();
@@ -202,7 +239,8 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         factory.init( store, password );
         return factory.getKeyManagers();
     }
-    
+    */
+    /*
     private KeyStore loadKeyStore() throws Exception
     {
         final String type = getKeystoreType();
@@ -224,7 +262,8 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
             return keyStore;
         }
     }
-    
+    */
+    /*
     private KeyStore loadTrustStore() throws Exception
     {
         final String type = m_context.getTrustStoreType( KEYSTORE_TYPE );
@@ -243,7 +282,8 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
             return null;
         }
     }
-    
+    */
+    /*
     private TrustManager[] getTrustManagers() throws Exception
     {
         final String algorithm = m_context.getTrustAlgorithm( ALGORITHM );
@@ -259,7 +299,8 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
             return new TrustManager[0];
         }
     }
-
+    */
+    /*
     private char[] toCharArray( Password value )
     {
         if( null == value )
@@ -271,7 +312,8 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
             return value.toString().toCharArray();
         }
     }
-    
+    */
+    /*
     private SSLContext getSSLContext() throws NoSuchAlgorithmException, NoSuchProviderException
     {
         final String protocol = getProtocol();
@@ -285,5 +327,6 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
             return SSLContext.getInstance( protocol, provider );
         }
     }
+    */
 }
     
