@@ -138,8 +138,11 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         if( confidentialPort > -1 )
         {
             setConfidentialPort( confidentialPort );
-            Scheme confidentialScheme = Scheme.valueOf( context.getConfidentialScheme( "HTTPS" ).toUpperCase() );
-            setConfidentialScheme( confidentialScheme.name().toLowerCase() );
+            String confidentialScheme = context.getConfidentialScheme( null );
+            if( null != confidentialScheme )
+            {
+                setConfidentialScheme( confidentialScheme.toLowerCase() );
+            }
         }
         
         
@@ -147,8 +150,11 @@ public class SslSocketConnector extends org.mortbay.jetty.security.SslSocketConn
         if( integralPort > -1 )
         {
             setIntegralPort( integralPort );
-            Scheme integralScheme = Scheme.valueOf( context.getIntegralScheme( "HTTPS" ).toUpperCase() );
-            setIntegralScheme( integralScheme.name().toLowerCase() );
+            String integralScheme = context.getIntegralScheme( null );
+            if( null != integralScheme )
+            {
+                setIntegralScheme( integralScheme.toLowerCase() );
+            }
         }
         
         // SslSocketConnector$Context

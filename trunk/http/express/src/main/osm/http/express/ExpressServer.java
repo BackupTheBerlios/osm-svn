@@ -35,8 +35,8 @@ import net.osm.http.spi.NCSAContext;
 import net.osm.http.spi.HttpConnectionContext;
 import net.osm.http.spi.HttpsConnectionContext;
 import net.osm.http.spi.ServerContext;
+import net.osm.http.spi.RealmContext;
 
-import net.osm.http.impl.HashUserRealm.RealmContext;
 import net.osm.http.impl.LoggerAdapter;
 import net.osm.http.impl.BoundedThreadPool;
 import net.osm.http.impl.SelectChannelConnector;

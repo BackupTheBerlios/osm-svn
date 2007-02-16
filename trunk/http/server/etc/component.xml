@@ -87,7 +87,7 @@
         </component>
       </parts>
     </component>
-
+    
     <component key="data" type="net.osm.http.impl.ContextHandler">
       <context>
         <entry key="contextPath" value="/data"/>
@@ -100,7 +100,7 @@
         </component>
       </parts>
     </component>
-
+    
     <component key="test" type="net.osm.http.impl.ServletContainer">
       <context>
         <entry key="contextPath" value="/test"/>

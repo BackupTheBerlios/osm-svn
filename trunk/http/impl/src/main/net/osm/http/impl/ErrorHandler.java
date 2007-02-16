@@ -28,7 +28,7 @@ import org.mortbay.util.StringUtil;
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
-public class ErrorHandler extends org.mortbay.jetty.handler.ErrorHandler
+class ErrorHandler extends org.mortbay.jetty.handler.ErrorHandler
 {
     protected void writeErrorPageBody(
       HttpServletRequest request, Writer writer, int code, String message, boolean showStacks )

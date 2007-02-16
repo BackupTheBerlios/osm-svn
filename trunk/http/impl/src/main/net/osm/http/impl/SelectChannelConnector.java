@@ -84,19 +84,27 @@ public class SelectChannelConnector extends org.mortbay.jetty.nio.SelectChannelC
         int linger = context.getSoLingerTime( SO_LINGER_TIME );
         setSoLingerTime( linger );
         
-        int confidentialPort = context.getConfidentialPort( CONFIDENTIAL_PORT );
-        setConfidentialPort( confidentialPort );
+        int confidentialPort = context.getConfidentialPort( -1 );
+        if( confidentialPort > -1 )
+        {
+            setConfidentialPort( confidentialPort );
+            String confidentialScheme = context.getConfidentialScheme( null );
+            if( null != confidentialScheme )
+            {
+                setConfidentialScheme( confidentialScheme.toLowerCase() );
+            }
+        }
         
-        Scheme confidentialScheme = Scheme.valueOf( context.getConfidentialScheme( "HTTPS" ).toUpperCase() );
-        setConfidentialScheme( confidentialScheme.name().toLowerCase() );
-        
-        int integralPort = context.getIntegralPort( INTEGRAL_PORT );
-        setIntegralPort( integralPort );
-        
-        Scheme integralScheme = Scheme.valueOf( context.getIntegralScheme( "HTTPS" ).toUpperCase() );
-        setIntegralScheme( integralScheme.name().toLowerCase() );
-        
-        // SelectChannelConnector$Context
+        int integralPort = context.getIntegralPort( -1 );
+        if( integralPort > -1 )
+        {
+            setIntegralPort( integralPort );
+            String integralScheme = context.getIntegralScheme( null );
+            if( null != integralScheme )
+            {
+                setIntegralScheme( integralScheme.toLowerCase() );
+            }
+        }
         
         boolean flag = context.getDelaySelectKeyUpdate( ASSUME_SHORT_DISPATCH );
         setDelaySelectKeyUpdate( flag );

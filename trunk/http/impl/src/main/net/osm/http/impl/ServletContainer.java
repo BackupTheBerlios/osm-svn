@@ -22,7 +22,6 @@ import net.dpml.util.Logger;
 import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
-import net.dpml.annotation.Parts;
 
 import static net.dpml.annotation.LifestylePolicy.SINGLETON;
 
@@ -37,8 +36,7 @@ import org.mortbay.jetty.servlet.ServletHandler;
 @Component( name="servlet", lifestyle=SINGLETON )
 public class ServletContainer extends org.mortbay.jetty.servlet.Context
 {
-    @Parts
-    public interface ServletContainerParts
+    public interface Parts
     {
         ServletEntry[] getServletEntries();
     }
@@ -53,7 +51,7 @@ public class ServletContainer extends org.mortbay.jetty.servlet.Context
     * @exception Exception if an instantiation error occurs
     */
     public ServletContainer( 
-      Logger logger, ContextConfiguration context, ServletContainerParts parts ) throws Exception
+      Logger logger, ContextConfiguration context, Parts parts ) throws Exception
     {
         super();
         

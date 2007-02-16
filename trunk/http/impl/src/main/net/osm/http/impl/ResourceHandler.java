@@ -25,7 +25,6 @@ import javax.servlet.ServletException;
 
 import net.dpml.util.Logger;
 
-import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
 
@@ -41,7 +40,7 @@ import org.mortbay.io.WriterOutputStream;
 import org.mortbay.util.TypeUtil;
 
 /**
- * Servlet context handler. 
+ * Simple resource handler. 
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
@@ -49,10 +48,9 @@ import org.mortbay.util.TypeUtil;
 public class ResourceHandler extends org.mortbay.jetty.handler.ResourceHandler
 {
    /**
-    * HTTP static resource vontext handler parameters.
+    * HTTP static resource context handler parameters.
     */
-    @Context
-    public interface Configuration
+    public interface Context
     {
        /**
         * Get the http context resource base.  The value may contain symbolic
@@ -73,14 +71,14 @@ public class ResourceHandler extends org.mortbay.jetty.handler.ResourceHandler
    /**
     * Creation of a new servlet context handler.
     * @param logger the assigned logging channel
-    * @param config the deployment context
+    * @param context the deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public ResourceHandler( Logger logger, Configuration config ) throws Exception
+    public ResourceHandler( Logger logger, Context context ) throws Exception
     {
         super();
         
-        String base = config.getResourceBase();
+        String base = context.getResourceBase();
         
         File file = new File( base );
         String path = file.getCanonicalPath();
@@ -91,7 +89,7 @@ public class ResourceHandler extends org.mortbay.jetty.handler.ResourceHandler
         
         super.setResourceBase( path );
         
-        String[] welcome = config.getWelcomeFiles( null );
+        String[] welcome = context.getWelcomeFiles( null );
         if( null != welcome )
         {
             super.setWelcomeFiles( welcome );

@@ -21,6 +21,8 @@ import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
 
+import net.osm.http.spi.RealmContext;
+
 import org.mortbay.jetty.security.UserRealm;
 
 import static net.dpml.annotation.LifestylePolicy.SINGLETON;
@@ -34,27 +36,6 @@ import static net.dpml.annotation.LifestylePolicy.SINGLETON;
 @Services( UserRealm.class )
 public class HashUserRealm extends org.mortbay.jetty.security.HashUserRealm
 {
-   /**
-    * HTTP Context handler context defintion.
-    */
-    @Context
-    public interface RealmContext
-    {
-       /**
-        * Get the user realm name.
-        *
-        * @return the realm name
-        */
-        String getName();
-        
-       /**
-        * Return a uri of the real configuration properties file.
-        *
-        * @return the realm configuration uri
-        */
-        URI getURI();
-    }
-
    /**
     * Creation of a new hash user realm.
     * @param context the deployment context

@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Hashtable;
 
-import net.osm.http.impl.HashUserRealm.RealmContext;
+import net.osm.http.spi.RealmContext;
 
 import dpml.lang.ContextInvocationHandler;
 
