@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="osm-http-test" basedir="." xmlns="dpml:library">
+
+  <properties>
+    <property name="project.javadoc.exclude" value="true"/>
+  </properties>
+  
+  <types>
+    <type id="jar" test="true"/>
+  </types>
+  
+  <dependencies>
+    <build>
+      <include ref="osm/http/osm-http-server"/>
+    </build>
+    <test>
+      <include ref="dpml/metro/dpml-metro-part"/>
+      <include ref="org/apache/ant/ant-junit"/>
+    </test>
+  </dependencies>
+  
+</project>

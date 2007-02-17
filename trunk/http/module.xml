@@ -24,27 +24,9 @@
     </dependencies>
   </project>
 
-  <project file="server/project.xml"/>
-
-  <project name="osm-http-test" basedir="test">
-    <properties>
-      <property name="project.javadoc.exclude" value="true"/>
-    </properties>
-    <types>
-      <type id="jar" test="true"/>
-    </types>
-    <dependencies>
-      <build>
-        <include key="osm-http-server"/>
-      </build>
-      <test>
-        <include ref="dpml/metro/dpml-metro-part"/>
-        <include ref="org/apache/ant/ant-junit"/>
-      </test>
-    </dependencies>
-  </project>
-
   <project file="express/project.xml"/>
   <project file="demo/project.xml"/>
+  <project file="server/project.xml"/>
+  <project file="test/project.xml"/>
 
 </module>

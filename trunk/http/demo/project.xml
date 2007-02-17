@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-http-demo" basedir="." xmlns="dpml:library">
+
+  <properties>
+    <property name="project.javadoc.exclude" value="true"/>
+  </properties>
+
+  <types>
+    <type id="jar"/>
+    <type id="part" source="etc/component.xml" alias="true"/>
+    <type id="part" source="etc/component.xml" name="test" test="true"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include ref="osm/http/osm-http-express"/>
+    </runtime>
+  </dependencies>
+
+</project>

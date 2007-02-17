@@ -10,6 +10,9 @@
   </types>
 
   <dependencies>
+    <build>
+      <include ref="osm/http/osm-http-express"/>
+    </build>
     <runtime>
       <include ref="org/mortbay/jetty/jsp-api-2.1"/>
       <include ref="org/mortbay/jetty/jsp-2.1"/>

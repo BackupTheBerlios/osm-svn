@@ -10,6 +10,8 @@
   <dependencies>
     <build>
       <include key="osm-http-app"/>
+      <include key="osm-http-express"/>
+      <include key="osm-http-demo"/>
     </build>
     <runtime>
       <include ref="org/mortbay/jetty/jsp-api-2.1" tag="PUBLIC"/>

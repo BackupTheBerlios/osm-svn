@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 
 import net.dpml.util.Logger;
 
-import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
 
@@ -41,9 +40,84 @@ import org.mortbay.jetty.handler.HandlerCollection;
  * @version @PROJECT-VERSION@
  */
 @Component( name="context", lifestyle=SINGLETON )
-//@Services( ServletContextHandler.class )
 public class ContextHandler extends org.mortbay.jetty.handler.ContextHandler
 {
+   /**
+    * Deployment context for a generic context handler.
+    */
+    public interface Context
+    {
+       /**
+        * Get the http context resource base.  The value may contain symbolic
+        * property references and should resolve to a local directory.
+        *
+        * @param base the default base value
+        * @return the resource base
+        */
+        String getResourceBase( String base );
+        
+       /**
+        * Get the array of virtual hosts.
+        * @param hosts the default virtual host array
+        * @return the resolved virtual host array
+        */
+        String[] getVirtualHosts( String[] hosts );
+        
+       /**
+        * Get the array of connectors. The function returns the set of 
+        * connectors in the form <tt>host:port</tt>.
+        * @param connectors the default connector array
+        * @return the resolved host array
+        */
+        String[] getConnectors( String[] connectors );
+        
+       /**
+        * Get the array of welcome files.
+        * @param values the default welcome file values
+        * @return the resolved array of welcome files
+        */
+        String[] getWelcomeFiles( String[] values );
+        
+       /**
+        * Get the classloader to assign to the context handler.
+        * @param classloader the default classloader
+        * @return the resolved classloader
+        */
+        ClassLoader getClassLoader( ClassLoader classloader );
+    
+       /**
+        * Get the context path under which the http context instance will 
+        * be associated.
+        *
+        * @return the assigned context path
+        */
+        String getContextPath();
+    
+       /**
+        * Get the context handler display name.
+        * @param name the default name
+        * @return the resolved name
+        */
+        String getDisplayName( String name );
+    
+       /**
+        * Get the mime type mapping.
+        * @param map the default value
+        * @return the resolved value
+        */
+        Map getMimeTypes( Map map );
+    
+       /**
+        * Get the assigned error handler.
+        * @param handler the default handler
+        * @return the resolved handler
+        */
+        ErrorHandler getErrorHandler( ErrorHandler handler );
+    }
+
+   /**
+    * Internal parts management interface for a generic request context handler.
+    */
     public interface Parts
     {
         Handler[] getHandlers();
@@ -57,7 +131,7 @@ public class ContextHandler extends org.mortbay.jetty.handler.ContextHandler
     * @param context the deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public ContextHandler( Logger logger, ContextConfiguration context, Parts parts ) throws Exception
+    public ContextHandler( Logger logger, Context context, Parts parts ) throws Exception
     {
         super();
         
@@ -65,7 +139,7 @@ public class ContextHandler extends org.mortbay.jetty.handler.ContextHandler
         
         m_logger.info( "establishing context " + context.getContextPath() );
         
-        configure( context );
+        contextualize( logger, this, context );
         
         HandlerCollection collection = new HandlerCollection();
         for( Handler handler : parts.getHandlers() )
@@ -84,43 +158,57 @@ public class ContextHandler extends org.mortbay.jetty.handler.ContextHandler
         return m_logger;
     }
     
-    private void configure( ContextConfiguration context )
+   /**
+    * Contextualize a handler using a supplied context.
+    * @param handler the handler to contextualize
+    * @param context the context instance
+    */
+    public static void contextualize( 
+      Logger logger, org.mortbay.jetty.handler.ContextHandler handler, Context context ) throws Exception
     {
         String path = context.getContextPath();
-        super.setContextPath( path );
+        handler.setContextPath( path );
+        logger.debug( "setting context path: " + path );
         
         ErrorHandler defaultErrorHandler = new net.osm.http.impl.ErrorHandler();
         ErrorHandler errorHandler = context.getErrorHandler( defaultErrorHandler );
-        super.setErrorHandler( errorHandler );
+        handler.setErrorHandler( errorHandler );
         
         ClassLoader classloader = context.getClassLoader( null );
         if( null != classloader )
         {
-            super.setClassLoader( classloader );
+            handler.setClassLoader( classloader );
+        }
+        
+        String base = context.getResourceBase( null );
+        if( null != base )
+        {
+            logger.info( "RESOURCE BASE: " + path );
+            handler.setResourceBase( base );
         }
         
         String name = context.getDisplayName( null );
         if( null != name )
         {
-            super.setDisplayName( name );
+            handler.setDisplayName( name );
         }
         
         String[] hosts = context.getConnectors( null );
         if( null != hosts )
         {
-            super.setConnectorNames( hosts );
+            handler.setConnectorNames( hosts );
         }
         
         String[] virtual = context.getVirtualHosts( null );
         if( null != virtual )
         {
-            super.setVirtualHosts( virtual );
+            handler.setVirtualHosts( virtual );
         }
         
         String[] welcome = context.getWelcomeFiles( null );
         if( null != welcome )
         {
-            super.setWelcomeFiles( welcome );
+            handler.setWelcomeFiles( welcome );
         }
         
         Map map = context.getMimeTypes( null );
@@ -128,8 +216,7 @@ public class ContextHandler extends org.mortbay.jetty.handler.ContextHandler
         {
             MimeTypes types = new MimeTypes();
             types.setMimeMap( map );
-            super.setMimeTypes( types );
+            handler.setMimeTypes( types );
         }
-        
     }
 }

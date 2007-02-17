@@ -26,7 +26,7 @@ import java.util.Hashtable;
 import java.security.Permission;
 import java.security.PermissionCollection;
 
-import net.osm.http.impl.WebAppContextHandler.WebConfiguration;
+import net.osm.http.impl.WebAppContextHandler.Context;
 
 import dpml.lang.ContextInvocationHandler;
 
@@ -71,8 +71,8 @@ public class WebAppContextHandlerTestCase extends AbstractContextHandlerTestCase
         map.put( "sessionHandler", SESSIONS_HANDLER );
         map.put( "servletHandler", SERVLET_HANDLER );
         
-        Class clazz = WebConfiguration.class;
-        WebConfiguration context = (WebConfiguration) ContextInvocationHandler.getProxiedInstance( clazz, map );
+        Class clazz = Context.class;
+        Context context = (Context) ContextInvocationHandler.getProxiedInstance( clazz, map );
         Logger logger = new DefaultLogger( "test" );
         m_handler = new WebAppContextHandler( logger, context );
     }

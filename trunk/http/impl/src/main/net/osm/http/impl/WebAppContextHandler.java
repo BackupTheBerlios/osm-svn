@@ -38,14 +38,12 @@ import org.mortbay.jetty.servlet.ServletHandler;
  * @version @PROJECT-VERSION@
  */
 @Component( name="webapp", lifestyle=SINGLETON )
-//@Services( WebAppContextHandler.class )
 public class WebAppContextHandler extends org.mortbay.jetty.webapp.WebAppContext
 {
    /**
     * HTTP static resource vontext handler parameters.
     */
-    @Context
-    public interface WebConfiguration extends ContextConfiguration
+    public interface Context extends ContextHandler.Context
     {
        /**
         * Get the war artifact uri.
@@ -111,10 +109,9 @@ public class WebAppContextHandler extends org.mortbay.jetty.webapp.WebAppContext
     * @param context the deployment context
     * @exception Exception if an instantiation error occurs
     */
-    public WebAppContextHandler( Logger logger, WebConfiguration context ) throws Exception
+    public WebAppContextHandler( Logger logger, Context context ) throws Exception
     {
-        ContextHelper helper = new ContextHelper( logger );
-        helper.contextualize( this, context );
+        ContextHandler.contextualize( logger, this, context );
         
         SecurityHandler securityHandler = 
           context.getSecurityHandler( new SecurityHandler() );

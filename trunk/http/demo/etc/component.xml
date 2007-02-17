@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<component xmlns="dpml:metro" type="osm.http.demo.SampleServlet" 
+    lifestyle="singleton" 
+    collection="hard">
+  
+</component>

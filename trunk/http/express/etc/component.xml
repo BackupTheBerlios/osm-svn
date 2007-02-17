@@ -39,7 +39,7 @@
       </context>
     </component>
     <!-- add a context handler for the '/' path -->
-    <component key="root" type="net.osm.http.impl.ServletContainer">
+    <component key="root" type="net.osm.http.impl.ServletContextHandler">
       <context>
         <entry key="contextPath" value="/"/>
       </context>

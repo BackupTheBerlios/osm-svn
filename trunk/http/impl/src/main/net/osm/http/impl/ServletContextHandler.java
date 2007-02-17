@@ -23,10 +23,10 @@ import net.dpml.annotation.Context;
 import net.dpml.annotation.Component;
 import net.dpml.annotation.Services;
 
-import static net.dpml.annotation.LifestylePolicy.SINGLETON;
-
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.ServletHandler;
+
+import static net.dpml.annotation.LifestylePolicy.SINGLETON;
 
 /**
  * Servlet context handler. 
@@ -34,8 +34,18 @@ import org.mortbay.jetty.servlet.ServletHandler;
  * @version @PROJECT-VERSION@
  */
 @Component( name="servlet", lifestyle=SINGLETON )
-public class ServletContainer extends org.mortbay.jetty.servlet.Context
+public class ServletContextHandler extends org.mortbay.jetty.servlet.Context
 {
+   /**
+    * Deployment context for a servlet context handler.
+    */
+    public interface Context extends ContextHandler.Context
+    {
+    }
+    
+   /**
+    * Servlet context handler internal parts management interface.
+    */
     public interface Parts
     {
         ServletEntry[] getServletEntries();
@@ -50,15 +60,14 @@ public class ServletContainer extends org.mortbay.jetty.servlet.Context
     * @param parts the internal comparts
     * @exception Exception if an instantiation error occurs
     */
-    public ServletContainer( 
-      Logger logger, ContextConfiguration context, Parts parts ) throws Exception
+    public ServletContextHandler( 
+      Logger logger, Context context, Parts parts ) throws Exception
     {
         super();
         
         m_logger = logger;
         
-        ContextHelper helper = new ContextHelper( logger );
-        helper.contextualize( this, context );
+        ContextHandler.contextualize( logger, this, context );
         
         for( ServletEntry entry : parts.getServletEntries() )
         {

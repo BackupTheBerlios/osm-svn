@@ -35,10 +35,10 @@
         collection="hard">
       <context>
         <entry key="name" value="User Realm"/>
-        <entry key="URI" value="local:properties:osm/http/realm"/>
+        <entry key="URI" value="file:target/test/realm.properties"/>
       </context>
     </component>
-    <component key="root" type="net.osm.http.impl.ServletContainer">
+    <component key="root" type="net.osm.http.impl.ServletContextHandler">
       <context>
         <entry key="contextPath" value="/"/>
       </context>

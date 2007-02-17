@@ -32,10 +32,10 @@
       <context>
         <entry key="port" value="8443"/>
         <entry key="maxIdleTime" value="30000"/>
-        <entry key="keyStore" value="local:keystore:dpml/planet/http/sample"/>
+        <entry key="keyStore" value="local:keystore:osm/http/sample"/>
         <entry key="keyStorePassword" value="password"/>
         <entry key="certificatePassword" value="password"/>
-        <entry key="trustStore" value="local:keystore:dpml/planet/http/certs"/>
+        <entry key="trustStore" value="local:keystore:osm/http/certs"/>
         <entry key="trustStorePassword" value="password"/>
       </context>
     </component>
@@ -48,7 +48,7 @@
         collection="hard">
       <context>
         <entry key="name" value="Test Realm"/>
-        <entry key="URI" value="local:properties:dpml/planet/http/realm"/>
+        <entry key="URI" value="local:properties:osm/http/realm"/>
       </context>
     </component>
     
@@ -101,7 +101,7 @@
       </parts>
     </component>
     
-    <component key="test" type="net.osm.http.impl.ServletContainer">
+    <component key="test" type="net.osm.http.impl.ServletContextHandler">
       <context>
         <entry key="contextPath" value="/test"/>
       </context>
