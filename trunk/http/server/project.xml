@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="osm-http-server" basedir="." xmlns="dpml:library">
 
+  <properties>
+    <property name="project.javadoc.exclude" value="true"/>
+  </properties>
+
   <types>
     <type id="jar"/>
     <type id="part" source="target/component.xml" alias="true"/>
