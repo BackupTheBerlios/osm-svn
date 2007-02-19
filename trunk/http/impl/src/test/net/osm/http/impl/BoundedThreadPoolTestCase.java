@@ -47,14 +47,14 @@ public class BoundedThreadPoolTestCase extends TestCase
      */
     public void setUp() throws Exception
     {
-        Map map = new Hashtable();
+        Map<String,Object> map = new Hashtable<String,Object>();
         map.put( "min", new Integer( MIN_THREADS ) );
         map.put( "max", new Integer( MAX_THREADS ) );
         map.put( "daemon", new Boolean( true ) );
         map.put( "name", NAME );
         map.put( "priority", new Integer( PRIORITY ) );
         map.put( "idle", new Integer( IDLE ) );
-        Class clazz = ThreadContext.class;
+        Class<?> clazz = ThreadContext.class;
         ThreadContext context = (ThreadContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_pool = new BoundedThreadPool( context );
     }

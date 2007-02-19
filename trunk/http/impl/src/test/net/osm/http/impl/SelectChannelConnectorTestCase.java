@@ -41,11 +41,11 @@ public class SelectChannelConnectorTestCase extends AbstractConnectorContextTest
      */
     public void setUp() throws Exception
     {
-        Map map = createMap();
+        Map<String,Object> map = createMap();
         
         map.put( "delaySelectKeyUpdate", new Boolean( ASSUME_SHORT_DISPATH_POLICY ) );
         
-        Class clazz = HttpConnectionContext.class;
+        Class<?> clazz = HttpConnectionContext.class;
         HttpConnectionContext context = 
           (HttpConnectionContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_connector = new SelectChannelConnector( context );

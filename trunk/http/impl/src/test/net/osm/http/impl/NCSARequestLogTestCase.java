@@ -54,7 +54,7 @@ public class NCSARequestLogTestCase extends TestCase
      */
     public void setUp() throws Exception
     {
-        Map map = new Hashtable();
+        Map<String,Object> map = new Hashtable<String,Object>();
         map.put( "ignorePaths", IGNORE_PATHS );
         map.put( "append", new Boolean( APPEND_POLICY ) );
         map.put( "extended", new Boolean( EXTENDED_POLICY ) );
@@ -66,7 +66,7 @@ public class NCSARequestLogTestCase extends TestCase
         map.put( "logLatency", new Boolean( LATENCY_POLICY ) );
         map.put( "logCookies", new Boolean( COOKIE_POLICY ) );
         
-        Class clazz = NCSAContext.class;
+        Class<?> clazz = NCSAContext.class;
         NCSAContext context = (NCSAContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_handler = new NCSARequestLogHandler( context );
         m_logger = (NCSARequestLog) m_handler.getRequestLog(); 

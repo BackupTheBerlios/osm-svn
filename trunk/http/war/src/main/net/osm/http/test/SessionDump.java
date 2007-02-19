@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package net.osm.http.impl.test;
+package net.osm.http.test;
 
 import java.io.IOException;
 import java.io.PrintWriter;

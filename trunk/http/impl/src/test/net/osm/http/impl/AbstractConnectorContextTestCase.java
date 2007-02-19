@@ -49,9 +49,9 @@ public abstract class AbstractConnectorContextTestCase extends TestCase
      * @return the context map
      * @throws Exception if an error occurs
      */
-    protected Map createMap() throws Exception
+    protected Map<String,Object> createMap() throws Exception
     {
-        Map map = new Hashtable();
+        Map<String,Object> map = new Hashtable<String,Object>();
         map.put( "host", HOST );
         map.put( "port", new Integer( PORT ) );
         map.put( "maxIdleTime", new Integer( MAX_IDLE_TIME ) );

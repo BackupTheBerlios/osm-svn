@@ -10,6 +10,7 @@
 
   <properties>
     <property name="java.util.logging.config.class" value="dpml"/>
+    <property name="project.javac.lint" value="unchecked"/>
   </properties>
 
   <module name="osm" basedir=".">

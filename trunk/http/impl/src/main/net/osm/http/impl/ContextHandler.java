@@ -183,7 +183,6 @@ public class ContextHandler extends org.mortbay.jetty.handler.ContextHandler
         String base = context.getResourceBase( null );
         if( null != base )
         {
-            logger.info( "RESOURCE BASE: " + path );
             handler.setResourceBase( base );
         }
         

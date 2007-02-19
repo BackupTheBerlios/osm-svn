@@ -126,6 +126,7 @@
         <entry key="contextPath" value="/"/>
         <entry key="war" value="link:war:osm/http/osm-http-app"/>
         <entry key="tempDirectory" value="$${dpml.data}/work/http"/>
+        <!--<entry key="extractionPolicy" value="false"/>-->
       </context>
     </component>
     

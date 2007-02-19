@@ -18,8 +18,8 @@
       <include key="osm-http-demo"/>
     </build>
     <runtime>
-      <include ref="org/mortbay/jetty/jsp-api-2.1" tag="PUBLIC"/>
-      <include uri="artifact:jar:javax/servlet/servlet-api#2.5" tag="PUBLIC"/>
+      <include ref="org/mortbay/jetty/jsp-api-2.1"/>
+      <include uri="artifact:jar:javax/servlet/servlet-api#2.5"/>
       <include ref="org/mortbay/jetty/jsp-2.1"/>
       <include key="osm-http-impl"/>
     </runtime>

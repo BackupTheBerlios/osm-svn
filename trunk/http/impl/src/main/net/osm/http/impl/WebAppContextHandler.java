@@ -15,6 +15,8 @@
  */
 package net.osm.http.impl;
 
+import dpml.util.StandardClassLoader;
+
 import java.net.URI;
 import java.util.Map;
 import java.security.PermissionCollection;
@@ -31,6 +33,8 @@ import net.dpml.util.Logger;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.SessionHandler;
 import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.webapp.WebAppClassLoader;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * Servlet context handler. 
@@ -38,7 +42,7 @@ import org.mortbay.jetty.servlet.ServletHandler;
  * @version @PROJECT-VERSION@
  */
 @Component( name="webapp", lifestyle=SINGLETON )
-public class WebAppContextHandler extends org.mortbay.jetty.webapp.WebAppContext
+public class WebAppContextHandler extends WebAppContext
 {
    /**
     * HTTP static resource vontext handler parameters.
@@ -151,5 +155,8 @@ public class WebAppContextHandler extends org.mortbay.jetty.webapp.WebAppContext
         {
             setPermissions( permissions );
         }
+        
+        ClassLoader classloader = getClass().getClassLoader();
+        setClassLoader( new WebAppClassLoader( classloader, this ) );
     }
 }

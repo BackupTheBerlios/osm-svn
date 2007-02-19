@@ -2,8 +2,6 @@
 <module name="http" xmlns="dpml:library">
 
   <properties>
-    <property name="jasper.version" value="5.5.15"/>
-    <property name="sl4j.version" value="1.0.1"/>
     <property name="project.major.version" value="0"/>
     <property name="project.minor.version" value="0"/>
     <property name="project.micro.version" value="0"/>
@@ -19,6 +17,7 @@
     </types>
     <dependencies>
       <runtime>
+        <include ref="dpml/transit/dpml-transit-main"/>
         <include uri="artifact:jar:javax/servlet/servlet-api#2.5" tag="PUBLIC"/>
       </runtime>
     </dependencies>

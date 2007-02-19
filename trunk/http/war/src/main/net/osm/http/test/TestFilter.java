@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package net.osm.http.impl.test;
+package net.osm.http.test;
 
 import java.io.IOException;
 
@@ -59,7 +59,7 @@ public class TestFilter implements Filter
     {
         Integer oldValue = null;
         try
-        {
+        {   
             oldValue = (Integer) request.getAttribute( "testFilter" );
             Integer value = null;
             if( null == oldValue )

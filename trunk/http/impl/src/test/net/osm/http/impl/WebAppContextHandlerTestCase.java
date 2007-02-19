@@ -60,7 +60,7 @@ public class WebAppContextHandlerTestCase extends AbstractContextHandlerTestCase
      */
     public void setUp() throws Exception
     {
-        Map map = createMap();
+        Map<String,Object> map = createMap();
         
         map.put( "war", WAR_URI );
         map.put( "tempDirectory", TEMP_DIR );
@@ -71,7 +71,7 @@ public class WebAppContextHandlerTestCase extends AbstractContextHandlerTestCase
         map.put( "sessionHandler", SESSIONS_HANDLER );
         map.put( "servletHandler", SERVLET_HANDLER );
         
-        Class clazz = Context.class;
+        Class<?> clazz = Context.class;
         Context context = (Context) ContextInvocationHandler.getProxiedInstance( clazz, map );
         Logger logger = new DefaultLogger( "test" );
         m_handler = new WebAppContextHandler( logger, context );

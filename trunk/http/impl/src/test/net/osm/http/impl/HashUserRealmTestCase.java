@@ -43,14 +43,14 @@ public class HashUserRealmTestCase extends TestCase
      */
     public void setUp() throws Exception
     {
-        Map map = new Hashtable();
+        Map<String,Object> map = new Hashtable<String,Object>();
         map.put( "name", "test" );
         File test = new File( System.getProperty( "project.test.dir" ) );
         File properties = new File( test, "realm.properties" );
         URI uri = properties.toURI();
         m_config = uri.toASCIIString();
         map.put( "URI", uri );
-        Class clazz = RealmContext.class;
+        Class<?> clazz = RealmContext.class;
         RealmContext context = (RealmContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_realm = new HashUserRealm( context );
     }

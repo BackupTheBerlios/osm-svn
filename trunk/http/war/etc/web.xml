@@ -8,12 +8,12 @@
   <display-name>Test WebApp</display-name>
   
   <listener>
-    <listener-class>net.osm.http.impl.test.TestListener</listener-class>
+    <listener-class>net.osm.http.test.TestListener</listener-class>
   </listener>
 
   <filter>
     <filter-name>TestFilter</filter-name>
-    <filter-class>net.osm.http.impl.test.TestFilter</filter-class>
+    <filter-class>net.osm.http.test.TestFilter</filter-class>
   </filter>
 
   <filter-mapping>
@@ -25,7 +25,7 @@
   
   <servlet>
     <servlet-name>Hello</servlet-name>
-    <servlet-class>net.osm.http.impl.test.HelloWorld</servlet-class>
+    <servlet-class>net.osm.http.test.HelloWorld</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
@@ -36,7 +36,7 @@
   
   <servlet>
     <servlet-name>Dump</servlet-name>
-    <servlet-class>net.osm.http.impl.test.Dump</servlet-class>
+    <servlet-class>net.osm.http.test.Dump</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
@@ -48,7 +48,7 @@
 
   <servlet>
     <servlet-name>Session</servlet-name>
-    <servlet-class>net.osm.http.impl.test.SessionDump</servlet-class>
+    <servlet-class>net.osm.http.test.SessionDump</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   
@@ -59,7 +59,7 @@
   
   <servlet>
     <servlet-name>Dispatch</servlet-name>
-    <servlet-class>net.osm.http.impl.test.DispatchServlet</servlet-class>
+    <servlet-class>net.osm.http.test.DispatchServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   

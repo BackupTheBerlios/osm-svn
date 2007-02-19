@@ -51,7 +51,7 @@ public class SslSocketConnectorTestCase extends AbstractConnectorContextTestCase
      */
     public void setUp() throws Exception
     {
-        Map map = createMap();
+        Map<String,Object> map = createMap();
         
         //map.put( "cipherSuites", CIPHER_SUITES );
         map.put( "algorithm", ALGORITHM );
@@ -63,7 +63,7 @@ public class SslSocketConnectorTestCase extends AbstractConnectorContextTestCase
         map.put( "provider", PROVIDER );
         map.put( "trustAlgorithm", TRUST_ALGORITHM );
         
-        Class clazz = HttpsConnectionContext.class;
+        Class<?> clazz = HttpsConnectionContext.class;
         HttpsConnectionContext context = 
           (HttpsConnectionContext) ContextInvocationHandler.getProxiedInstance( clazz, map );
         m_connector = new SslSocketConnector( context );
