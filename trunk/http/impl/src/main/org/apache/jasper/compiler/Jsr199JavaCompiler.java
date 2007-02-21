@@ -186,6 +186,13 @@ public class Jsr199JavaCompiler implements JavaCompiler
     {
         final String source = m_charArrayWriter.toString();
         javax.tools.JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+        if( null == javac )
+        {
+            final String error = 
+              "Java compiler not present in the system tool classloader.";
+            throw new Error( error );
+        }
+        
         DiagnosticCollector<JavaFileObject> diagnostics =
             new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager stdFileManager =
