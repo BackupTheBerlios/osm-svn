@@ -60,7 +60,7 @@ import static net.dpml.annotation.LifestylePolicy.SINGLETON;
  * @author <a href="@PUBLISHER-URL@">@PUBLISHER-NAME@</a>
  * @version @PROJECT-VERSION@
  */
-@Component( name="server", lifestyle=SINGLETON )
+@Component( name="jetty", lifestyle=SINGLETON )
 public class ExpressServer extends org.mortbay.jetty.Server
 {
    /**
@@ -106,7 +106,7 @@ public class ExpressServer extends org.mortbay.jetty.Server
         ThreadContext defaultPool = 
           ContextInvocationHandler.getProxiedInstance( 
             ThreadContext.class, 
-            new Hashtable() );
+            new Hashtable<String,Object>() );
         ThreadContext poolConfig = context.getThreads( defaultPool );
         BoundedThreadPool pool = new BoundedThreadPool( poolConfig );
         super.setThreadPool( pool );
@@ -148,7 +148,7 @@ public class ExpressServer extends org.mortbay.jetty.Server
         NCSAContext logDefaultContext = 
           ContextInvocationHandler.getProxiedInstance( 
             NCSAContext.class, 
-            new Hashtable() );
+            new Hashtable<String,Object>() );
         NCSAContext logContext = context.getLog( logDefaultContext );
         NCSARequestLogHandler requestLogHandler = new NCSARequestLogHandler( logContext );
         

@@ -1,21 +1,5 @@
 <?xml version="1.0"?>
-
-<component xmlns="dpml:metro" class="osm.http.express.ExpressServer">
-  <context>
-    <context key="https">
-      <entry key="keyStore" value="local:keystore:osm/http/sample"/>
-      <entry key="keyStorePassword" value="password"/>
-      <entry key="certificatePassword" value="password"/>
-      <entry key="trustStore" value="local:keystore:osm/http/certs"/>
-      <entry key="trustStorePassword" value="password"/>
-    </context>
-  </context>
-</component>
-
-<!--
-<component xmlns="dpml:metro" type="osm.http.express.ExpressServer" 
-    lifestyle="singleton" 
-    collection="hard">
+<profile xmlns="dpml:metro" lifestyle="singleton" collection="hard">
   
   <context>
     <context key="threads">
@@ -30,11 +14,13 @@
     <context key="https">
       <entry key="port" value="8443"/>
       <entry key="maxIdleTime" value="30000"/>
+      <!--
       <entry key="keyStore" value="local:keystore:osm/http/sample"/>
       <entry key="keyStorePassword" value="password"/>
       <entry key="certificatePassword" value="password"/>
       <entry key="trustStore" value="local:keystore:osm/http/certs"/>
       <entry key="trustStorePassword" value="password"/>
+      -->
     </context>
     <context key="log">
       <entry key="filename" value="$${dpml.data}/logs/http/request.log"/>
@@ -52,6 +38,7 @@
         <entry key="URI" value="local:properties:osm/http/realm"/>
       </context>
     </component>
+    <!-- add a context handler for the '/' path -->
     <component key="root" type="net.osm.http.impl.ServletContextHandler">
       <context>
         <entry key="contextPath" value="/"/>
@@ -59,5 +46,4 @@
     </component>
   </parts>
   
-</component>
--->
+</profile>
