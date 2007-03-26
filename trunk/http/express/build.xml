@@ -20,7 +20,7 @@
 
   <x:import uri="local:template:dpml/tools/standard"/>
 
-  <target name="install" depends="standard.install">
+  <target name="package" depends="standard.package">
     <property name="prefs" location="${dpml.prefs}/osm/http"/>
     <mkdir dir="${prefs}"/>
     <copy toDir="${prefs}" filtering="false">
