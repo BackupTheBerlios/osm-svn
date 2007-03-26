@@ -14,6 +14,7 @@
       <include ref="org/mortbay/jetty/jsp-2.1"/>
       <include ref="org/mortbay/jetty/jetty"/>
       <include uri="artifact:jar:openjdk/javac/javac"/>
+      <include ref="org/apache/ant/ant"/>
     </runtime>
     <test>
       <include ref="org/apache/ant/ant-junit"/>

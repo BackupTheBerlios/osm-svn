@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-db-connection" basedir="." xmlns="dpml:library">
+
+  <types>
+    <type id="jar"/>
+    <type id="part" source="etc/component.xml" alias="true"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include uri="artifact:jar:org/apache/derby/derby#10.2.2.0"/>
+    </runtime>
+    <test>
+      <include ref="org/apache/ant/ant-junit"/>
+    </test>
+  </dependencies>
+
+</project>

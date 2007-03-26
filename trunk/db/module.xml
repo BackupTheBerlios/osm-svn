@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<module name="db" xmlns="dpml:library">
+
+  <properties>
+    <property name="project.major.version" value="1"/>
+    <property name="project.minor.version" value="0"/>
+    <property name="project.micro.version" value="0"/>
+  </properties>
+  
+  <types>
+    <type id="module" alias="true"/>
+  </types>
+
+  <project file="connection/project.xml"/>
+
+</module>

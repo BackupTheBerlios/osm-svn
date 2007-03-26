@@ -7,6 +7,10 @@
     <property name="project.micro.version" value="0"/>
   </properties>
 
+  <types>
+    <type id="module" alias="true"/>
+  </types>
+
   <project file="spi/project.xml"/>
   <project file="impl/project.xml"/>
 

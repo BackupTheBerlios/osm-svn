@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<profile xmlns="dpml:metro" lifestyle="singleton" collection="hard">
+  
+  <context>
+    <!--<entry key="append" value="jdbc:odbc:demo"/>-->
+    <entry key="driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+    <entry key="autoCommitPolicy" value="false"/>
+    <entry key="commitOnClosePolicy" value="false"/>
+    <entry key="shutdownOnClosePolicy" value="true"/>
+  </context>
+  
+</profile>

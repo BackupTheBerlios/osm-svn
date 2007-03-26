@@ -28,10 +28,6 @@
       <property name="project.svn.host" value="svn://svn.berlios.de/osm/trunk"/>
     </properties>
 
-    <types>
-      <type id="module"/>
-    </types>
-
     <filters>
       <filter token="PUBLISHER-NAME" value="${project.publisher.name}"/> 
       <filter token="PUBLISHER-URL" value="${project.publisher.url}"/> 
@@ -54,9 +50,14 @@
       </filters>
       
     </project>
+    
       
     <module file="http/module.xml"/>
+    <module file="db/module.xml"/>
+    
     <!--
+    <project file="service/project.xml"/>
+    <module file="test/module.xml"/>
     <module file="process/module.xml"/>
     <module file="egov/module.xml"/>
     <module file="testing/module.xml"/>

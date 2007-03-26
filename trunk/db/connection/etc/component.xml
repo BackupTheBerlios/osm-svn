@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<component xmlns="dpml:metro" class="net.osm.db.ConnectionHandler" name="connection" lifestyle="singleton">
+
+  <!--
+  <context>
+    <entry key="append" value="jdbc:odbc:demo"/>
+  </context>
+  -->
+
+</component>
+
