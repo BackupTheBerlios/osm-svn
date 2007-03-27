@@ -43,6 +43,14 @@ public class ConnectionHandler
         String getProtocol();
        
        /**
+        * Return the auto-create policy.  If true, the connection will be 
+        * established with the attribute <tt>create=true</tt>.
+        * The default policy is false.
+        * @return the auto create policy
+        */
+        boolean getAutoCreatePolicy();
+        
+       /**
         * Return the auto-commit policy.  On establishment of a connection
         * the implementation will set the autocommit policy to the returned value.
         * The default policy is false.
@@ -89,6 +97,10 @@ public class ConnectionHandler
         boolean policy = m_context.getAutoCommitPolicy();
         
         m_logger.info( "loading connection: " + protocol );
+        if( m_context.getAutoCreatePolicy() )
+        {
+            protocol = protocol + ";create=true";
+        }
         m_connection = DriverManager.getConnection( protocol, properties );
         m_connection.setAutoCommit( policy );
         m_logger.info( "connection established" );
