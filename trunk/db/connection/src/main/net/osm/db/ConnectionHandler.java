@@ -14,65 +14,16 @@ import java.util.Properties;
 import net.dpml.util.Logger;
 
 /**
+ * Connection handler component. 
  */
 public class ConnectionHandler 
 {
-    //------------------------------------------------------------------------------
-    // context
-    //------------------------------------------------------------------------------
-
-   /**
-    * Connection handler deployment context.
-    */
-    public interface Context
-    {
-       /**
-        * Return the classname of the driver.  Default value is 
-        * <tt>org.apache.derby.jdbc.EmbeddedDriver</tt>.
-        * @return the driver classname
-        */
-        String getDriver();
-        
-       /**
-        * Return the protocol identifying the connection source.
-        * No default value is provided as such component assemblers 
-        * must supply a value in a component directive or as a part
-        * uri query.
-        * @return the protocol value
-        */
-        String getProtocol();
-       
-       /**
-        * Return the auto-create policy.  If true, the connection will be 
-        * established with the attribute <tt>create=true</tt>.
-        * The default policy is false.
-        * @return the auto create policy
-        */
-        boolean getAutoCreatePolicy();
-        
-       /**
-        * Return the auto-commit policy.  On establishment of a connection
-        * the implementation will set the autocommit policy to the returned value.
-        * The default policy is false.
-        * @return the autocommit policy
-        */
-        boolean getAutoCommitPolicy();
-        
-       /**
-        * Return the shutdown on close policy.  On disposal of a connection the 
-        * implementation will shutdown the underlying database if thihs policy 
-        * returns true. The default value is true.
-        * @return the shutdown on close policy
-        */
-        boolean getShutdownOnClosePolicy();
-    }
-    
     //------------------------------------------------------------------------------
     // state
     //------------------------------------------------------------------------------
     
     private final Connection m_connection;
-    private final Context m_context;
+    private final ConnectionContext m_context;
     private final Logger m_logger;
     
     //------------------------------------------------------------------------------
@@ -86,7 +37,7 @@ public class ConnectionHandler
     * @param context the deployment context
     * @exception SQLException if an SQL error occurs
     */
-    public ConnectionHandler( final Logger logger, final Context context ) throws SQLException
+    public ConnectionHandler( final Logger logger, final ConnectionContext context ) throws SQLException
     {
         m_logger = logger;
         m_context = context;

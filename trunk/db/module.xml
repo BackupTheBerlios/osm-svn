@@ -12,5 +12,6 @@
   </types>
 
   <project file="connection/project.xml"/>
+  <project file="transform/project.xml"/>
 
 </module>

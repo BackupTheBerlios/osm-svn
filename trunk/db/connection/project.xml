@@ -8,6 +8,7 @@
 
   <dependencies>
     <runtime>
+      <include ref="dpml/metro/dpml-metro-part"/>
       <include uri="artifact:jar:org/apache/derby/derby#10.2.2.0"/>
     </runtime>
     <test>
