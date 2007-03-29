@@ -107,11 +107,14 @@ public class ConnectionHandler
             try
             {
                 DriverManager.getConnection( protocol + ";shutdown=true" );
-                m_logger.info( "driver shutdown complete" );
             }
             catch( SQLException e )
             {
-                m_logger.warn( "driver shutdown raised an error", e );
+                // normal behaviour
+            }
+            finally
+            {
+                m_logger.info( "driver shutdown complete" );
             }
         }
     }
