@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<profile xmlns="dpml:metro" lifestyle="singleton" collection="hard">
+
+  <context>
+    <map key="factoryParameters">
+      <entry key="toplink.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+      <entry key="toplink.logging.level" value="SEVERE"/>
+    </map>
+  </context>
+
+</profile>

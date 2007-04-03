@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-db-demo-impl" basedir="." xmlns="dpml:library">
+
+  <types>
+    <type id="jar"/>
+    <type id="part" source="etc/component.xml"/>
+    <type id="part" source="etc/test.xml" name="test" test="true"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include key="osm-db-demo-api" tag="public"/>
+      <include key="osm-db-demo-unit"/>
+    </runtime>
+    <test>
+      <include ref="dpml/metro/dpml-metro-part"/>
+      <include ref="org/apache/ant/ant-junit"/>
+    </test>
+  </dependencies>
+  
+  <filters>
+    <filter token="PERSISTENCE-UNIT-NAME" value="${persistence.unit.name}"/>
+    <!--<feature ref="osm/db/demo" id="name" token="PERSISTENCE-UNIT-NAME"/>-->
+  </filters>
+
+</project>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<state xmlns="dpml:state"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <operation name="dispose" method="dispose"/>
+  <trigger event="termination">
+    <exec id="dispose"/>
+  </trigger>
+
+</state>
