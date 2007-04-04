@@ -23,6 +23,8 @@ public interface Order
     int getID();
 
     String getAddress();
+    
+    void setAddress( String address );
 
     Customer getCustomer();
 }

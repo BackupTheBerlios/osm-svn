@@ -53,6 +53,11 @@ public class DefaultCustomer implements Customer
         return m_unit.getName();
     }
     
+    public void setName( String value )
+    {
+        m_unit.setName( value );
+    }
+    
     public Iterable<Order> getOrders()
     {
         return new OrderWrapper( m_unit.getOrders() );

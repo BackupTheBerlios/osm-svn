@@ -42,6 +42,11 @@ public class DefaultOrder implements Order
         return m_unit.getAddress();
     }
 
+    public void setAddress( String value )
+    {
+        m_unit.setAddress( value );
+    }
+    
     public Customer getCustomer() 
     {
         CustomerStorageUnit store = m_unit.getCustomer();

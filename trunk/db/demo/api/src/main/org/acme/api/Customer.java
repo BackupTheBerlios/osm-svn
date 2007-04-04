@@ -24,5 +24,7 @@ public interface Customer
     
     String getName();
     
+    void setName( String name );
+    
     Iterable<Order> getOrders();
 }
