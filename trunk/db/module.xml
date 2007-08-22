@@ -12,7 +12,9 @@
   </types>
 
   <project file="connection/project.xml"/>
-  <project file="transform/project.xml"/>
+  <project file="server/project.xml"/>
+  
+  <!--<project file="transform/project.xml"/>-->
   <!--
   <project file="p2/project.xml"/>
   <project file="p3/project.xml"/>
