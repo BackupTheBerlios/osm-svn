@@ -1,0 +1,63 @@
+/*
+ * session.idl
+ *
+ * Copyright 2000-2001 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.3 18 MAR 2001
+ */
+
+#ifndef _OSM_SESSION_IDL_
+#define _OSM_SESSION_IDL_
+#include <Session.idl>
+#pragma prefix "osm.net"
+
+module session
+{
+
+    typedef CORBA::OctetSeq PID;
+
+   /**
+    * SubscriberProxy is an interface that extends StructuredPushSupplier within 
+    * internal operations enabling local resources to post events to the proxy, 
+    * and to initiate a termination sequence.  Posting events results in the 
+    * addition of a supplied event to the subscriber queue.  Initating termination
+    * prevents further events from being queued, and triggers delegate destruction
+    * when the event queue is empty.
+    */
+    interface SubscriberProxy : CosNotifyComm::StructuredPushSupplier
+    {
+       /**
+        * Return the persitent object identifier for this object.
+        * @return PID the persitent object identifier
+        */
+        PID getIdentifier();
+
+       /**
+        * Adds a structured event to the event queue.
+        * @param event the structured event to add to the queue.
+        */
+        void post( in CosNotification::StructuredEvent event );
+
+       /**
+        * Initate the termination sequence for this proxy.  if the 
+        * supplied termination policy is true, the implementation
+        * shall complete delivery of all pending events followed by servant
+        * disposal, otherwise the termination shall be immediate.
+        */
+        void terminate( in boolean policy );
+    };
+
+   /**
+    * The <code>net.osm.session.Task</code> interface extends the classic Task 
+    * defintion by including the behaviour of an <code>IdentifiableDomainConsumer</code>.
+    * This addition enables the task to register itself as a listener on the processor it
+    * is coordinating.
+    */
+    interface Task : Session::Task, Session::IdentifiableDomainConsumer{};
+
+};
+
+#endif // _OSM_SESSION_IDL_

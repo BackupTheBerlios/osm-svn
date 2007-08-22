@@ -1,0 +1,198 @@
+#ifndef __PKIREPOSITORY_IDL
+#define __PKIREPOSITORY_IDL
+
+#include <PKI.idl>
+
+#pragma prefix "omg.org"
+
+// SJM: moved PKIPrincipal and Schema to PKIExtension module
+// SJM: defintion of PKIPrincipal needs to be revied to more correctly
+//      define it as a Principal name - and resolve question of 
+//      PKIPrincipal as an attribute carrier (as distinct to defining 
+//      a seperate message type for that)
+// SJM: changed RepositoryProviderInfo to be an implemenmtation independent valuetype
+
+module PKIRepository{
+
+   /**
+    * Aggregated description of a repository, supported standard, supplier, 
+    * supported certificate types and encodings, and cross-CA agreements.
+    */
+    valuetype RepositoryProviderInfo 
+    {
+        //
+        // equivalent to the current RepositoryProviderInfo 
+        // without attribute name declarations
+        //
+
+       /**
+        * Description of the standard that the repository is compliant with.
+        */
+        public string standardDescription;
+
+       /**
+        * The version of the standard that the repository is compliant with.
+        */
+        public string standardVersion;
+
+       /**
+        * Description of the product.
+        */
+        public string productDescription;
+
+       /**
+        * Product version identifier.
+        */
+        public string productVersion;
+
+       /**
+        * Name of the product vendor.
+        */
+        public string productVendor;
+
+       /**
+        * Supported certificate types and encoding.
+        */
+        public PKI::CertificateInfoList supportedCertificates;
+
+       /**
+        * Supported cross-certification agreements.
+        */
+        public PKI::CertificateInfoList supportedCrossCertificates;
+
+       /**
+        * Supported CRL types and encoding.
+        */
+        public PKI::CRLInfoList supportedCRLs;
+    };
+
+    //
+    // SJM
+    // Changed exception to return the name 
+    // 
+   /**
+    * Exception raised in response to a action where the target Principal
+    * name is unknown within the scope of the repository.
+    */
+    exception UnknownPrincipal {
+        string name;
+    };
+
+   /**
+    * Exception indicatating an internal error in the repository.
+    */
+    exception RepositoryError {
+        string reason;
+    };
+
+   /**
+    * Exception raised when an attept is made to add a Principal with 
+    * name the conflicts with an existing name in the repository.
+    */
+    exception DuplicatePrincipal {
+        string name;
+    };
+
+   /**
+    * Structure defining a Principal.
+    */
+    valuetype PrincipalValue
+    {
+	  public string name;
+        public PKI::CertificateList certificates;
+        public PKI::CertificateList authorities;
+        public PKI::CertificatePairList pairs;
+        public PKI::CRL crl;
+        public PKI::CRL delta;
+        public PKI::CRL arl;
+    };
+
+   /**
+    * Provides lookup service to retireve a Pricipal based on a supplied name.
+    */
+    interface PrincipalLocator // abstract
+    {
+       /**
+        * Returns the aggregated repository provider information.
+        * @return RepositoryProviderInfo structure describing the repository and provider.
+        */
+        RepositoryProviderInfo get_provider_info();
+
+       /**
+        * Replaces an existing pricipal valuetype in the repository 
+        * with the supplied pricipal valuetype.
+        * <p>
+        * @param principal the replacement pricipal valuetype
+        * @exception UnknownPrincipal if requested name is not found
+        * @exception RepositoryError
+        */
+
+        PrincipalValue locate (
+            in string name
+        ) raises (
+            UnknownPrincipal, RepositoryError
+        );
+    };
+
+   /**
+    * Privides supplimentariy management operations to publish, update and 
+    * delete Principals from the repository.
+    */
+    interface PrincipalRepository : PrincipalLocator // abstract
+    {
+
+       /**
+        * Enters a new principal valuetype into the repository.
+        * <p>
+        * @param principal the pricipal valuetype to be added to the repository
+        * @exception DuplicatePrincipal if there is an existing pricipal with the same name
+        * @exception RepositoryError
+        */
+        void publish(
+            in PrincipalValue principal
+        ) raises (
+            DuplicatePrincipal, RepositoryError
+        );
+ 
+       /**
+        * Deletes a pricipal in the repository using the supplied name as a key.
+        * <p>
+        * @param name the privipal valuetype repository key
+        * @exception UnknownPrincipal if requested name is not found
+        * @exception RepositoryError
+        */
+        void delete (
+            in string name
+        ) raises (
+            UnknownPrincipal, RepositoryError
+        );
+
+       /**
+        * Replaces an existing pricipal valuetype in the repository 
+        * with the supplied pricipal valuetype.
+        * <p>
+        * @param principal the replacement pricipal valuetype
+        * @exception UnknownPrincipal if requested name is not found
+        * @exception RepositoryError
+        */
+        void update (
+            in PrincipalValue principal
+        ) raises (
+            UnknownPrincipal, RepositoryError
+        );
+    };
+
+   /**
+    * Concrete interface defining a Principal directory service through which 
+    * clients can locate pricipals based on supplied names.
+    */
+    interface Repository : PrincipalRepository {};
+
+   /**
+    * Concrete interface defining management services used by a CA in the 
+    * publication, updatating and retraction of pricipals to/from the 
+    * repository.
+    */ 
+    interface Directory : PrincipalLocator{};
+};
+#endif __PKIREPOSITORY_IDL

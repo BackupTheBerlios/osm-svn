@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<DPML>
+        <!--
+        The following community element declares policy for a new community.
+        -->
+
+        <community label="Untitled Community" note="New community using default membership policies.">
+            <membership label="Membership Model" note="Default membership model">
+                <mpolicy privacy="PUBLIC" exclusivity="true" />
+                <role label="participant" note="generic root role" abstract="true" >
+                    <rpolicy ceiling="0" quorum="0" assessment="STRICT" policy="CONNECTED" />
+                    <role label="guest" abstract="false" note="general guest access role"/>
+                    <role label="member" abstract="false" note="registered member access role"/>
+                </role>
+            </membership>
+        </community>
+</DPML>

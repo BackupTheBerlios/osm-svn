@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: OSM SARL
+
+Name: net/osm/community/CommunityProvider.class
+Avalon-Block: true

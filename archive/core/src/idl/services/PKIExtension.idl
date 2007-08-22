@@ -1,0 +1,197 @@
+#ifndef __PKIEXTENSION_IDL
+#define __PKIEXTENSION_IDL
+
+#include <PKIRepository.idl>
+
+#pragma prefix "omg.org"
+
+module PKIExtension{
+
+    typedef string PKIName;
+    typedef sequence <PKIName> PKINameList;
+
+    struct PKIAttribute {
+        string name;
+        any value;
+    };
+    typedef sequence <PKIAttribute> PKIAttributeList;
+
+    struct PKIPrincipal {
+        PKIName name;
+        PKIAttributeList attributes;
+    };
+
+    struct Schema {
+        PKIAttributeList attribute_defs;
+        PKIAttributeList syntax_defs;
+    };
+
+    //
+    // SJM:
+    // Extracted from RepositoryProviderInfo
+    //
+    valuetype RepositoryMappingInfo 
+    {
+        public string user_attribute_name;
+        public string ca_attribute_name;
+        public string crl_attribute_name;
+        public string certificatePair_attribute_name;
+        public string deltaCRL_attribute_name;
+        public string arl_attribute_name;
+    };
+
+    enum PrincipalAttributeErrorReason {
+        MissingPKIAttributes,
+        InvalidPKIAttributes
+    };
+
+    exception PrincipalAttributeError {
+        PrincipalAttributeErrorReason reason;
+        PKIPrincipal principal;
+        PKINameList attribute_names;
+    };
+
+    exception RepositoryError {
+        string reason;
+    };
+ 
+    exception UnknownPrincipal {
+        PKIPrincipal pricipal;
+    };
+
+
+    //
+    // SJM: Updated to inherit from PKIRepository::Repository 
+    //
+
+    interface LDAPRepository : PKIRepository::Repository 
+    {
+    
+        //
+        // SJM:
+        // suppliments RepositoryProviderInfo
+        // with LDAP related info
+        // 
+
+        RepositoryMappingInfo mapping();
+
+        Schema get_schema();
+
+        void publish_certificate(
+            in PKIPrincipal principal,
+            in PKI::Certificate certificate, in string attr_name)
+            raises (UnknownPrincipal,PrincipalAttributeError,RepositoryError);
+
+        PKI::CertificateList get_certificate(
+            in PKIPrincipal principal, in string attr_name)
+            raises (UnknownPrincipal,RepositoryError);
+
+
+        void delete_certificate(
+            in PKIPrincipal principal,
+            in PKI::Certificate certificate, in string attr_name)
+            raises(UnknownPrincipal,RepositoryError);
+
+
+        void publish_crl(in PKIPrincipal principal, in PKI::CRL crl,
+                                  in string attr_name)
+            raises(UnknownPrincipal,PrincipalAttributeError,RepositoryError);
+
+
+        PKI::CRL get_crl(in PKIPrincipal principal, in string attr_name)
+            raises(UnknownPrincipal,RepositoryError);
+
+
+        void delete_crl(in PKIPrincipal principal,
+                                 in PKI::CRL crl,in string attr_name)
+            raises(UnknownPrincipal,RepositoryError);
+
+
+        void publish_certificate_pair(
+            in PKIPrincipal principal, in PKI::CertificatePair certPair,
+            in string attr_name)
+            raises(UnknownPrincipal,PrincipalAttributeError,RepositoryError);
+
+        PKI::CertificatePairList get_certificate_pair(
+            in PKIPrincipal principal, in string attr_name)
+            raises(UnknownPrincipal,RepositoryError);
+
+        void delete_certificate_pair(
+            in PKIPrincipal principal,
+            in PKI::CertificatePair certificate_pair,
+            in string attr_name)
+            raises(UnknownPrincipal,RepositoryError);
+
+
+        void publish_user_certificate(in PKIPrincipal principal,
+                                      in PKI::Certificate certificate)
+            raises(UnknownPrincipal,PrincipalAttributeError,RepositoryError);
+
+
+        PKI::CertificateList get_user_certificate(in PKIPrincipal principal)
+            raises(UnknownPrincipal,RepositoryError);
+
+ 
+        void delete_user_certificate(in PKIPrincipal principal,
+                                     in PKI::Certificate certificate)
+            raises(UnknownPrincipal,RepositoryError);
+
+
+        void publish_ca_certificate(
+            in PKIPrincipal principal,
+            in PKI::Certificate certificate)
+            raises(UnknownPrincipal, PrincipalAttributeError,RepositoryError);
+
+
+        PKI::CertificateList get_ca_certificate(in PKIPrincipal principal)
+            raises(UnknownPrincipal,RepositoryError);
+
+
+        void delete_ca_certificate(in PKIPrincipal principal,
+                                   in PKI::Certificate certificate)
+            raises(UnknownPrincipal,RepositoryError);
+
+
+
+        void publish_default_crl(in PKIPrincipal principal, in PKI::CRL crl)
+         raises(UnknownPrincipal,PrincipalAttributeError,RepositoryError);
+
+        PKI::CRL get_default_crl(in PKIPrincipal principal)
+            raises(UnknownPrincipal,RepositoryError);
+
+        void delete_default_crl(in PKIPrincipal principal, in PKI::CRL crl)
+            raises(UnknownPrincipal,RepositoryError);
+
+        void publish_default_certificate_pair(in PKIPrincipal principal,
+                                      in PKI::CertificatePair certificate_pair)
+            raises(UnknownPrincipal,PrincipalAttributeError,RepositoryError);
+
+        PKI::CertificatePairList get_default_certificate_pair(
+            in PKIPrincipal principal)
+            raises(UnknownPrincipal,RepositoryError);
+
+        void delete_default_certificate_pair(in PKIPrincipal principal,
+                                     in PKI::CertificatePair certificate_pair)
+            raises(UnknownPrincipal,RepositoryError);
+
+        void publish_delta_crl(in PKIPrincipal principal,
+                               in PKI::CRL delta_crl)
+          raises(UnknownPrincipal,PrincipalAttributeError,RepositoryError);
+
+        PKI::CRL get_delta_crl(in PKIPrincipal principal)
+          raises(UnknownPrincipal,RepositoryError);
+
+        void delete_delta_crl(in PKIPrincipal principal, in PKI::CRL delta_crl)
+          raises(UnknownPrincipal,RepositoryError);
+
+        void publish_arl(in PKIPrincipal principal, in PKI::CRL arl)
+          raises(UnknownPrincipal,PrincipalAttributeError,RepositoryError);
+
+        PKI::CRL get_arl(in PKIPrincipal principal)
+          raises(UnknownPrincipal,RepositoryError);
+
+        void delete_arl(in PKIPrincipal principal, in PKI::CRL arl)
+          raises(UnknownPrincipal,RepositoryError);
+    };
+};
+#endif __PKIEXTENSION_IDL

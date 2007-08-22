@@ -1,0 +1,210 @@
+/**
+ */
+
+#ifndef _LIST_PSS_PSDL_
+#define _LIST_PSS_PSDL_
+#include <CosPersistentState.idl>
+
+#pragma prefix "osm.net"
+
+module list {
+
+
+    // forward declarations
+
+    local interface Iterator;
+    abstract storagetype EntryStorage;
+ 
+    // typedefs
+
+    typedef CORBA::OctetSeq ID;
+    typedef ref<EntryStorage> EntryStorageRef;
+
+    // utilities
+
+   /**
+    * Exception thrown when an attempt is made to reference an entry that does 
+    * not exist.
+    */
+
+    exception NoEntry{};
+
+   /**
+    * EntryStorage defines a member of a LinkedList and contains pids to the 
+    * previous and next entries in the list.
+    */
+
+    abstract storagetype EntryStorage
+    {
+
+       /**
+        * Locked status of the entry.
+        */
+        state boolean locked;
+
+       /**
+        * The reference to the next entry in the linked list.
+        * If the entry is the last entry in the list, next contains
+        * the list header entry.
+        */
+	  state ref<EntryStorage> next;
+
+       /**
+        * The reference to the previous entry in the linked list.
+        * If the entry is the first entry in the list, prev contains
+        * the reference to the last entry in the list.
+        */
+	  state ref<EntryStorage> prev;
+
+       /**
+        * The full pid of the storage type instance that the 
+        * entry refers to.
+        */
+        state ID target_pid;
+
+       /**
+        * Returns the target of the entry.
+        */
+	  CosPersistentState::StorageObject target();
+
+	  /**
+         * Returns a reference to the target of the entry.
+	   */
+	   EntryStorageRef reference();
+    };
+
+   /**
+    * EntryHome is the persistent repository of all Entry instances.
+    */
+
+    abstract storagehome EntryStorageHome of EntryStorage
+    {
+	  factory create( target_pid, prev, next, locked );
+    };
+
+   /**
+    * Iterator is a interface exposed by a LinkedList that 
+    * supports forward iteration over an Element list and returns the short
+    * pid of the target storage object.
+    */
+    local interface Iterator
+    {
+       /**
+        * Returns true if the list contains another <code>Entry</code>.
+        */
+	  boolean has_next();
+
+       /**
+        * Returns the next <code>StorageObject</code> in the list without incrementing the iterator.
+        */
+	  CosPersistentState::StorageObject peek()
+        raises 
+        (
+		NoEntry
+	  );
+
+       /**
+        * Returns the next <code>Entry</code> in the list.
+        */
+	  CosPersistentState::StorageObject next() 
+	  raises 
+	  (
+		NoEntry
+	  );
+
+       /**
+        * Removes the <code>entry</code> referencing the last target 
+        * returned from the iteration.
+        */
+        void remove();
+
+	 /**
+	  * Resets the iterator to the inital state in which a call to 
+	  * next will return the target of the first entry in the list.
+	  */
+	  void reset();
+
+    };
+
+   /**
+    * LinkedList is an embedded storagetype used to hold a reference to storage type  
+    * instance derived from Entry. The size state member records the number of 
+    * entries in the linked list.
+    */
+    abstract storagetype LinkedList
+    {
+
+       /**
+        * Short PID of the first entry in the linked list.
+        */
+
+	  state ref<EntryStorage> header;
+
+       /**
+        * Number of entries in the list.
+        */
+
+        state long size;
+
+       /**
+        * Adds a new entry to the end of the linked list.
+        * @param target a <code>StorageObject</code> to add to the list
+        */
+        void add
+	  (
+            in CosPersistentState::StorageObject target
+	  );
+
+       /**
+        * Removes an storage object from the linked list (where the storage object 
+        * is a valid target of a entry within the list).
+        * @param target a <code>StorageObject</code> to remove from the list
+        */
+        void remove
+	  ( 
+		in CosPersistentState::StorageObject target
+	  ) 
+        raises 
+        (
+	      CosPersistentState::NotFound
+	  );
+
+       /**
+        * Returns an iterator supporting iteration over members of the list.
+        */
+	  Iterator iterator();
+
+    };
+
+    //
+    // EntryStorageBase
+    //
+
+    storagetype EntryStorageBase;
+
+    storagehome EntryStorageHomeBase of EntryStorageBase
+    implements EntryStorageHome
+    {
+    };
+
+    storagetype EntryStorageBase
+    implements EntryStorage
+    { 
+        stores prev as ref<EntryStorageBase> scope EntryStorageHomeBase;
+        stores next as ref<EntryStorageBase> scope EntryStorageHomeBase;
+    };
+
+
+    //
+    // LinkedListBase
+    //
+
+    storagetype LinkedListBase
+    implements LinkedList
+    {
+        stores header as ref<EntryStorageBase> scope EntryStorageHomeBase;
+    };
+
+};
+
+#endif // _LIST_PSS_PSDL_

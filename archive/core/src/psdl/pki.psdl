@@ -1,0 +1,136 @@
+/**
+ */
+
+#ifndef _PKI_PSDL_
+#define _PKI_PSDL_
+#include <PKIRepository.idl>
+#pragma prefix "osm.net"
+
+module pki
+{
+  module repository
+  {
+
+      //
+      // role
+      //
+
+     /**
+      * Storage type defintion for a Principal valuetype.
+      */
+      abstract storagetype PrincipalStorage
+      {
+       /**
+        * The unique name of this storage entry within the scope of the storage home.
+        */
+        state string name;
+
+       /**
+        * The principal valuetype.
+        */
+        state PKIRepository::PrincipalValue value;
+      };
+
+     /**
+      * Storage type implementation for PrincipalStorage.
+      */
+      storagetype PrincipalStorageBase implements PrincipalStorage { };
+
+     /**
+      * The storage home defintion for PrincipalStorage instances.
+      */
+      abstract storagehome PrincipalStorageHome of PrincipalStorage
+      {
+        key name;
+
+       /**
+        * Creation of a new SubscriptionStorage entry.
+        */
+        factory create( name, value );
+      };
+
+     /**
+      * The storage home implementation for PrincipalStorageHome.
+      */
+      storagehome PrincipalStorageHomeBase of PrincipalStorageBase implements PrincipalStorageHome{ };
+
+      //
+      // catalog
+      //
+    
+      //catalog PrincipalCatalog
+      //{
+      //  provides PrincipalStorageHome principal_home;
+      //};
+
+  };
+
+  module authority
+  {
+
+     /**
+      * Abstract request storage type.
+      */
+      abstract storagetype RequestStorage
+      {
+	   /**
+	    * Transaction identifier.
+	    */
+          state long long tid;
+
+	   /**
+	    * Transaction status.
+	    */
+          state PKI::PKIStatus status;
+      };
+
+     /**
+      * Certificate request storage type local interface.
+      */
+      abstract storagetype RequestCertificateStorage : RequestStorage
+      {
+	   /**
+	    * Certificate request supplied by the client.
+	    */
+          state PKI::CertificateRequest request;
+
+	   /**
+	    * Data to supplied in response to a request for a 
+          * certificate result status query (established
+          * the request manager).
+	    */
+          state PKI::ResponseData response;
+
+	   /**
+	    * Certificate to be supplied in response to a 
+	    * <code>get_certificate_request_result</code>.
+	    */
+          state PKI::CertificateList certificates;
+
+      };
+
+     /**
+      * Certificate request storage type implementation.
+      */
+      storagetype RequestCertificateStorageBase implements RequestCertificateStorage { };
+
+     /**
+      * Certificate request storage home local interface.
+      */
+      abstract storagehome RequestCertificateStorageHome of RequestCertificateStorage
+      {
+          key tid;
+          factory create( tid, status, request, response, certificates );
+      };
+
+     /**
+      * Certificate request storage home implementation.
+      */
+      storagehome RequestCertificateStorageHomeBase of RequestCertificateStorageBase 
+		implements RequestCertificateStorageHome{ };
+
+    };
+
+};
+
+#endif // _PKI_PSDL_

@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+
+<!--
+config.java
+
+Copyright 2000-2001 OSM SARL All Rights Reserved.
+This configuration is the proprietary information of OSM SARL.
+Use is subject to license terms.  
+
+@author  Stephen McConnell <mailto:mcconnell@osm.net>
+@version 1.0 24 DEC 2000
+-->
+
+<config>
+
+    <vault name="Vault" alias="mcconnell" challenge="paris.14"/>
+
+    <orb class="org.openorb.CORBA.ORB" singleton="org.openorb.CORBA.ORBSingleton">
+        <property name="openorb.debug" value="1" />
+        <property name="openorb.home" file="." />
+        <property name="openorb.config" file="conf/orb.xml" />
+        <property name="openorb.profile" value="audit" />
+        <property name="openorb.debug.ShowStackTrace" value="true"/>
+        <property name="iiop.port" value="2508" />
+        <property name="iiop.alternateAddr" value="home.osm.net:2508"/>
+        <property name="PSS.debug" value="false" />
+        <property name="PSS.debug" value="false" />
+        <property name="PSS.File.DataStore.Directory" file="pss" />
+        <property name="PSS.File.DataStore.Name" value="hub" />
+        <property name="PSS.File.FlushTime" value="30" />
+        <property name="PSS.File.Transaction.IsolationLevel" value="1" />
+    </orb>
+
+    <desktop/>
+
+    <shell>
+
+      <!--
+      The root element declares the default origin and dimensions of the 
+      main root shell window.
+      -->
+
+      <root top="0" right="0" width="500" height="700" title="OSM Shell"/>
+
+      <preferences>
+
+	  <font>
+           <default face="Dialog" style="0" size="11" />
+           <title face="Dialog" style="0" size="18" />
+	  </font>
+
+	  <colours>
+           <default background="white" foreground="block"/>
+	  </colours>
+
+	</preferences>
+
+    </shell>
+
+    <!--
+    The audit element declares the configuration of a audit service local to 
+    the web gateway.  This provides support for the maintenance of a persistent 
+    cache for object adapters and structured events issued under subscriptions
+    established by adapters on primary resource references. Adapters act as a 
+    factory for agents, a transient object that is used to represent the adapted
+    resource withing the scope of a client application.
+    -->
+
+    <audit name="OSM Audit Service" version="1.0.3">
+
+        <!-- 
+        Declaration of the server domain identifications structure used by identifiable
+        business objects in combination with a random integer identifier.  This value
+        must be updated to match the specific installation.  The authority value must 
+        contain one of DNS, IDL, ISO, DCE, or OTHER.  The address contains the name of 
+        the authority in a form consitent with the authority address type.  The constant 
+        value must be a number unique within a scope defined by the authority and  
+        address values.  The combionation of authority, address and constant uniquely 
+        identifies this server to an event producer.
+        -->
+
+        <domain authority="DNS" address="audit.osm.net" constant="1" />
+
+    </audit>
+
+    <agent cache="100">
+
+      <!--
+      URL of the gatway finder from which a root community can be established
+      and resource factories can be located.
+      -->
+
+      <finder ior="http://home.osm.net/gateway/finder.ior" />
+
+      <!--
+      URL of the PKI RA to which PKCS#10 certificate requests for a UserPrincipal
+	credential should be directed.
+      -->
+
+      <authority ior="http://home.osm.net/gateway/authority.ior" />
+
+      <vault name="Vault" login="conf/login.conf"/>
+
+      <resource role="IDL:omg.org/Session/AbstractResource:2.1">
+
+           <processor role="IDL:omg.org/CollaborationFramework/Processor:1.0" 
+                class="net.osm.agent.ProcessorAgent"/>
+
+           <workspace role="IDL:omg.org/Session/Workspace:2.1" 
+                 class="net.osm.agent.WorkspaceAgent">
+
+                 <desktop role="IDL:omg.org/Session/Desktop:2.1" 
+                    class="net.osm.agent.DesktopAgent"/>
+
+                 <community role="IDL:omg.org/CommunityFramework/Community:2.0" 
+                    class="net.osm.agent.CommunityAgent"/>
+
+	     </workspace>
+
+           <task role="IDL:omg.org/Session/Task:2.1" 
+                  class="net.osm.agent.TaskAgent"/>
+
+           <user role="IDL:omg.org/Session/User:2.1" 
+                  class="net.osm.agent.UserAgent"/>
+
+           <generic role="IDL:omg.org/CommunityFramework/GenericResource:2.1" 
+                  class="net.osm.agent.GenericResourceAgent"/>
+
+      </resource>
+		
+      <values>
+
+          <message role="IDL:omg.org/Session/SystemMessage:1.0" 
+            class="net.osm.agent.MessageAgent"/>
+
+          <membership-model role="IDL:omg.org/CommunityFramework/MembershipModel:1.0" 
+            class="net.osm.agent.MembershipModelAgent"/>
+
+          <processor-model role="IDL:omg.org/CollaborationFramework/ProcessorModel:1.0" 
+            class="net.osm.agent.ProcessorModelAgent"/>
+
+          <criteria role="IDL:omg.org/CommunityFramework/Criteria:1.0" 
+            class="net.osm.agent.CriteriaAgent"/>
+
+          <generic-criteria role="IDL:omg.org/CommunityFramework/GenericCriteria:2.1" 
+            class="net.osm.agent.GenericCriteriaAgent"/>
+
+          <processor-criteria role="IDL:omg.org/CollaborationFramework/ProcessorCriteria:1.0" 
+            class="net.osm.agent.ProcessorCriteriaAgent"/>
+
+          <processor-criteria role="IDL:omg.org/CommunityFramework/CommunityCriteria:1.0" 
+            class="net.osm.agent.CommunityCriteriaAgent"/>
+
+          <accessedBy role="IDL:omg.org/Session/AccessedBy:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <accesses role="IDL:omg.org/Session/Accesses:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <administeredBy role="IDL:omg.org/Session/AdministeredBy:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <administers role="IDL:omg.org/Session/Administers:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <collectedBy role="IDL:omg.org/Session/CollectedBy:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <collects role="IDL:omg.org/Session/Collects:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <composedOf role="IDL:omg.org/Session/ComposedOf:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <consumedBy role="IDL:omg.org/Session/ConsumedBy:1.0" 
+            class="net.osm.agent.UsageAgent"/>
+
+          <consumes role="IDL:omg.org/Session/Consumes:1.0" 
+            class="net.osm.agent.UsageAgent"/>
+
+          <isPartOf role="IDL:omg.org/Session/IsPartOf:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <ownedBy role="IDL:omg.org/Session/OwnedBy:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <owns role="IDL:omg.org/Session/Owns:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <producedBy role="IDL:omg.org/Session/ProducedBy:1.0" 
+            class="net.osm.agent.UsageAgent"/>
+
+          <produces role="IDL:omg.org/Session/Produces:1.0" 
+            class="net.osm.agent.UsageAgent"/>
+
+          <member role="IDL:omg.org/CommunityFramework/Member:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <recognizes role="IDL:omg.org/CommunityFramework/Recognizes:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+          <link role="IDL:omg.org/Session/Link:1.0" 
+            class="net.osm.agent.LinkAgent"/>
+
+      </values>
+
+    </agent>
+
+</config>
+
+

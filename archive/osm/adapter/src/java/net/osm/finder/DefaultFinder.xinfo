@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<!--
+ Copyright 2002 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <name>finder</name>
+    <version>1.0</version>
+  </block>
+
+  <!-- 
+  services that are offered by this block 
+  -->
+
+  <services>
+      <service name="net.osm.finder.FinderService" version="1.0" />
+  </services>
+
+  <!-- 
+  dependencies that this block has on other blocks 
+  -->
+
+  <dependencies>
+      <dependency>
+          <role>poa</role>
+          <service name="org.apache.orb.POAContext" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+  <configuration>
+
+    <ior value="finder.ior" />
+
+  </configuration>
+
+  <implementation policy="SINGLETON"/>
+
+</blockinfo>
+

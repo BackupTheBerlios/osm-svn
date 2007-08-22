@@ -1,0 +1,407 @@
+
+<!-- 
+Copyright 2001-2002 OSM SARL, All Rights Reserved.
+-->
+
+<project name="community" default="help" basedir=".">
+
+  <property file="local.properties"/>
+  <property file="build.properties"/>
+
+  <target name="help" >
+    <echo>
+
+      Description
+      -----------
+
+      ${project.title}
+
+      General Targets:
+      ----------------
+
+      all              - clean, build and dist
+      build            - invokes the general build target
+      javadoc          - javadoc API generation
+      dist             - executes build, javadoc and support file creation
+      clean            - destroy the build directory
+      
+    </echo>
+  </target>
+
+  <property name="VERSION" value="${MAJOR}.${MINOR}.${MICRO}"/>
+
+  <property name="apps.path" value="../../jakarta-avalon-apps" />
+  <property name="enterprise" value="${apps.path}/enterprise" />
+  <property name="common.path" value="${apps.path}/common" />
+  <property name="common.lib.path" value="${common.path}/lib" />
+  <property name="orb.path" value="${enterprise}/orb" />
+  <property name="orb.lib.path" value="${enterprise}/orb/lib" />
+  <property name="orb.dist.path" value="${enterprise}/orb/dist" />
+  <property name="idl.class"  value="org.openorb.compiler.IdlCompiler" />
+  <property name="pss.dist.path" value="${enterprise}/pss/dist" />
+  <property name="time.dist.path" value="${enterprise}/time/dist" />
+  <property name="session.path" value="../session" />
+  <property name="session.dist.path" value="${session.path}/dist" />
+  <property name="domain.path" value="../domain" />
+  <property name="domain.dist.path" value="${domain.path}/dist" />
+  <property name="sps.path" value="../sps" />
+  <property name="sps.dist.path" value="${sps.path}/dist" />
+  <property name="properties.path" value="../properties" />
+  <property name="properties.dist.path" value="${properties.path}/dist" />
+  <property name="adapter.path" value="../adapter" />
+  <property name="adapter.dist.path" value="${adapter.path}/dist" />
+  <property name="realm.path" value="../realm" />
+  <property name="realm.dist.path" value="${realm.path}/dist" />
+
+  <property name="project.jar" value="${ant.project.name}.jar"/>
+
+  <property name="lib" value="lib" />
+  <property name="src" value="src" />
+  <property name="etc" value="${src}/etc" />
+  <property name="idl" value="${src}/idl" />
+  <property name="psdl" value="${src}/psdl" />
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+
+  <property name="pss.engine.jar"  value="pss-2.0.1.jar" />
+  <property name="psdl.jar"  value="psdl-2.0.1.jar" />
+  <property name="psdl.class"  value="org.apache.pss.compiler.PsdlCompiler" />
+  <property name="persistence" value="file" />
+  <property name="net.osm.pss.connector" value="${persistence}" />
+
+  <property name="javadoc.root.path"  value="${dist}/javadoc" />
+  <property name="avalon.href"  value="http://jakarta.apache.org/avalon/api/" />
+  <property name="jdk.href"  value="http://java.sun.com/j2se/1.4/docs/api/" />
+  <property name="overview.html" value="${etc}/overview.html" />
+
+  <!-- classpath -->
+
+  <path id="project.classpath">
+      <fileset dir="${common.lib.path}">
+        <include name="logkit.jar" />
+        <include name="avalon-framework.jar" />
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${time.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${session.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${adapter.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${sps.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${domain.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${realm.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${properties.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+  </path>
+
+  <!-- MAIN TARGETS -->
+
+  <target name="all" depends="clean,dist"/>
+  <target name="dist" depends="build,javadoc,support"/>
+  <target name="build" depends="psdl,compile"/>
+
+  <target name="clean">
+     <delete dir="${build}"/>
+     <delete dir="${dist}"/>
+     <delete dir="pss"/>
+  </target>
+
+  <!-- PREPARE -->
+
+  <target name="prepare"  >
+    <mkdir dir="${dist}" />
+    <mkdir dir="${build}/idl" />
+    <mkdir dir="${build}/psdl" />
+    <mkdir dir="${build}/lib" />
+  </target>
+
+  <!-- CONTEXT -->
+
+  <target name="context" depends="prepare">
+    <uptodate property="project.uptodate" targetfile="${dist}/${project.jar}">
+      <srcfiles dir="${src}/java">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${etc}">
+         <include name="*.mf"/>
+      </srcfiles>
+      <srcfiles dir="${build}/idl">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/psdl">
+         <include name="**/*.*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <!-- IDL -->
+
+  <target name="idl" depends="CommunityFramework.idl,community.idl"/>
+
+  <target name="idl.context" depends="prepare">
+    <uptodate property="CommunityFramework.modified" targetfile="${idl}/CommunityFramework.idl">
+      <srcfiles dir="${build}/idl">
+         <include name="**/*.*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="community.modified" targetfile="${idl}/community.idl">
+      <srcfiles dir="${build}/idl">
+         <include name="**/*.*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="CommunityFramework.idl" depends="idl.context" if="CommunityFramework.modified">
+    <echo message="IDL"/>
+    <java classname="${idl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-I ${domain.path}/src/idl"/>
+	<arg line="-I ${session.path}/src/idl"/>
+	<arg line="-I ${sps.path}/src/idl"/>
+	<arg line="-I ${properties.path}/src/idl"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-d ${build}/idl"/>
+	<arg line="${idl}/CommunityFramework.idl"/>
+    </java>
+    <mkdir dir="${build}/exclude"/>
+    <move todir="${build}/exclude">
+      <fileset dir="${build}/idl/org/omg/CommunityFramework">
+        <include name="AgencyCriteria.java"/>
+        <include name="CommunityCriteria.java"/>
+        <include name="Control.java"/>
+        <include name="Criteria.java"/>
+        <include name="ExternalCriteria.java"/>
+        <include name="GenericCriteria.java"/>
+        <include name="Member.java"/>
+        <include name="MembershipCount.java"/>
+        <include name="MembershipModel.java"/>
+        <include name="MembershipPolicy.java"/>
+        <include name="MessageCriteria.java"/>
+        <include name="Problem.java"/>
+        <include name="Recognizes.java"/>
+        <include name="Role.java"/>
+        <include name="RolePolicy.java"/>
+        <include name="RoleStatus.java"/>
+        <include name="UserCriteria.java"/>
+      </fileset>
+    </move>
+  </target>
+
+  <target name="community.idl" depends="idl.context" if="community.modified">
+    <echo message="IDL community"/>
+    <java classname="${idl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-I ${adapter.path}/src/idl"/>
+	<arg line="-I ${domain.path}/src/idl"/>
+	<arg line="-I ${session.path}/src/idl"/>
+	<arg line="-I ${orb.path}/src/idl"/>
+	<arg line="-I ${sps.path}/src/idl"/>
+	<arg line="-I ${properties.path}/src/idl"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-d ${build}/idl"/>
+	<arg line="${idl}/community.idl"/>
+    </java>
+  </target>
+
+
+  <!-- PSDL -->
+
+  <target name="psdl" depends="generic.psdl,community.psdl"/>
+
+  <target name="psdl.context" depends="prepare">
+    <uptodate property="generic.modified" targetfile="${psdl}/generic.psdl">
+      <srcfiles dir="${build}/psdl">
+         <include name="**/*.*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="community.modified" targetfile="${psdl}/community.psdl">
+      <srcfiles dir="${build}/psdl">
+         <include name="**/*.*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="generic.psdl" depends="idl,psdl.context" if="generic.modified">
+    <echo message="PSDL"/>
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-I ${realm.path}/src/idl"/>
+	<arg line="-I ${session.path}/src/idl"/>
+	<arg line="-I ${session.path}/src/psdl"/>
+	<arg line="-I ${adapter.path}/src/idl"/>
+	<arg line="-I ${domain.path}/src/idl"/>
+	<arg line="-I ${session.path}/src/idl"/>
+	<arg line="-I ${sps.path}/src/idl"/>
+	<arg line="-I ${sps.path}/src/psdl"/>
+	<arg line="-I ${orb.path}/src/idl"/>
+	<arg line="-I ${properties.path}/src/idl"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="-d ${build}/psdl"/>
+	<arg line="${psdl}/generic.psdl"/>
+    </java>
+  </target>
+
+  <target name="community.psdl" depends="idl,psdl.context" if="community.modified">
+    <echo message="PSDL"/>
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="-I ${sps.path}/src/psdl"/>
+	<arg line="-I ${realm.path}/src/idl"/>
+	<arg line="-I ${session.path}/src/idl"/>
+	<arg line="-I ${session.path}/src/psdl"/>
+	<arg line="-I ${adapter.path}/src/idl"/>
+	<arg line="-I ${domain.path}/src/idl"/>
+	<arg line="-I ${session.path}/src/idl"/>
+	<arg line="-I ${sps.path}/src/idl"/>
+	<arg line="-I ${sps.path}/src/psdl"/>
+	<arg line="-I ${orb.path}/src/psdl"/>
+	<arg line="-I ${properties.path}/src/idl"/>
+	<arg line="-d ${build}/psdl"/>
+	<arg line="${psdl}/community.psdl"/>
+    </java>
+  </target>
+
+  <!-- COMPILE -->
+
+  <target name="compile" depends="context,idl,psdl" unless="project.uptodate" >
+      <echo message="Building project"/>
+      <javac debug="off" destdir="${build}/lib" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+        <src path="${src}/java" />
+        <src path="${build}/idl" />
+        <src path="${build}/psdl" />
+      </javac>
+      <copy todir="${build}/lib">
+          <fileset dir="${src}/java">
+             <include name="**/*.xinfo"/>
+          </fileset>
+      </copy>
+      <jar jarfile="${dist}/${project.jar}" basedir="${build}/lib"
+        manifest="${etc}/${ant.project.name}.mf"/>
+  </target>
+
+  <!-- DEMO -->
+
+  <target name="demo" depends="loader.validation,build" if="merlin.available" >
+    <load target="${demo.target}" priority="${demo.priority}" disposal="${demo.disposal}" 
+      verbose="${demo.verbose}">
+      <fileset dir="${dist}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+    </load>
+  </target>
+
+
+  <!-- INTERNAL UTILITY TARGETS -->
+
+  <target name="support">
+    <copy todir="${dist}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.TXT"/>
+         <include name="README.TXT"/>
+       </fileset>
+    </copy>
+  </target>
+
+  <target name="javadoc" depends="prepare" >
+    <mkdir dir="${javadoc.root.path}/${ant.project.name}" />
+    <copy todir="${javadoc.root.path}/${ant.project.name}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.HTML"/>
+         <include name="license.css"/>
+       </fileset>
+    </copy>
+    <javadoc destdir="${javadoc.root.path}/${ant.project.name}" 
+	doctitle="&lt;h1&gt;${project.title} ${VERSION}&lt;/h1&gt;" 
+      noindex="false" author="false" 
+      use="true"
+      overview="${overview.html}"
+	windowtitle="${project.title}" 
+      bottom="&lt;a href='{@docRoot}/LICENSE.HTML'/&gt;License, Disclaimer and due credits.&lt;/a&gt;"
+      additionalparam="-breakiterator -J-Xmx128m -tag osm.warning:a:Warning"
+      packagenames="net.*,org.*"  
+      >
+        <sourcepath path="${build}/idl"/>
+        <sourcepath path="${build}/psdl"/>
+        <sourcepath path="${src}/java"/>
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+	  <link href="${jdk.href}" />
+	  <link href="${avalon.href}" />
+	  <link href="${orb.href}" />
+	  <link href="${pss.href}" />
+	  <link href="${session.href}" />
+    </javadoc>
+  </target>
+
+  <target name="loader.context">
+    <available property="merlin.available" file="${ant.home}/lib/merlin.jar"/>
+  </target>
+
+  <target name="loader.defintion" depends="loader.context" if="merlin.available">
+    <taskdef resource="merlin.properties"/>
+  </target>
+ 
+  <target name="loader.validation" depends="loader.defintion" unless="merlin.available">
+    <echo>
+
+     Merlin is not installed in your Ant library.
+     In order to use the "load" task the following jar files 
+     must be added to your ${ant.home}/lib directory:
+
+       - merlin.jar
+       - avalon-framework.jar
+       - logkit.jar
+       - xerces.jar (for JRE 1.3 and earlier)
+    </echo>
+  </target>
+
+</project>

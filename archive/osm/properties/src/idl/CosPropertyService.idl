@@ -1,0 +1,766 @@
+//File: CosPropertyService.idl
+//The only module of the Persistence Service
+
+#ifndef _COS_PROPERTY_SERVICE_IDL_
+#define _COS_PROPERTY_SERVICE_IDL_
+#pragma prefix "omg.org"
+
+/**
+* An object supports an interface. An interface consists of operations and attributes. The
+* interface is statically defined in OMG IDL. Two objects are of the same type if they
+* support the same interface.
+* Properties are typed, named values dynamically associated with an object, outside of
+* the type system. There are many useful cases for properties. For example:
+* <ul>
+* <li>Object Classification -- A particular document may be classified as important; it
+* must be read by the end of the day. Another document is marginally important; it
+* must be read by the end of the month. Yet another document is not marked
+* important. The classification of the document was invented by the user. It is not
+* part of the document’s type. However, a user may use a standard utility to find all
+* documents marked important.
+* <li>Object Usage Count -- An on-line service download utility increments a counter
+* every time an object has been downloaded by a user. The information is associated
+* with the object but it is not part of the object’s type.
+* </ul>
+* The property service implements objects supporting the PropertySet interface or the
+* PropertySetDef interface. The PropertySet interface supports a set of properties. A
+* property is two tuple of: <property_name, property_value>.
+* property_name is a string that names the property. property_value is of type
+* any and carries the value assigned to the property.<p>
+* The PropertySetDef interface is a specialization (subclass) of the PropertySet interface
+* that exposes the characteristics (or metadata) of each property (e.g. readonly or
+* read/write access). In general, this specification will use the term PropertySet to refer
+* to the collection of properties and will only use the term PropertySetDef when
+* explicitly referring to operations related to property metadata.
+* The association of properties with an object is considered an implementation detail.
+* This property service specification allows for the creation of PropertySets or
+* PropertySetDefs via factory interfaces, or an object may inherit the PropertySet or
+* PropertySetDef interfaces.<p>
+* <u>Client’s Model of Properties</u><p>
+* As with CORBA attributes, clients can get and set property values. However, with
+* properties, clients can also dynamically create and delete properties associated with an
+* object. Clients can manipulate properties individually or in batches using a sequence of
+* the Property data type called Properties.
+* In addition, when using objects that support the PropertySetDef interface, clients can
+* create and manipulate properties and their characteristics, such as the property mode.
+* The PropertySetDef interface also provides operations for clients to retrieve constraint
+* information about a PropertySet, such as allowed property types.
+* To aid in the client’s view of properties associated with an object, the client may
+* request a list of property names (PropertyNames) or the number of properties.
+* Iterators are used by the property service to return lists of properties when the number
+* of properties exceeds that which is expected by the client. Iterators contain operations
+* that allow clients fine-grained control over the enumeration of properties.
+* <p><u>Object’s Model of Properties</u><p>
+* Every object that wishes to provide a property service must support either the
+* PropertySet or PropertySetDef interface. PropertySet is the interface that provides
+* operations for defining, deleting, enumerating and checking for the existence of
+* properties. The PropertySetDef interface is a subclass of PropertySet that provides
+* operations to retrieve PropertySet constraints, define and modify properties with
+* modes, and to get and set property modes.<p>
+* Subclasses of PropertySet or PropertySetDef may impose restrictions on some or all of
+* the properties they store.<p>
+* Properties are intended to be the dynamic equivalent of CORBA attributes. As such,
+* the PropertySet interface provides exceptions to allow implementors to support the
+* concepts of a readonly property and a fixed property (i.e., a property that cannot be
+* deleted). In addition, the PropertySetDef interface provides operations for
+* implementors to declare their PropertySet constraints to clients. This mechanism is for
+* those implementations that need the dynamics of properties, yet want the interface
+* control of CORBA attributes.<p>
+* A PropertySet object may support the storage of property data types itself, or there
+* may be a “generic” PropertySet implementation that handles the parsing of property
+* data types and the memory management associated with storing properties. This is
+* considered an implementation detail.<p>
+* When a PropertySet object receives a define_property request from a client, it
+* must ensure there are no property_name conflicts and then retain the property
+* information such that the object can later respond to get_property,
+* delete_property, and is_property_defined requests from clients.
+* When a PropertySet object receives a define_property request to an existing
+* property from a client, it must ensure that the any TypeCode of the
+* property_value of the request matches the existing property’s any TypeCode.
+* Use of property modes within a PropertySet is an implementation issue, as clients can
+* neither access nor modify a property mode. For example, an implementation may
+* define some initial readonly properties at create time and raise the ReadOnlyProperty
+* exception if a client attempts to define a new property value.
+*/
+
+module CosPropertyService
+{
+	/*****************************************************/
+	/*  Data Types                                       */
+	/*****************************************************/
+
+	/**
+	* Defintion of the string type defining a property name.
+	*/
+
+	typedef string PropertyName;
+
+	/**
+	* A property is a two tuple of: <property_name, property_value>.
+	* property_name is a string, which names the property. property_value is of
+	* type any and carries the value assigned to the property. This data type is considered the
+	* base type for dealing with property data and is used throughout the PropertySet
+	* interface.<p>
+	* Clients can manipulate properties individually or in batches using a sequence of the
+	* Property data type called Properties or, when appropriate, a sequence of the
+	* PropertyName data type called PropertyNames.
+	*/
+
+	struct Property {
+		PropertyName property_name;
+ 		any property_value;
+ 	};
+
+
+	/**
+	* There are five mutually exclusive property mode types defined:
+	* <UL>
+	* <LI>Normal means there are no restrictions to the property. A client may define new
+	* values to an existing property or delete this property.
+	* <LI>Readonly means clients can only get the property information. However, a readonly
+	* property may be deleted.
+	* <LI>Fixed_Normal means the property cannot be deleted. However, clients are free to
+	* define new values to an existing property.
+	* <LI>Fixed_Readonly means the property cannot be deleted and clients can only get the
+	* property information.
+	* <LI>Undefined is used to signify PropertyNotFound when requesting a multiple get
+	* mode request. Using this on an operation that sets the mode of a property (e.g.
+	* set_mode or define_property_with_mode) will raise the
+	* UnsupportedMode exception.
+	* </UL>
+	* Restrictions on the property_mode_type field is an implementation issue. For
+	* example, a PropertySetDef implementation may choose to not support a client setting a
+	* property to the fixed_readonly mode.
+	*/
+
+	enum PropertyModeType {
+		normal,
+		read_only,
+		fixed_normal,
+		fixed_readonly,
+		undefined
+	};
+
+	/**
+	* A PropertyDef is a three tuple of: <property_name, property_value,
+	* property_mode_type>. property_name is a string, which names the
+	* property. property_value is of type any and carries the value assigned to the
+	* property. property_mode_type is an enumeration that defines the characteristics
+	* of the property. A property definition combines property characteristics (metadata) and
+	* property data information and is used in the PropertySetDefFactory and
+	* PropertySetDef interfaces. The PropertyDef data type provides clients access and
+	* control of property metadata.
+	*/
+
+	struct PropertyDef {
+		PropertyName property_name;
+		any property_value;
+		PropertyModeType property_mode;
+	};	
+
+	/**
+	* A PropertyMode is a two tuple of: <property_name,
+	* property_mode_type>. property_name is a string, which names the
+	* property. property_mode_type is an enumeration that defines the characteristics
+	* of the property. The PropertyMode data type is used in the PropertySetDef
+	* interface and provides clients access and control of property metadata.
+	*/
+
+	struct PropertyMode {
+		PropertyName property_name;
+		PropertyModeType property_mode;
+	};	
+
+
+	typedef sequence<PropertyName> PropertyNames;
+
+	typedef sequence<Property> Properties;
+
+	/**
+	* Clients can manipulate property definitions individually or in batches using a sequence
+	* of the PropertyDef data type called PropertyDefs.
+	*/
+
+	typedef sequence<PropertyDef> PropertyDefs;
+
+	/**
+	* Clients can manipulate property modes individually or in batches using a sequence of
+	* the PropertyMode data type called PropertyModes.
+	*/
+
+	typedef sequence<PropertyMode> PropertyModes;
+
+
+	typedef sequence<CORBA::TypeCode> PropertyTypes;
+
+	interface PropertyNamesIterator;
+	interface PropertiesIterator;
+	interface PropertySetFactory;
+	interface PropertySetDef;
+	interface PropertySet;
+
+	/*****************************************************/
+	/*  Exceptions                                       */
+	/*****************************************************/
+
+	/**
+	* Indicates that either the allowed_property_types,
+	* allowed_properties, or allowed_property_defs parameter could
+	* not be properly supported by this PropertySet or PropertySetDef.
+	*/
+
+	exception ConstraintNotSupported{};
+
+	/**
+	* Indicates that the supplied property_name is not valid. For example, a
+	* property_name of length 0 is invalid. Implementations may place other
+	* restrictions on property_name.
+	*/
+
+	exception InvalidPropertyName {};
+
+	/**
+	* Indicates that the user is trying to modify an existing property_name with an
+	* any TypeCode in a property_value that is different from the current.
+	*/
+
+	exception ConflictingProperty {};
+
+	/**
+	* Indicates that the supplied property_name is not in the PropertySet.
+	*/
+
+	exception PropertyNotFound {};
+
+	/**
+	* Indicates that a user is trying to define a property having an any TypeCode that is
+	* not supported by this PropertySet.
+	*/
+
+	exception UnsupportedTypeCode {};
+
+	/**
+	* Indicates that a user is trying to define a property not supported by this PropertySet.
+	*/
+
+	exception UnsupportedProperty {};
+
+	exception UnsupportedMode {};
+
+	/**
+	* Indicates that a user is trying to delete a property that the PropertySet 
+	* considers undeletable.
+	*/
+
+	exception FixedProperty {};
+
+	/**
+	* This indicates that a user is trying to modify a property that the PropertySet
+	* considers to be readonly.
+	*/
+
+	exception ReadOnlyProperty {};
+
+	enum ExceptionReason {
+		invalid_property_name,
+		conflicting_property,
+		property_not_found,
+		unsupported_type_code,
+		unsupported_property,
+		unsupported_mode,
+		fixed_property,
+		read_only_property
+	};
+
+	struct PropertyException {
+		ExceptionReason reason;
+		PropertyName failing_property_name;
+	};
+ 
+	typedef sequence<PropertyException> PropertyExceptions;
+
+	/**
+	* This exception is used to return a sequence of exceptions when dealing with the
+	* “batch” operations of define_properties and delete_all_properties
+	* in the PropertySet interface, define_properties_with_modes and
+	* set_property_modes in the PropertySetDef interface,
+	* create_initial_propertyset in the PropertySetFactory interface, and
+	* create_initial_propertysetdef in the PropertySetDefFactory interface.
+	* Each operation defines the valid entries that may occur in the sequence.
+	* A PropertyException is a two tuple of: <reason,
+	* failing_property_name>. reason is an enumeration reflecting one of the
+	* exceptions defined above. failing_property_name is a string, which names
+	* the property. The sequence of property exceptions returned as MultipleExceptions is
+	* the PropertyExceptions data type.
+	*/
+
+	exception MultipleExceptions {
+		PropertyExceptions exceptions;
+	};
+
+	/**
+	* PropertySet factory.
+	*/
+
+	interface PropertySetFactory
+	{
+
+		/**
+		* The create_propertyset operation returns a new PropertySet. It is considered
+		* an implementation issue as to whether the PropertySet contains any initial properties
+		* or has constraints.
+		*/
+
+		PropertySet create_propertyset();
+
+		/**
+		* The create_constrained_propertyset operation allows a client to create a
+		* new PropertySet with specific constraints. The modes associated with the allowed
+		* properties is considered an implementation issue.
+		*/
+
+		PropertySet create_constrained_propertyset(
+			in PropertyTypes allowed_property_types,
+			in Properties  allowed_properties)
+			raises(ConstraintNotSupported);
+
+		/**
+		* The create_initial_propertyset operation allows a client to create a new
+		* PropertySet with specific initial properties. The modes associated with the initial
+		* properties is considered an implementation issue.
+		*/
+
+		PropertySet create_initial_propertyset(
+			in Properties  initial_properties)
+			raises(MultipleExceptions);
+
+	};
+
+	/**
+	* PropertySetDef factory.
+	*/
+
+	interface PropertySetDefFactory
+	{
+		/**
+		* The create_propertysetdef operation returns a new PropertySetDef. It is
+		* considered an implementation issue as to whether the PropertySetDef contains any
+		* initial properties or has constraints.
+		*/
+
+		PropertySetDef create_propertysetdef();
+
+		/** 
+		* The create_constrained_propertysetdef operation allows a client to create a
+		* new PropertySetDef with specific constraints, including property modes.
+		*/
+
+		PropertySetDef create_constrained_propertysetdef(
+			in PropertyTypes allowed_property_types,
+			in PropertyDefs  allowed_property_defs)
+			raises(ConstraintNotSupported);
+
+		/** 
+		* The create_initial_propertysetdef operation allows a client to create a new
+		* PropertySetDef with specific initial properties, including property modes.
+		*/ 
+
+		PropertySetDef create_initial_propertysetdef(
+			in PropertyDefs  initial_property_defs)
+			raises(MultipleExceptions);
+	};
+
+
+	/**
+	* The PropertySet interface provides operations to define and modify properties, list and
+	* get properties, and delete properties.<p>
+	* The PropertySet interface also provides “batch” operations, such as
+	* define_properties, to deal with sets of properties as a whole. The execution of
+	* the “batch” operations is considered best effort (i.e., not an atomic set) in that not all
+	* suboperations need succeed for any suboperation to succeed.
+	* For define_properties and delete_properties, if any suboperation fails, a
+	* MultipleExceptions exception is returned to identify which property name had which
+	* exception.<p>
+	* For example, a client may invoke define_properties using three property
+	* structures. The first property could be accepted (added or modified), the second could
+	* fail due to an InvalidPropertyName, and the third could fail due to a
+	* ConflictingProperty. In this case a property is either added or modified in the
+	* PropertySet, and a MultipleExceptions is raised with two items in the
+	* PropertyExceptions sequence.<p>
+	* The get_properties and delete_all_properties “batch” operations utilize
+	* a boolean flag to identify that mixed results occurred and additional processing may be
+	* required to fully analyze the exceptions.<P>
+	* Making “batch” operations behave in an atomic manner is considered an
+	* implementation issue that could be accomplished via specialization of this property
+	* service.
+	*/
+
+	interface PropertySet
+	{
+
+		/**
+		* Will modify or add a property to the PropertySet. If the property already exists, then
+		* the property type is checked before the value is overwritten. If the property does not
+		* exist, then the property is added to the PropertySet.<p>
+		* To change the any TypeCode portion of the property_value of a property, a client
+		* must first delete_property, then invoke the define_property.<p>
+		*/
+
+		void define_property(
+			in PropertyName property_name,
+			in any property_value)
+			raises(	InvalidPropertyName,
+					ConflictingProperty,
+					UnsupportedTypeCode,
+					UnsupportedProperty,
+					ReadOnlyProperty);
+
+		/**
+		* Will modify or add each of the properties in Properties parameter to the
+		* PropertySet. For each property in the list, if the property already exists, then the
+		* property type is checked before overwriting the value. If the property does not exist,
+		* then the property is added to the PropertySet.<p>
+		* This is a batch operation that returns the MultipleExceptions exception if any define
+		* operation failed. 
+		*/
+
+		void define_properties(
+			in Properties nproperties)
+			raises(MultipleExceptions);
+
+		/**
+		* Returns the current number of properties associated with this PropertySet.
+		*/
+
+		unsigned long get_number_of_properties();
+
+		/**
+		* Returns all of the property names currently defined in the PropertySet. If the
+		* PropertySet contains more than how_many property names, then the remaining
+		* property names are put into the PropertyNamesIterator.
+		*/
+
+		void get_all_property_names(
+			in unsigned long how_many,
+			out PropertyNames property_names,
+			out PropertyNamesIterator rest);
+
+		/**
+		* Returns the value of a property in the PropertySet.
+		*/
+
+		any  get_property_value(
+			in  PropertyName property_name)
+			raises(	PropertyNotFound,
+					InvalidPropertyName);
+
+		/**
+		* Returns the values of the properties listed in property_names.
+		* When the boolean flag is true, the Properties parameter contains valid values for all
+		* requested property names. If false, then all properties with a value of type tk_void
+		* may have failed due to PropertyNotFound or InvalidPropertyName.<p>
+		* A separate invocation of get_property for each such property name is necessary to
+		* determine the specific exception or to verify that tk_void is the correct any
+		* TypeCode for that property name.<p>
+		* This approach was taken to avoid a complex, hard to program structure to carry mixed
+		* results.
+		*/
+
+		boolean get_properties(
+			in PropertyNames property_names,
+			out Properties nproperties);
+
+		/**
+		* Returns all of the properties defined in the PropertySet. If more than how_many
+		* properties are found, then the remaining properties are returned in
+		*/
+
+		void get_all_properties(
+			in unsigned long how_many,
+			out Properties nproperties,
+			out PropertiesIterator rest);
+
+		/**
+		* Deletes the specified property if it exists from a PropertySet.
+		*/
+
+		void delete_property(
+			in PropertyName property_name)
+			raises(	PropertyNotFound,
+					InvalidPropertyName,
+					FixedProperty);
+
+		/**
+		* Deletes the properties defined in the property_names parameter. 
+		* This is a batch operation that returns the MultipleExceptions exception 
+		* if any delete failed.
+		*/
+
+		void delete_properties(
+			in PropertyNames property_names)
+			raises(MultipleExceptions);
+
+		/**
+		* Variation of delete_properties. Applies to all properties.
+		* Since some properties may be defined as fixed property types, it may be that not all
+		* properties are deleted. The boolean flag is set to false to indicate that not all properties
+		* were deleted.<p>
+		* A client could invoke get_number_of_properties to determine how many
+		* properties remain. Then invoke get_all_property_names to extract the property
+		* names remaining. A separate invocation of delete_property for each such property
+		* name is necessary to determine the specific exception.<p>
+		* Note – If the property is in a PropertySetDef, then the set_mode operation could be
+		* invoked to attempt to change the property mode to something other than fixed before
+		* using delete_property.
+		* This approach was taken to avoid the use of an iterator to return an indeterminate
+		* number of exceptions.
+		*/
+
+		boolean delete_all_properties();
+
+		/**
+		* The is_property_defined operation returns true if the property is defined in the
+		* PropertySet, and returns false otherwise.
+		*/
+
+		boolean is_property_defined(
+			in PropertyName property_name)
+			raises(InvalidPropertyName);
+	};
+
+	/**
+	* The PropertySetDef interface is a specialization (subclass) of the PropertySet interface.
+	* The PropertySetDef interface provides operations to retrieve PropertySet constraints,
+	* define and modify properties with modes, and to get or set property modes.
+	* It should be noted that a PropertySetDef is still considered a PropertySet. The
+	* specialization operations are simply to provide more client access and control of the
+	* characteristics (metadata) of a PropertySet.<p>
+	* The PropertySetDef interface also provides “batch” operations, such as
+	* define_properties_with_modes, to deal with sets of property definitions as a
+	* whole. The execution of the “batch” operations is considered best effort (i.e., not an
+	* atomic set) in that not all suboperations need to succeed for any suboperation to
+	* succeed.<p>
+	* For define_properties_with_modes and set_property_modes, if any
+	* suboperation fails, a MultipleExceptions exception is returned to identify which
+	* property name had which exception.<p>
+	* For example, a client may invoke define_properties_with_modes using four
+	* property definition structures. The first property could be accepted (added or
+	* modified), the second could fail due to an UnsupportedMode, the third could fail due
+	* to a ConflictingProperty, and the fourth could fail due to ReadOnlyProperty. In this
+	* case a property is either added or modified in the PropertySetDef and a
+	* MultipleExceptions exception is raised with three items in the PropertyExceptions
+	* sequence.<p>
+	* The get_property_modes “batch” operation utilizes a boolean flag to signal that
+	* mixed results occurred and additional processing may be required to fully analyze the
+	* exceptions.<p>
+	* Making “batch” operations behave in an atomic manner is considered an
+	* implementation issue that could be accomplished via specialization of this property
+	* service.<p>
+	*/
+
+	interface PropertySetDef:PropertySet
+	{
+
+
+		/**
+		* Indicates which types of properties are supported by this PropertySet. If the output
+		* sequence is empty, then there is no restrictions on the any TypeCode portion of the
+		* property_value field of a Property in this PropertySet, unless the
+		* get_allowed_properties output sequence is not empty.
+		* For example, a PropertySet implementation could decide to only accept properties that
+		* had any TypeCodes of tk_string and tk_ushort to simplify storage processing and
+		* retrieval.
+		*/
+
+		void get_allowed_property_types(
+			out PropertyTypes property_types);
+          
+		/** 
+		* Indicates which properties are supported by this PropertySet. If the output sequence is
+		* empty, then there is no restrictions on the properties that can be in this PropertySet,
+		* unless the get_allowed_property_types output sequence is not empty.
+		*/
+
+		void get_allowed_properties(
+			out PropertyDefs property_defs);
+            
+		/** 
+		* This operation will modify or add a property to the PropertySet. If the property already
+		* exists, then the property type is checked before the value is overwritten. The property
+		* mode is also checked to be sure a new value may be written. If the property does not
+		* exist, then the property is added to the PropertySet.
+		* To change the any TypeCode portion of the property_value of a property, a client
+		* must first delete_property, then invoke the define_property_with_mode.
+		*/
+
+		void define_property_with_mode(
+			in PropertyName property_name,
+			in any property_value,
+			in PropertyModeType property_mode)
+			raises(	InvalidPropertyName,
+					ConflictingProperty,
+					UnsupportedTypeCode,
+					UnsupportedProperty,
+					UnsupportedMode,
+					ReadOnlyProperty);
+
+		/**
+		* This operation will modify or add each of the properties in the Properties parameter
+		* to the PropertySet. For each property in the list, if the property already exists, then the
+		* property type is checked before overwriting the value. The property mode is also
+		* checked to be sure a new value may be written. If the property does not exist, then the
+		* property is added to the PropertySet.
+		* This is a batch operation that returns the MultipleExceptions exception if any define
+		* operation failed.
+		*/
+
+		void define_properties_with_modes(
+			in PropertyDefs property_defs)
+			raises(MultipleExceptions);
+
+		/** 
+		* Returns the mode of the property in the PropertySet.
+		*/
+
+		PropertyModeType get_property_mode(
+			in  PropertyName property_name)
+			raises(	PropertyNotFound,
+					InvalidPropertyName);
+
+		/** 
+		* Returns the modes of the properties listed in property_names.
+		* When the boolean flag is true, the property_modes parameter contains valid values
+		* for all requested property names. If false, then all properties with a
+		* property_mode_type of undefined failed due to PropertyNotFound or
+		* InvalidPropertyName. A separate invocation of get_property_mode for each such
+		* property name is necessary to determine the specific exception for that property name.
+		* This approach was taken to avoid a complex, hard to program structure to carry mixed
+		* results.
+		*/
+
+		boolean get_property_modes(
+			in PropertyNames property_names,
+			out PropertyModes property_modes);
+
+		/** 
+		* Sets the mode of a property in the PropertySet.
+		* Protection of the mode of a property is considered an implementation issue. For
+		* example, an implementation could raise the UnsupportedMode when a client attempts
+		* to change a fixed_normal property to normal.
+		*/
+
+		void set_property_mode(
+			in PropertyName property_name,
+			in PropertyModeType property_mode)
+			raises(	InvalidPropertyName,
+					PropertyNotFound,
+					UnsupportedMode);
+
+		/** 
+		* Sets the mode for each property in the property_modes parameter. This is a batch
+		* operation that returns the MultipleExceptions exception if any set failed.
+		*/
+
+		void set_property_modes(
+			in PropertyModes property_modes
+		) raises(
+			MultipleExceptions
+		);
+
+	};
+
+	/** 
+	* A PropertySet maintains a set of name-value pairs. The get_all_property_names
+	* operation returns a sequence of names (PropertyNames). If there are additional names,
+	* the get_all_property_names operation returns an object supporting the
+	* PropertyNamesIterator interface with the additional names.
+	* The PropertyNamesIterator interface allows a client to iterate through the names using
+	* the next_one or next_n operations.
+	*/
+
+	interface PropertyNamesIterator
+	{
+
+		/** 
+		* The reset operation resets the position in an iterator to the first 
+		* property name, if one exists.
+		*/
+
+		void    reset();
+
+		/**
+		* The next_one operation returns true if an item exists at the current position in the
+		* iterator with an output parameter of a property name. A return of false signifies no
+		* more items in the iterator.
+		*/
+
+		boolean next_one(
+			out PropertyName property_name);
+
+		/** 
+		* The next_n operation returns true if an item exists at the current position in the
+		* iterator and the how_many parameter was set greater than zero. The output is a
+		* PropertyNames sequence with at most the how_many number of names. A return of
+		* false signifies no more items in the iterator.
+		*/
+
+		boolean next_n (
+			in  unsigned long how_many,
+			out PropertyNames property_names);
+
+		/** 
+		* The destroy operation destroys the iterator.
+		*/
+
+		void    destroy();
+	};
+
+	/**
+	* A PropertySet maintains a set of name-value pairs. The get_all_properties
+	* operation of the PropertySet interface returns a sequence of Property structures
+	* (Properties). If there are additional properties, the get_all_properties operation
+	* returns an object supporting the PropertiesIterator interface with the additional
+	* properties.<p>
+	* The PropertiesIterator interface allows a client to iterate through the name-value pairs
+	* using the next_one or next_n operations.
+	*/
+
+	interface PropertiesIterator
+	{
+
+		/**
+		* The reset operation resets the position in an iterator to the first 
+		* property, if one exists.
+		*/
+
+		void    reset();
+
+		/**
+		* The next_one operation returns true if an item exists at the current position in the
+		* iterator with an output parameter of a property. A return of false signifies no more
+		* items in the iterator.
+		*/
+
+		boolean next_one(
+			out Property aproperty);
+
+		/**
+		* The next_n operation returns true if an item exists at the current position in the
+		* iterator and the how_many parameter was set greater than zero. The output is a
+		* properties sequence with at most the how_many number of properties. A return of
+		* false signifies no more items in the iterator.
+		*/
+
+		boolean next_n(
+			in unsigned long how_many,
+			out Properties nproperties);
+
+		/**
+		* The destroy operation destroys the iterator.
+		*/
+
+		void    destroy();
+	};
+};
+
+#endif /* ifndef _COS_PROPERTY_SERVICE_IDL_ */

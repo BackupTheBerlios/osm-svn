@@ -1,0 +1,87 @@
+/**
+ */
+
+#ifndef _OSM_DOMAIN_PSDL_
+#define _OSM_DOMAIN_PSDL_
+#include <NamingAuthority.idl>
+
+#pragma prefix "osm.net"
+
+module domain {
+
+    //
+    // Domain
+    //
+
+   /**
+    * Storage type interface under which information defining a specific domain 
+    * is stored.
+    */
+    abstract storagetype DomainStorage 
+    {
+
+       /**
+        * Value qualifying the type of address.
+        * @see org.omg.NamingAuthority.RegistrationAuthority
+        */
+        readonly state long authority;
+
+       /**
+        * The domain address.
+        */
+        readonly state string naming_entity;
+
+       /**
+        * Returns the <code>DomainStorage</code> state in the 
+        * form of a <code>omg.omg.AuthorityId</code> struct.
+        * @return AuthorityId the domain identifier
+        */
+        NamingAuthority::AuthorityId authority_id();
+
+    };
+
+   /**
+    * Storage home interface for the DomainStorage storage type.
+    */
+    abstract storagehome DomainStorageHome of DomainStorage
+    {
+       /**
+        * Locates a domain storage instance given an authority
+	  * type and authority name value.
+        */
+	  key domain_key( authority, naming_entity );
+
+       /**
+        * Creation of a new domain storage instance with 
+	  * the supplied domain type and value.
+        * @param authority authority type
+        * @param naming_entity the authority name value
+        */
+	  factory create( authority, naming_entity );
+    };
+
+    //
+    // DomainStorageBase 
+    //
+
+   /**
+    * Storage type implementation under which information defining a 
+    * specific domain is maintained.
+    */
+    storagetype DomainStorageBase
+    implements DomainStorage
+    { 
+    };
+
+   /**
+    * Storage home implementation under which <code>DomainStorage</code>
+    * instances are maintained.
+    */
+    storagehome DomainStorageHomeBase of DomainStorageBase
+    implements DomainStorageHome
+    { 
+    };
+
+};
+
+#endif // _OSM_DOMAIN_PSDL_

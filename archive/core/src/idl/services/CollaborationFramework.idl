@@ -1,0 +1,1563 @@
+/*
+ * CommunityFramework.idl
+ *
+ * Copyright 2000-2001 OSM SARL.
+ * Rights to world-wide unlimited distribution of version 2.0 
+ * granted to the Object Management Group by OSM SARL. This 
+ * version (2.1 contains supplimentary specifications that are
+ * copyright OSM SARL.  OSM reserves all rights pending incorporation 
+ * all or part of these supplimentary specifications under future 
+ * revisions of the OMG Electronic Commerce Domain Specifications.
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 2.1 2 APR 2001
+ */
+
+// Changes:
+// SJM, 26 DEC 2000, changed the defintion of Label valuetypes
+// due to runtime failure on JBroker and OpenORB platforms (see below).
+// SJM replaced "state" with "processor_state" due to PSDL keyword 
+// conflict in the StateDescriptor valuetype
+
+#ifndef _COLLABORATION_IDL_
+#define _COLLABORATION_IDL_
+#include <CommunityFramework.idl>
+#pragma prefix "omg.org"
+
+module CollaborationFramework{
+
+        #pragma version CollaborationFramework 2.0
+
+	//  forward declarations
+
+	abstract valuetype Action;
+	abstract valuetype Transitional;
+	abstract valuetype Guard;
+	abstract valuetype Proof;
+	abstract valuetype Evidence;
+	abstract valuetype UsageDescriptor;
+
+	valuetype State;
+	valuetype Initialization;
+	valuetype Trigger;
+	valuetype Transition;
+	valuetype SimpleTransition;
+	valuetype LocalTransition;
+	valuetype TerminalTransition;
+	valuetype CompoundTransition;
+	valuetype Referral;
+
+	abstract interface Slave;
+	abstract interface Master;
+	abstract interface Vote;
+	abstract interface Engagement;
+	abstract interface Collaboration;
+	abstract interface Directive;
+
+	interface Encounter;
+	interface Processor;
+	interface VoteProcessor;
+	interface EngagementProcessor;
+	interface CollaborationProcessor;
+
+	// typedefs
+
+	valuetype Label string; // SJM: was valuetype Label CommunityFramework::Label;
+	valuetype ProcessorState Session::task_state;
+	valuetype ResultID unsigned long ;
+	valuetype TypeCode CORBA::TypeCode;
+	valuetype ResultClass boolean;
+
+	valuetype States sequence <State> ;
+	valuetype Triggers sequence <Trigger> ;
+	valuetype Initializations sequence <Initialization> ;
+	valuetype UsageDescriptors sequence <UsageDescriptor> ;
+	valuetype Slaves sequence <Slave> ;
+	valuetype Directives sequence <Directive>;
+
+	// structures
+
+/**
+ * Duration is a utility valuetype that contains a possibly null UTC time interval.
+ */
+
+	valuetype Duration {
+
+    	     /**
+    		* UTC time interval.
+    		*/
+
+		public TimeBase::TimeT value;
+	};
+
+     /**
+      * Structure defining the proportion of votes registered for a vote to succeed.
+	* The numerator value is the numberator of the fraction defined by this value 
+	* divided by the demoninator value.  The denominator value is the denominator 
+	* of the fraction.
+      */
+
+	struct VoteCeiling{
+		short numerator;
+		short denominator;
+	};
+
+     /**
+      * Enumeration of vote policy values - corresponding to AFFIRMATIVE_MAJORITY or
+	* NON_ABSTAINING_MAJORITY.
+      */
+
+	enum VotePolicy{
+		AFFIRMATIVE_MAJORITY,
+		NON_ABSTAINING_MAJORITY
+	};
+
+/**
+ * Empty Proof valuetype that serves as a base type for 
+ * an implementation specific Proof valuetype.
+ */
+
+	abstract valuetype Proof {};
+
+/**
+ * Empty Evidence valuetype subject to specialization by an implementation.
+ */ 
+
+	abstract valuetype Evidence {};
+
+/**
+ * Enumeration of the possible arguments under a vote operation - possible
+ * values include YES, NO and ABSTAIN.
+ */
+
+	enum VoteDescriptor{
+		NO,
+		YES,
+		ABSTAIN
+	};
+
+/**
+ * Structure declaring the result of a votting process.
+ */
+
+	valuetype VoteStatement : 
+		Evidence 
+		{
+
+    /**
+     *
+     * The vote result.
+     */
+		public VoteDescriptor vote;
+	};
+
+/**
+ * Value returned to a client on receipt of a vote registration.
+ */
+
+	valuetype VoteReceipt :
+		Proof 
+		{
+
+    /**
+     * Timestamp of the vote registration act.
+     */
+		public Session::Timestamp timestamp;
+    /**
+     * A statement of the vote submitted by the client.
+     */
+		public VoteStatement statement;
+	};
+
+/**
+ * Doc pending.
+ */
+
+	valuetype VoteCount : 
+		Proof
+		{
+		public Session::Timestamp timestamp;
+		public long yes;
+		public long no;
+		public long abstain;
+	};
+
+/**
+ * Doc pending.
+ */
+
+	valuetype Timeout{
+		public Label identifier; 
+		public Session::Timestamp timestamp;	
+	};
+
+/**
+ * Doc pending.
+ */
+
+	valuetype TimeoutSequence sequence <Timeout> ;
+
+     /**
+      * Enumeration of the implicit role guarding the invocation of a trigger - values
+      * include INITIATOR (the last user to invoke a trigger), RESPONDENT (any user other
+      * than the initiator) and PARTICIPANT (either initiator or respondent).
+      */
+
+	enum TriggerMode{
+		INITIATOR, 
+		RESPONDENT,
+		PARTICIPANT
+	};
+
+/**
+ * Completion is a valuetype contained within StateDescriptor. When a processor completes
+ * (signalled by the establishment of the closed processor state), the completion field contains a
+ * Completion instance that qualifies the closed state as either a logical business level success or
+ * failure. For example, a processor supporting vote aggregation can declare a distinction between
+ * a successful and unsuccessful result towards a client. In this example, failure could arise as a
+ * result of an insufficient number of affirmative votes, or through failure of the group to establish
+ * quorum. In both cases, the failure is a business level failure and should not be confused with
+ * technical or transaction failure. An implementation dependant identifier may be attributed to a
+ * Completion instance to further classify a success or fail result. Prior to a processor reaching a
+ * closed state the completion field shall return a null value.
+ */
+
+	valuetype Completion
+		{
+
+   /**
+    * An implementation specific identifier of a completion state.
+    */
+		public ResultClass result;
+
+   /**
+    * A boolean value indicating a business level notion of success or failure of a process.
+    */
+
+		public ResultID code;
+	};
+
+/**
+ * Processor state is accessible through the state attribute. The state attribute returns an instance of
+ * StateDescriptor, a valuetype containing an enumeration value of the process state equivalent to
+ * the state model defined under Task and Session specification (refer Task and Session, Task
+ * Specification). StateDescriptor also contains a state field named problems that exposes any
+ * standing problems concerning processor configuration or execution.
+ */
+
+	valuetype StateDescriptor 
+		{
+
+    /**
+    * The state of the processor at a general level (equivilent to the general
+    * task state enumeration values.
+    */
+
+		// SJM replaced "state" with "processor_state" due to PSDL conflict
+		public ProcessorState processor_state; 
+
+   /**
+    * A completion status (SUCCESS or FAILURE and result id).  May be null if 
+    * the processor exposing this instance has not completed execution.
+    */
+
+		public CollaborationFramework::Completion completion;
+
+   /**
+    * A sequence of problems raised by the processor presenting normal execution.
+    */
+
+		public CommunityFramework::Problems problems;
+
+	};
+
+	// exceptions
+
+	exception InvalidTrigger{ 
+		CommunityFramework::Problem problem;
+		Label identifier;
+	};
+
+	exception ApplyFailure{ 
+		CommunityFramework::Problem problem;
+		Label identifier;
+	};
+
+	exception InitializationFailure{ 
+		CommunityFramework::Problem problem;
+		Label identifier;
+	};
+
+	exception EngagementProblem{ 
+		CollaborationFramework::Evidence evidence;
+		CommunityFramework::Problem problem;
+	};
+
+/**
+ * Iterator of object refernces implementing the Slave interface.
+ */
+
+	interface SlaveIterator : CosCollection :: Iterator { }; 
+
+/**
+ * The Execution link defined under the Task and Session specification declares an abstract
+ * association between an AbstractResource, acting as a processor, and a Task. The abstract
+ * Execution relationship is used as the base for definition of an abstract <code>Coordination</code> relationship.
+ * Coordination serves as the base for the concrete links named <code>Monitors</code>, <code>Coordinates</code>, and
+ * <code>CoordinatedBy</code>.
+ */
+
+	abstract valuetype Coordination : Session::Execution{ };
+
+/**
+ * The Execution link defined under the Task and Session specification declares an abstract
+ * association between an AbstractResource, acting as a processor, and a Task. The abstract
+ * Execution relationship is used as the base for definition of an abstract Coordination relationship.
+ * Coordination serves as the base for the concrete links named Monitors, Coordinates, and
+ * CoordinatedBy.
+ */
+
+	valuetype Monitors : Coordination {
+
+   /**
+    * A reference to a Processor that the Task holding this link monitors.
+    */
+
+		public Processor resource_state;
+	};
+
+/**
+ * The Coordinates link is a type of Monitors (which in turn is a type of Execution) that 
+ * references the Processor that a Task (or more typically an Encounter) holding this link 
+ * coordinates.  A Task (or Encounter) may coordinate at most one Processor.
+ */
+
+	valuetype Coordinates : Monitors {}; 
+
+/**
+ * The Execution link defined under the Task and Session specification declares an abstract
+ * association between an AbstractResource, acting as a processor, and a Task. The abstract
+ * Execution relationship is used as the base for definition of an abstract Coordination relationship.
+ * Coordination serves as the base for the concrete links named Monitors, Coordinates, and
+ * CoordinatedBy.
+ */
+
+	valuetype CoordinatedBy : Coordination { 
+
+    /**
+    * The Task that Processor holding this link is coordinated by.
+    */
+
+		public Session::Task resource_state;
+	};
+
+/**
+ * Management extends the Link interface and is used by the Controls and ControlledBy Link types.
+ */ 
+
+	abstract valuetype Management : Session::Link{ };
+
+/**
+ * Controls is a link held by an implementation of Master that references zero to many Slave
+ * instances.
+ */
+
+	valuetype Controls : Management {
+
+   /**
+    * A reference to an AbstractResource implementing the Slave interface.
+    * An implementation of Master may hold 0..* Controls link instances,
+    * representing the strong aggregation relationship from a Master to
+    * subsidiary Slaves.
+    */
+
+		public Slave resource_state;
+
+	};
+
+/**
+ * ControlledBy is a link held by a Slave implementation that references zero to one
+ * Master instances. The relationship from master to slave is one of strong aggregation – removal of
+ * the Master implies removal of all Slaves. Using the control relationship, it is possible for a Processor
+ * to expose a sub-process hierarchy that can be navigated by a client.
+ */
+
+	valuetype ControlledBy : Management {
+
+   /**
+    * A reference to an AbstractResource implementing the Master interface.
+    * An implementation of Master may hold 0..1 ControlledBy link instances
+    * representing the parent processor.
+    */
+
+		public Master resource_state;
+	};
+
+
+/**
+ * Encounter is a specialization of Task structured to support collaborative 
+ * association of a set of users within the context of a particular process or 
+ * sequence of processes.
+ */
+
+	interface Encounter : 
+		Session::Task,
+		CommunityFramework::Membership
+		{
+	};
+
+/**
+ * EncounterCriteria is a Criteria valuetype used to construct a new Encounter 
+ * instance using a ResourceFactory.  EncounterCriteria cointains a MembershipModel 
+ * that defines the MembershipPolicy applicable to the created Encounter.
+ */
+
+	valuetype EncounterCriteria :
+		CommunityFramework::Criteria
+		{
+
+   /**
+    * The membership model instance to be associated to the created Encounter.
+    */
+
+		public CommunityFramework::MembershipModel model;
+	};
+
+/**
+ * Interface implemented by classes acting in the role of a usage description.
+ * The ProcessorModel valuetype defines a set of usage (input and output) towards its controlling
+ * Task. These declarations are expressed as a set of UsageDescriptor instances (equivalent to the
+ * declaration of argument parameters). Collectively, the set of UsageDescriptor instances declare
+ * the naming convention to be applied to tagged Usage links held by the co-ordinating Task. Usage
+ * declarations are defined through the valuetypes InputDescriptor and OutputDescriptor. Both
+ * valuetypes contain the declaration of a tag name (corresponding to the usage tag string) and a
+ * type field containing a TypeCode value. The OutputDescriptor contains an additional required
+ * field that if true, states that the link must exist or be supplied. If false, the input 
+ * declaration can be considered as an optional argument.
+ */
+
+	abstract valuetype UsageDescriptor { };
+
+/**
+ * Declaration of an input resource (consumed) that a processor requires on its associated task.
+ */
+
+	valuetype InputDescriptor :
+		UsageDescriptor
+		{
+
+        #pragma version InputDescriptor 2.1
+
+   /**
+    * The tag value of a usage consumption link to be established
+    * on a processor.
+    */
+
+		public string tag;
+
+   /**
+    * True if the consumption association is mandatory, else the association
+    * is optional.
+    */
+
+		public boolean required;
+
+   /**
+    * If true, an existing consumption relationship with a corresponding tag name
+    * can be used to satisfy the constraint.  If false, the existing association must be 
+    * replaced with a new association.
+    */
+
+		public boolean implied;
+
+   /**
+    * The type of resource to be supplied under the usage relationship.
+    */
+
+		public TypeCode type;
+
+   /**
+    * A criteria that (possibly null) to be used to create an input resource. 
+    * @since 2.1
+    */
+
+		public CommunityFramework::Criteria criteria;
+
+	};
+
+/**
+ * OutputDescriptor defines the production relationships that will be 
+ * established by the processor on the controlling Task that it is 
+ * associated to under the ControlledBy link.
+ */
+
+	valuetype OutputDescriptor :
+		UsageDescriptor
+		{
+		public string tag;
+		public TypeCode type;
+	};
+
+/**
+ * Doc pending.
+ */
+
+	valuetype ProcessorModel :
+		CommunityFramework::Control
+		supports CommunityFramework::Model
+		{
+		public UsageDescriptors usage;
+	};
+
+/**
+ * The abstract interfaces Master and Slave are used in conjunction with an abstract valuetype
+ * named Management that defines the base type for the concrete links Controls and ControlledBy.
+ * Controls is a link held by an implementation of Master that references zero to many Slave
+ * instances. ControlledBy is a link held by a Slave implementation that references zero to one
+ * Master instances. The relationship from master to slave is one of strong aggregation – removal of
+ * the Master implies removal of all Slaves. Using the control relationship, it is possible for a Processor
+ * to expose a sub-process hierarchy that can be navigated by a client. Both Master and Slave
+ * define convenience operations concerning access to the respective sub-processors and parent
+ * processor. Master interface defines the slaves operation that returns an iterator and a sequence of
+ * Slave sub-processors. The maximum length of the Slaves sequence is controlled by the input
+ * argument max_number. The Slave interface defines the readonly attribute master that returns a
+ * reference to the controlling Master. In the event of a top-level processor, the master attribute will
+ * return a null object reference.
+ *
+ * @see Slave
+ * @see Controls
+ * @see ControlledBy
+ */
+
+	abstract interface Master {
+
+   /**
+    * Reurns an interator and slave sequence representing the slaves
+    * that this master is coordinating.
+    * @return SlaveIterator iterator of types supporting slave that 
+    * are coordinated by this master.
+    * @param max_number int number of slave instances to include in the
+    * slaves inout value.
+    * @param slaves SlavesHolder sequence of Slave references.
+    */
+
+		SlaveIterator slaves (
+			in long max_number,
+			out Slaves slaves
+		);
+	};
+
+/**
+ * The abstract interfaces Master and Slave are used in conjunction with an abstract valuetype
+ * named Management that defines the base type for the concrete links Controls and ControlledBy.
+ * Controls is a link held by an implementation of Master that references zero to many Slave
+ * instances. ControlledBy is a link held by a Slave implementation that references zero to one
+ * Master instances. The relationship from master to slave is one of strong aggregation – removal of
+ * the Master implies removal of all Slaves. Using the control relationship, it is possible for a Processor
+ * to expose a sub-process hierarchy that can be navigated by a client. Both Master and Slave
+ * define convenience operations concerning access to the respective sub-processors and parent
+ * processor. Master interface defines the slaves operation that returns an iterator and a sequence of
+ * Slave sub-processors. The maximum length of the Slaves sequence is controlled by the input
+ * argument max_number. The Slave interface defines the readonly attribute master that returns a
+ * reference to the controlling Master. In the event of a top-level processor, the master attribute will
+ * return a null object reference.
+ *
+ * @see Slave
+ * @see Controls
+ * @see ControlledBy
+ */
+
+	abstract interface Slave {
+
+   /**
+    * Returns the Master controlling this Slave.
+    * @return Master controller
+    */
+
+		readonly attribute CollaborationFramework::Master master;
+	};
+
+/**
+ * A processor is responsible for applying input arguments (associated consumed and produced
+ * resource selection) declared by a co-ordinating Task in the execution of a service. Operations
+ * exposed by Processor are largely defined by the implied semantics documented under the Task
+ * and Session Specification (formal/00-05-03). A processor is responsible for notification of state
+ * change towards its associated Task and handling start, suspend and stop requests in accordance
+ * with the Task Session state model. Processor inherits from AbstractResource (consistent with the
+ * Task and Session Specification of a processor).
+ * <p>As a Simulator, a Processor exposes a valuetype that supports the Model interface. A Processor
+ * specialisation is required to return an instance of ProcessorModel under the model operation from
+ * the inherited abstract Simulator interface. Through inheritance of both Slave and Master abstract
+ * interfaces, a Processor can expose subsidiary and parent processors associated through
+ * Coordination links to a single managing Task. As such, a Task can be view as the coordinator of
+ * the processor hierarchy.
+ */
+
+
+	interface Processor :
+		Session::AbstractResource,
+		CommunityFramework::Simulator,
+		Master, Slave
+		{
+
+	     /**
+		* Declaration of the state of a Processor
+		* @see State Descriptor.
+		*/
+
+		readonly attribute StateDescriptor _state; // added _ (PSDL conflict)
+
+	     /**
+		*The coordinator operation returns the Task acting
+		* as coordinator of the processor. If no task is
+		* associated to the processor, the operation raises
+		* the ResourceUnavailable exception.
+		* @return Task
+		*/
+
+		Session::Task coordinator(
+		) raises (
+			Session::ResourceUnavailable
+		);
+
+	     /**
+		* Operations returns a sequence of Problem
+		* instances concerning configuration of a processor
+		* relative to the constraints defined under the
+		* associated ProcessorModel.
+		* @return org.omg.CommunityFramework::Problem[] 
+		*/
+
+		CommunityFramework::Problems verify( );
+
+	     /**
+		* Moves a processor into the running state.
+		* Semantically equivalent to the Task start
+		* operation (refer Task and Session, Task
+		* specification). If the start operation raises the
+		* CannotStart exception, a client can access
+		* supplementary information under the
+		* StateDescriptor instance returned from the
+		* processor state attribute.
+		*
+		* @exception org.omg.Session.CannotStart
+		* @exception org.omg.Session.AlreadyRunning
+		*/
+
+		void start ( 
+		) raises (
+			Session::CannotStart, 
+			Session::AlreadyRunning
+		);
+ 
+ 	     /**
+	 	* Moves a processor into a suspended state.
+		* Semantically equivalent to the Task suspend
+		* operation (refer Task and Session, Task
+		* specification).
+		*
+		* @exception org.omg.Session.CannotSuspend
+		* @exception org.omg.Session.CurrentlySuspended
+		*/
+
+		void suspend ( 
+		) raises (
+			Session::CannotSuspend, 
+			Session::CurrentlySuspended
+		);
+
+	     /**
+		* Stops a processor. Semantically equivalent to the
+		* Task stop operation (refer Task and Session, Task
+		* specification).
+		* 
+		* @exception org.omg.Session.CannotStop
+		* @exception org.omg.Session.NotRunning
+		*/
+
+		void stop ( 
+		) raises (
+			Session::CannotStop, 
+			Session::NotRunning
+		);
+	};
+
+ /**
+  * Declaration of processor consumption and production usage constraints within 
+  * a contained ProcessorModel. An implementation of ResourceFactory is responsible 
+  * for assessing the type of Model contained within a ProcessorCriteria to determine 
+  * the type of Process to create. For example, a ProcessorCriteria containing an instance of
+  * CollaborationModel will return a type of CollaborationProcessor. 
+  */
+
+	valuetype ProcessorCriteria :
+		CommunityFramework::Criteria
+		{
+
+   /**
+    * The model that qualifies and controls processor behaviour. 
+    */
+
+		public ProcessorModel model;
+	};
+
+/**
+ * The engage abstract interface (inherited under the EngagementProcessor
+ * interface) is used to facilitate the establishment of Proof of agreement 
+ * between a set of collaborating clients. EngagementProcessor
+ * contains an EngagementModel, exposed through the inherited model operation from the abstract
+ * Model interface. EngagementModel contains a root Role used to qualify the number of
+ * engagements required for an engagement process to be considered as binding.
+ *
+ * @see EngagementProcessor
+ * @see EngagementModel
+ */
+
+	abstract interface Engagement 
+		{
+
+   /**
+    * The engage operation allows a client to provide evidence of 
+    * of contractual engagement in exchenge for proof of engagement
+    * in accordance with the EngagementPolicyassociated to a 
+    * concrete EngagementProcessor
+    * 
+    * @return Proof - implementation specific proof of engagement
+    * @param evidence Evidence - implementation specific evidence of contractual engagement
+    * @exception EngagementProblem
+    */
+
+		Proof engage( 
+			in CollaborationFramework::Evidence evidence 
+		) raises (
+			EngagementProblem
+		);
+	};
+
+	/**
+	* An EngagementProcessor supports the registration of Evidence by a client and return of Proof of
+	* the act of engagement. Proof and Evidence are abstract valuetypes that may be specialized to
+	* support implementation specific engagement models. Engagement policy, also implementation
+	* specific is exposed as an instance of EngagementModel by the inherited model operation from
+	* the abstract Model interface under EngagementProcessor. New instances of
+	* EngagementProcessor may be created using a ProcessorCriteria passed as an argument to a
+	* ResourceFactory, where the contained model is an instance of EngagementModel.	
+	*/
+
+	interface EngagementProcessor :
+		Engagement,
+		Processor
+		{
+	};
+
+/**
+ * EngagementModel extends ProcessorModel through the addition of three values, a Role used to
+ * qualify the engagement context, a declaration of the maximum lifetime of an Engagement
+ * process, and a value indicating if the engagement has a unilateral implication on the members of
+ * an associated Encounter.
+ */
+
+ 	valuetype EngagementModel : 
+		ProcessorModel
+		{
+
+   /**
+    * The value of quorum under this Role indicates the number of engagements
+    * required following which engagement is considered as binding.
+    */
+
+		public CommunityFramework::Role role;
+
+   /**
+    * The maximum lifetime of the process commencing on transition of the
+    * process to a running state. A zero, negative or null value is equivalent to
+    * no constraint on process lifetime. 
+    */
+
+		public Duration lifetime; 
+
+   /**
+    * If true, the process of engagement shall be considered as binding on all
+    * members. If false, then the act of engagement is considered as binding
+    * on members that have actively engaged. Members that have not
+    * invoked the engage operation shall not be considered as bound to the
+    * engagement. 
+    */
+
+		public boolean unilateral; 
+	};
+
+/**
+ * Vote declares an method named vcount that returns a VoteCount instance which
+ * must be updated following each valid invocation of the vote operation.  The
+ * vote operation supports registration of a VoteStatement and returns a VoteReceipt 
+ * to a client. 
+ */
+
+	abstract interface Vote
+		{
+
+   /**
+    * Summation of yes, no and abstain votes registered with a vote processor.
+    */
+
+		readonly attribute VoteCount vcount;
+
+   /**
+    * Registration of a vote by a client in return for a receipt.  Votes are 
+    * registered through the supplied YES, NO or ABSTAIN VoteDescriptor value.
+    * Vote count and agggation is defined by a VoteModel associated to a 
+    * VoteProcessor inheriting this interface.
+    * 
+    * @return VoteReceipt proof of vote
+    * @param value VoteDescriptor a value of YES, NO or ABSTAIN
+    */
+
+		VoteReceipt vote( 
+			in VoteDescriptor value
+		);
+	};
+
+     /**
+	* A VoteProcessor is a type of Processor supporting operations defined under the abstract Vote
+	* interface. Vote exposes an attribute named vcount that returns a VoteCount instance. The
+	* VoteCount instance must be updated following each valid vote invocation. The vote operation
+	* supports registration of a VoteStatement and returns a VoteReceipt to a client. New instances of
+	* VoteProcessor may be created using a ProcessorCriteria passed as an argument to a
+	* ResourceFactory where the contained ProcessorCriteria model is an instance of VoteModel.
+	*/
+
+	interface VoteProcessor : 
+		Vote,
+		Processor
+		{
+	};
+
+/**
+ * Doc pending.
+ */
+
+      valuetype VoteModel : 
+		ProcessorModel
+		{
+		public VoteCeiling ceiling;
+		public VotePolicy policy;
+		public boolean single;
+		public Duration lifetime; 
+	};
+
+/**
+ * ApplyArgument is a valuetype that contains the declaration of a Usage link tag name and a value containing a
+ * reference to an AbstractResource to be associated to the Encounter coordinating the Collaboration
+ * under a new or existing usage link with the same tag name.
+ */
+
+	valuetype ApplyArgument 
+		{
+
+   /**
+    * An ApplyArgument is a valuetype that can be passed into an apply
+    * operation. The tag value must be equal to a tag value declared under
+    * the processors input usage list (declaration of InputDescriptor values
+    * exposed by ProcessorModel usage field). Following assessment of any
+    * preconditions associated with a referenced Trigger, an implementation
+    * of apply will create or replace an existing consumption link resource
+    * value on the associated Task with the value field of the ApplyArgument
+    * valuetype.
+    */
+
+		public CollaborationFramework::Label label; // identifies usage descriptor
+
+   /**
+    * The AbstractResource to associate under a tagged consumption link with
+    * the Task associated as coordinator to the Collaboration.
+    */
+
+		public Session::AbstractResource value;
+	};
+
+/**
+ * Sequence of ApplyArgument instances.
+ */
+
+	valuetype ApplyArguments sequence <ApplyArgument> ;
+
+
+/**
+ * Operations defined
+ * under the abstract Collaboration interface provide the ability for a client to modify the
+ * state of the processor relative to constraints established under the associated model. In the case of
+ * CollaborationProcessor, the model defines a nested state hierarchy, and associated transitions. A
+ * client can establish an initial collaborative state though invocation of the apply operation on the
+ * Collaboration interface, passing the identifier of a preferred initialization, following which
+ * members of an associated membership can invoke the apply and apply_arguments operations to
+ * achieve modification of the collaborative context through state-transitions. Following initialization,
+ * the collaboration is established in a running state exposed under the Collaboration active_state
+ * attribute. The active_state attribute is the identifier of a deepest state in a CollaborationModel
+ * state hierarchy referenced by a proceeding initialization or transition. Establishing an active state
+ * has an important implication on the membership associated to the collaboration. Every state from
+ * the deepest state referenced by the active_state attribute, up through all containing states, until
+ * the highest root-state are considered as active. Once a state is classified as active, any Trigger
+ * instances (transition holders) associated with that state are considered as candidates for
+ * subsequent reference under the apply operation.
+ */
+
+	abstract interface Collaboration
+		{ 
+
+   /**
+    * Identifier of the state resulting from an
+    * initialization or subsequent transition.
+    * All states between the active state
+    * and the root top level state constitute
+    * the active state path.
+    *
+    * @return Label of the current active state
+    */
+
+		readonly attribute Label active_state;
+
+   /**
+    * A sequence of Timeout valuetypes
+    * corresponding to current activated
+    * timeout conditions in place.
+    *
+    * @return TimeoutSequence of active timeout delcarations
+    */
+
+		readonly attribute TimeoutSequence timeout_list;
+
+   /**
+    * Used by a client to modify the state of a
+    * collaborative process by passing in a reference to a
+    * Trigger in the active state path. Typically used to
+    * invoke a transition resulting in the modification of the
+    * collaboration context.
+    * @param identifier String correponding to the label of the trigger to invoke
+    * @exception InvalidTrigger if the supplied label does not exist within the associated model
+    * @exception ApplyFailure if apply constraints restict trigger activation
+    */
+
+		void apply( 
+			in Label identifier
+		) raises (
+			InvalidTrigger,
+			ApplyFailure
+		);
+
+   /**
+    * Equivalent to apply except that the operation takes
+    * a series of arguments corresponding to change
+    * request to be applied to the usage relationships
+    * associated to the Encounter coordinating the
+    * Collaboration.
+    * @param identifier String correponding to the label of the trigger to invoke
+    * @param args ApplyArgument[] array of apply arguments to suppliment consumption
+    * and production relationships on the associated process task
+    * @exception InvalidTrigger if the supplied label does not exist within the associated model
+    * @exception ApplyFailure if apply constraints restict trigger activation
+    * @see #apply(String)
+    */
+
+		void apply_arguments(
+			in Label identifier,
+			in ApplyArguments args
+		) raises (
+			InvalidTrigger,
+			ApplyFailure
+		);
+ 	};
+
+     /**
+	* CollaborationProcessor is type of Processor that contains an instance of CollaborationModel
+	* (exposed under the model operation on the inherited Simulator interface). Operations defined
+	* under the inherited abstract Collaboration interface provide the ability for a client to modify the
+	* state of the processor relative to constraints established under the associated model. In the case of
+	* CollaborationProcessor, the model defines a nested state hierarchy, and associated transitions. A
+	* client can establish an initial collaborative state though invocation of the apply operation on the
+	* Collaboration interface, passing the identifier of a preferred initialization, following which
+	* members of an associated membership can invoke the apply and apply_arguments operations to
+	* achieve modification of the collaborative context through state-transitions. Following initialization,
+	* the collaboration is established in a running state exposed under the Collaboration active_state
+	* attribute. The active_state attribute is the identifier of a deepest state in a CollaborationModel
+	* state hierarchy referenced by a proceeding initialization or transition. Establishing an active state
+	* has an important implication on the membership associated to the collaboration. Every state from
+	* the deepest state referenced by the active_state attribute, up through all containing states, until
+	* the highest root-state are considered as active. Once a state is classified as active, any Trigger
+	* instances (transition holders) associated with that state are considered as candidates for
+	* subsequent reference under the apply operation.
+	* Triggers contain actions such as transitions and are also associated to business roles that act as
+	* guards to the trigger. Triggers can be declared as timeout (automatically activated) or launch
+	* trigger (explicit activation). Timeout based triggers are activated as a result of modification of the
+	* active state path and declared as active under the CollaborationProcessor timeout_list attribute.
+	* New instances of a CollaborationProcessor may be created by passing a ProcessorCriteria
+	* instance to a ResourceFactory create operation, where the model contained by the
+	* ProcessorCriteria is an instance CollaborationModel.
+	*/
+
+	interface CollaborationProcessor :
+		Collaboration,
+		Processor
+		{
+	};
+
+/**
+ * The primary valuetype used in the construction of a CollaborationModel is the State valuetype. A
+ * State is a container of sub-states and Trigger valuetypes. An instance of State has an identifier
+ * label (from the inherited Control valuetype), that may be exposed by a CollaborationProcessor
+ * under the active_state attribute. A State is activated as a result of a transition action applied
+ * through the apply operation or through implicit initialization using the start operation (from the
+ * abstract Processor interface inherited by Collaboration).
+ * <p>
+ * The Collaboration declares an active_state attribute and a corresponding structured event named
+ * active. The value of the event and attribute is an identifier of the state referenced in the last valid
+ * action (such as an initialization or simple transition). Once an active state has been established,
+ * the state containing an active state is considered as active, and as such, its parent, until the root-state
+ * is reached. This set of states is referred to as the active state path of the Collaboration
+ * processor. For every state in the active state path, all directly contained Triggers are considered
+ * as candidates with respect to the apply and apply_arguments operations on CollaborationProcessor. 
+ * That is to say that a client may invoke any Trigger exposed by a state in
+ * the active state path, providing that preconditions to Trigger activation are satisfied.
+ * 
+ */
+
+	valuetype State : 
+		CommunityFramework::Control
+ 		{
+
+   /**
+    * A sequence of Trigger instances that each define constraint conditions
+    * relative to a contained Action.
+    */
+
+
+		public CollaborationFramework::Triggers triggers;
+
+   /**
+    * A sequence of sub-states forming a state hierarchy.
+    */
+
+		public CollaborationFramework::States states;
+	};
+
+
+/**
+ * Directive is an abstract interface supported by particular valuetypes contained by 
+ * Trigger and Referral. It is used to express an execution
+ * directive to an implementation of Collaboration concerning link associations on the coordinating
+ * Task. For example, a compound transition can contain a directive that declares that a link be
+ * modified before the transition is fired. Another link directive could be contained in a Map
+ * declaring that the result of the compound transition sub-process must be assigned as an input to
+ * the current process. Four concrete valuetypes support the abstract Directive interface - Duplicate,
+ * Move, Remove and Constructor.
+ */
+
+	abstract interface Directive {};
+
+/**
+ * Instructs an implementation of Collaboration to create a new consumption 
+ * link named target based on the state of a source link. If the value 
+ * of invert is false, the type of link created is the same as the source 
+ * link. If invert is true, then if the source link is a Consumption link, 
+ * the created link will be a Production link and visa-versa. The resource 
+ * associated to the new target link shall be the same as the resource 
+ * declared under the source link.
+ */
+
+	valuetype Duplicate 
+		supports Directive
+		{
+
+   /**
+    * The name (tag value) of an existing link held by the coordinating Task.
+    */
+
+		public Label source;
+
+   /**
+    * The name (tag value) of a Usage Link to be created or replaced on the coordinating Task.
+    */
+
+		public Label target;
+
+   /**
+    * If true, an implementation of Collaboration is required to create a
+    * new Usage link using the inverse type (i.e. if source is Consumption then
+    * target type is Production, is source is Production then target type is
+    * Consumption). The new usage link is added to the coordinating Task.
+    */
+
+		public boolean invert;
+	};
+        
+
+/**
+ * The Move directive is a directive to a Collaboration implementation to change a source
+ * Consumption link name to the value of target. If the invert value of the Move instance is true, the
+ * move directive implies replacement of the link with its inverse type – i.e. if the source link is a type
+ * of Consumption link, then replace the link with a type of Production link. If the source link is a
+ * type of Production link then replace the link with a type of Consumption link.
+ */
+
+	valuetype Move 
+		supports Directive
+		{
+
+   /**
+    * The name (tag value) of an existing link held by the coordinating Task.
+    */
+
+		public Label source;
+
+   /**
+    * The name (tag value) of a Usage Link to be created or replaced on the coordinating Task.
+    */
+
+		public Label target;
+
+   /**
+    * If true, an implementation of Collaboration is required to replace an
+    * existing Usage link with the inverse (i.e. Consumption is replaced by
+    * Production, Production is replaced by Consumption).
+    */
+
+		public boolean invert;
+
+	};
+
+
+/**
+ * The Remove Directive directs a Collaboration implementation to remove a 
+ * tagged Usage link (with a tag value corresponding to source) from the 
+ * coordinating Task.
+ */
+
+      valuetype Remove 
+		supports Directive
+		{
+
+   /**
+    * The name (tag value) of an existing link held by the coordinating Task.
+    */
+
+		public Label source;
+
+	};
+
+/**
+ * The Constructor directive directs a Collaboration implementation to create a new resource based
+ * on the supplied criteria and associate the resource under a new named Consumption link on the
+ * coordinating Task using the target value as the links tag value.
+ */
+
+	valuetype Constructor 
+		supports Directive
+		{
+
+   /**
+    * The name of a Usage Link to be created and added to the
+    * coordinating Task (replacing any existing usage link of the same name),
+    * using the supplied criteria.
+    */
+
+		public Label target;
+
+   /**
+    * An instance of Criteria describing the resource to be created.
+    */
+
+		public CommunityFramework::Criteria criteria;
+
+	};
+
+
+/**
+ * Guard is an interface used to mark a valuetype as supporting Gaurd semantics.
+ */
+
+	abstract valuetype Guard {};
+
+/**
+ * A Clock, representing a timeout condition that is automatically armed by a
+ * Collaboration implementation whenever the containing trigger is a candidate (within the active
+ * state path). A Trigger containing a Clock is managed by a Collaboration implementation.
+ */
+
+	valuetype Clock :
+		Guard
+		{
+
+   /**
+    * Declaration of the delay between establishment of the containing trigger
+    * as a candidate (the moment the Trigger's containing state enters the
+    * active state path) and the automatic invocation of the action contained by
+    * the containing Trigger by a Collaboration implementation.
+    */
+
+		public Duration timeout; 
+	};
+
+
+/**
+ * Launch is a valurtype that contains a mode constraint (one of INITIATOR, RESPONDENT or PARTICIPANT) 
+ * and a reference to a role that qualifies accessibility of the containing Trigger relative to Members of an 
+ * associated Encounter.
+ */
+
+	valuetype Launch :
+		Guard
+		{
+
+   /**
+    * A value corresponding to one of INITIATOR, RESPONDENT or PARTICIPANT.
+    */
+
+		public TriggerMode mode;
+
+   /**
+    * If the role value is not null, a client invoking the containing trigger must
+    * be associated to the Encounter under a role with a label equal to the role
+    * identifier.
+    */
+
+		public CommunityFramework::Role role; 
+	};
+
+/**
+ * A Trigger is a valuetype contained by a State that is used to define an activation constraint
+ * (referred to as a guard), declarations of implementation actions to fire before action execution
+ * (referred to as directives), the action that a collaboration implementation applies to the
+ * collaborative state, and an action priority. Trigger labels are candidate arguments to the
+ * Collaboration apply operation when the State containing the Trigger is within the active state
+ * path. The value of guard is a valuetype that qualifies the functional role of the trigger. Two types
+ * of Guard are defined. A Clock, representing a timeout condition that is automatically armed by a
+ * Collaboration implementation whenever the containing trigger is a candidate (within the active
+ * state path). A second type of Guard is a Launch that contains a mode constraint (one of
+ * INITIATOR, RESPONDENT or PARTICIPANT) and a reference to a role that qualifies accessibility of
+ * the Trigger relative to Members of an associated Encounter. A Trigger containing a Clock is
+ * managed by a Collaboration implementation. A Trigger containing a Launch may be explicitly
+ * referenced by a client through the apply operations on the Collaboration interface providing the
+ * client meets any mode and role constraints associated with the Trigger.
+ */
+
+	valuetype Trigger :
+		CommunityFramework::Control
+		{
+
+   /**
+    * An implementation of apply is responsible for queuing apply requests
+    * relative to trigger priority and invocation order. Higher priority
+    * triggers will be fired ahead of lower priority triggers irrespective of apply
+    * invocation order. An implementation is responsible for retractions of apply
+    * requests following the disassociation of a containing state from the active
+    * state path.
+    */
+
+		public long priority;
+
+   /**
+    * An instance of Clock or Launch that defines the Trigger activation policy.
+    */
+
+
+		public CollaborationFramework::Guard guard;
+
+   /**
+    * A sequence of Directive valuetypes that declare modifications (rename,
+    * remove, copy and move) to the associated Task usage associations
+    * that will be invoked before the action is handled by the Collaboration
+    * implementation.
+    */
+
+		public CollaborationFramework::Directives directives; 
+
+   /**
+    * An Action valuetype that describes the action to take following client
+    * invocation of the apply operation. Argument to apply reference the label
+    * that corresponds to the Trigger label state filed inherited from Control.
+    */
+
+		public CollaborationFramework::Action action;
+
+	};
+
+
+/**
+ * The Action valuetype is a base type for Transition, CompoundAction and Referral. 
+ * Examples of transitions include initialization, simple transition, local transition
+ * and terminal transition. Transition can be considered as atomic in that there is no 
+ * subsequent redirection involved. In comparison, CompoundTransition and Referral 
+ * redirects execution towards another action.
+ */
+
+	abstract valuetype Action { };
+
+/**
+ *Interface implemented by valuetypes acting in the capicity of a Transitional object.
+ */
+
+	abstract valuetype Transitional { };
+
+/**
+ * Transition contains a state field named usage that contains a UsageDescriptor value. The value
+ * allows the definition of input and/or output statements (refer UsageDescriptor) during a
+ * collaborative process execution as a consequence of changes in the collaborative state. A second
+ * state field named transitional contains a single valuetype derived from the abstract Transitional
+ * valuetype.
+ * <p>
+ * Four types of Transitional valuetypes are defined,
+ * <ul>
+ * <li>Initialization, declares a possible initial active-state target
+ * <li>SimpleTransition, declares a potential a state transition
+ * <li>LocalTransition, declares a potential transition from the current state to the current state,
+ * during which side effects such as timeout resetting and Usage references may be modified.
+ * <li>TerminalTransition, signals termination of the running state of the processor and declares a
+ * successful or failure result.
+ * </ul>
+ */
+
+	valuetype Transition : 
+		Action
+		{
+
+   /**
+    * Declaration of the transitional operator – one of Initialization, SimpleTransition,
+    * LocalTransition or TerminalTransition.
+    */
+
+		public CollaborationFramework::Transitional transitional; 
+
+   /**
+    * Contains a sequence of UsageDescriptor instance (input and
+    * output declarations) that define required or operational arguments to
+    * the Collaboration apply operation when the state containing the usage
+    * declaration is active.
+    */
+
+		public UsageDescriptors usage; 
+	};
+
+/**
+ * Initialization is a type of Transitional that declares the potential for establishment of the
+ * active_state as the State instance containing a Trigger that contains an Action that contains an
+ * Initialization. The containing State corresponds to the initalization target. The Trigger containing
+ * the Initialization may declare a priority value. The value of priority is considered in the event of
+ * implicit initialization arising from client invocation of the Processor start operation. When invoking
+ * start, the Initialization with the highest priority and non-conflicting constraints set is inferred.
+ * Alternatively, a CollaborationProcessor may be explicitly initialized by referencing the
+ * Initialization's containing Action label under the apply operations.
+ */
+
+	valuetype Initialization :
+		Transitional
+		{
+	};
+
+/**
+ * SimpleTransition is Transitional that enables a state transition from the current active state to a
+ * State declared under by the SimpleTransition target value. A successful invocation of apply or
+ * apply_arguments on CollaborationProcessor will result in the change of the CollaborationProcessor
+ * active state to the state referenced by the target value.
+ */
+
+
+	valuetype SimpleTransition :
+		Transitional 
+		{ 
+
+   /**
+    * The state to be established as the active state of the CollaborationProcessor
+    * @see CollaborationProcessor#active_state
+    */
+
+		public State target;
+	};
+
+/**
+ * LocalTransition enables the possible modification of usage relationships (if the containing Trigger
+ * enables this), and the possibility to reset timeout constraints associated with the containing
+ * Trigger. LocalTransition can be considered as a transition from the current active state to the same
+ * state, where side effects concerning timeout and usage relationships can be declared.
+ */
+
+	valuetype LocalTransition :
+		Transitional 
+		{
+
+   /**
+    * If true, any timeout conditions established through Triggers containing Clocks are reset following application of the 
+    * containing trigger under a CollaborationProcessor.
+    */
+
+		public boolean reset;
+	};
+
+
+/**
+ * Starting a CollaborationProcessor is enabled through the start or initialize operation. These actions
+ * cause the establishment of an initial active state and active-state path. Actions such as
+ * SimpleTransition enable modification of the active-state-path leading to the potential exposure of
+ * a TerminalTransition action. Once a TerminalTransition action has been fired, the hosting
+ * processor enters a closed and completed state (refer ProcessState). A CollaborationProcessor
+ * implementation signals this change though modification of the state attribute on the inherited
+ * Processor interface (and corresponding structured event). This attribute returns a StateDescriptor
+ * which itself contains the Completion valuetype declared under the CollaborationModel
+ * TerminalTransition (indicating Success or Failure of the process).
+ */
+
+	valuetype TerminalTransition :
+		Transitional 
+		{
+
+   /**
+    * Declaration of processor termination the hosting processor will expose the
+    * Completion result instance, indicating the success or failure of the process.
+    */
+
+		public Completion result;
+	};
+
+/**
+ * Doc. pending.
+ */
+
+	valuetype Referral :
+		Action 
+		{ 
+
+	     /**
+ 		* Doc. pending.
+ 		*/
+
+		public CollaborationFramework::Action action;
+
+		/**
+		 * Doc. pending.
+		 */
+
+		public CollaborationFramework::Directives directives;
+	};
+
+/**
+ * Map is a valuetype that defines mapping between a processor completion 
+ * status and, a set of directives and action to perform given a matching 
+ * completion criteria.  Map is used by CompoundTransition to declare 
+ * multiple transition possibilities based on the outcome of the execution 
+ * of sub-process.
+ */
+
+	valuetype Map 
+		{
+
+ 	     /**
+    	   	* ResultClass containing a boolean <code>value</value>.
+    		*/
+
+		public ResultClass class;
+
+    	     /**
+    		* ResultID containing an implementation specific int <code>value</value>.
+    		*/
+
+		public ResultID code;
+
+   	     /**
+    		* A sequence of Directive valuetypes that declare modifications (rename,
+    		* remove, copy and move) to the associated Task usage associations
+    		* that will be invoked before the action is handled by the Collaboration
+    		* implementation.
+    		*/
+
+		public CollaborationFramework::Directives directives;
+
+   	     /**
+    		* The action to invoke.
+    		*/
+
+		public CollaborationFramework::Action action;
+	};
+
+/**
+ * A sequence of Map instances.
+ */
+
+	valuetype Mapping sequence <Map> ;
+
+/**
+ * CompoundTransition introduces the notion of a
+ * transition where the target is defined by the result of the execution of a subsidiary processor. An
+ * implementation of Collaboration on triggering a CompoundTransition, uses a factory Criteria
+ * instance defined under the criteria field to establish a new sub-processor to the current processor.
+ * The result of the sub-process execution is exposed by an instance of Completion (refer Completion
+ * valuetype). Completion contains a result identifier (refer ResultClass and ResultID). This identifier
+ * is used to establish the Action to apply based on a result to action mapping.
+ */
+
+	valuetype CompoundTransition : 
+		Action  
+		{
+
+   /**
+    * An instance of Criteria that is to be used as the criteria for sub-process establishment 
+    * under a ResourceFactory.
+    */
+
+		public CommunityFramework::Criteria criteria;
+
+   /**
+    * A sequence of Map instances defining the actions to be applied in the event
+    * of an identified result status. An implementation is responsible for
+    * ensuring a complete mapping of all possible sub-process result states to
+    * actions within the parent processor prior to initialization (refer verify
+    * operation on Collaboration interface).
+    */
+
+		public CollaborationFramework::Mapping mapping;
+	};
+
+/**
+ * CollaborationModel is the valuetype that defines the bulk of the semantics behind an instance of
+ * CollaborationProcessor. CollaborationModel extends ProcessorModel though addition of a role
+ * hierarchy, and, State hierarchy. The entire collaboration model is structurally centered on a state
+ * hierarchy, the root of which is defined by the State instance exposed under the state field. The
+ * root-state and sub-states contain the declaration of available triggers (transitions holders) that can
+ * be referenced by clients through apply operations on the Collaboration interface. The state field
+ * named role contains a Role valuetype that represents the root of a role hierarchy that can be
+ * referenced by Trigger instances (contained by State instances) as preconditions to activation. For
+ * example, a transition (exposed as Trigger) may reference a role as a guard, which in turn
+ * introduces a constraint on the invoking client to be associated with the Encounter membership
+ * under an equivalent role.
+ * <p>As a valuetype, a CollaborationModel can be passed between different domains and treated as a
+ * self-contained structure that can be readily re-used by trading partners. The structural
+ * information contained in the inherited ProcessorModel defines the logical wiring of a processor
+ * towards its coordinating task, while the extensions introduced under CollaborationModel define
+ * the semantics of collaborative interaction.
+ */
+
+	valuetype CollaborationModel :
+		ProcessorModel
+		{
+
+   /**
+    * A Role valuetype (refer CommunityFramework) that defines a
+    * hierarchy of business roles that may be referenced by other control
+    * structures within a CollaborationModel (refer Trigger) for the purpose of
+    * establishing membership and quorum preconditions towards an invoking
+    * client. This value may be null if all Trigger guard value are also null.
+    */
+
+		public CommunityFramework::Role role;
+
+   /**
+    * A non-null value defining the root state of the collaboration model. A
+    * State is itself a container of other states within which Triggers are contained.
+    * Triggers act as constraint guards relative to the Actions they contain.
+    */
+
+		public CollaborationFramework::State _state; // SJM: PSDL keyword conflict
+
+ 	};
+
+};
+
+#endif // _COLLABORATION_IDL_

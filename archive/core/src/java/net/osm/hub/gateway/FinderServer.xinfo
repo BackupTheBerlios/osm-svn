@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+
+<!--
+ CertificationRequestServer.xinfo
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <version>1.0</version>
+  </block>
+
+  <services>
+      <service name="net.osm.hub.gateway.FinderService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>VAULT</role>
+          <service name="net.osm.vault.Vault" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>ORB</role>
+          <service name="net.osm.orb.ORBService" version="2.3"/>
+      </dependency>
+      <dependency>
+          <role>PSS-CONNECTOR</role>
+          <service name="net.osm.pss.PSSConnectorService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>PSS-SESSION</role>
+          <service name="net.osm.pss.PSSSessionService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>FACTORY</role>
+          <service name="net.osm.hub.gateway.ResourceFactoryService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>USER-ADMINISTRATOR</role>
+          <service name="net.osm.hub.user.UserAdministratorService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>USER</role>
+          <service name="net.osm.hub.user.UserService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>COMMUNITY-ADMINISTRATOR</role>
+          <service name="net.osm.hub.community.CommunityAdministratorService" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+</blockinfo>
+

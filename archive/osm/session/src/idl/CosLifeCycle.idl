@@ -1,0 +1,223 @@
+//File: CosLifeCycle.idl
+//Part of the LifeCycle Service
+
+#ifndef _COS_LIFE_CYCLE_IDL_
+#define _COS_LIFE_CYCLE_IDL_
+
+#include <CosNaming.idl>
+
+#pragma prefix "omg.org"
+
+module CosLifeCycle{
+
+	typedef CosNaming::Name Key; 
+	typedef Object _Factory;
+	typedef sequence <_Factory> Factories;
+	typedef struct NVP {	 
+		CosNaming::Istring	name; 
+		any 				value; 
+	} NameValuePair;
+
+	typedef sequence <NameValuePair> Criteria;
+
+	exception NoFactory {
+		Key search_key;
+	};
+	exception NotCopyable { string reason; };
+	exception NotMovable { string reason; };
+	exception NotRemovable { string reason; };
+	exception InvalidCriteria{ Criteria invalid_criteria; };
+	exception CannotMeetCriteria { Criteria unmet_criteria;	};
+
+	/**
+	* Factory finders support an operation, <code>find_factories</code>, which 
+	* returns a sequence of factories. Clients pass factory finders to the move and copy 
+	* operations, which typically invoke this operation to find a factory to interact with.
+	* The new copy or the migrated object will then be within the scope of the
+	* factory finder.<p>
+	* Some examples of locations that a factory finder might represent are:
+	* <ul>
+	* <li>somewhere on a work group’s local area network
+	* <li>storage device A on machine X
+	* <li>Susan’s notebook computer
+	* </ul>
+	*/
+
+	interface FactoryFinder {
+
+		/**
+		* The find_factories operation is passed a key used to identify the desired factory.
+		* The key is a name, as defined by the naming service. More than one factory may
+		* match the key. As such, the factory finder returns a sequence of factories. If there are
+		* no matches, the NoFactory exception is raised.<p>
+		* The scope of the key is the factory finder. The factory finder assigns no semantics to
+		* the key. It simply matches keys. It makes no guarantees about the interface or
+		* implementation of the returned factories or objects they create.
+		*/
+
+		Factories find_factories(in Key factory_key)
+			raises(NoFactory);
+	};
+
+
+	interface LifeCycleObject {
+
+   	      /**
+		* The copy operation makes a copy of the object. The copy is located in the scope of
+		* the factory finder passed as the first parameter. The copy operation returns an object
+		* reference to the new object. The new object is initialized from the existing object.
+		* The first parameter, there, may be a nil object reference. If passed a nil object
+		* reference, the target object can determine the location or fail with the NoFactory
+		* exception.    
+		* The second parameter, the_criteria, allows for a number of optional parameters
+		* to be passed. Typically, the target simply passes this parameter to the factory used in
+		* creating the new object. The criteria parameter is explained in detail in section 6.2.4
+		* If the target cannot find an appropriate factory to create a copy "over there", the
+		* NoFactory exception is raised. An implementation that refuses to copy itself should
+		* raise the NotCopyable exception. If the target does not understand the criteria, the
+		* InvalidCriteria exception is raised. If the target understands the criteria but
+		* cannot satisfy the criteria, the CannotMeetCriteria exception is raised.
+		* In addition to these exceptions, implementations may raise standard CORBA
+		* exceptions. For example, if resources cannot be acquired for the copied object,
+		* NO_RESOURCES will be raised. Similarly, if a target does not implement the copy
+		* operation, the NO_IMPLEMENT exception will be raised.
+		* It is implementation dependent whether this operation is atomic.
+            */
+
+		LifeCycleObject copy(
+		    in FactoryFinder there, 
+		    in Criteria the_criteria
+		) raises (
+		    NoFactory, NotCopyable, InvalidCriteria,CannotMeetCriteria
+		);
+
+	     /**
+		* The move operation on the target moves the object to the scope of the factory finder
+		* passed as the first parameter. The object reference for the target object remains valid
+		* after move has successfully executed.
+		* The first parameter, there, may be a nil object reference. If passed a nil object
+		* reference, the target object can determine the location or fail with the NoFactory
+		* exception.
+		* The second parameter, the_criteria, allows for a number of optional parameters
+		* to be passed. Typically, the target simply passes this parameter to the factory used in
+		* migrating the new object. The criteria parameter is explained in detail in section 6.2.4
+		* If the target cannot find an appropriate factory to support migration of the object "over
+		* there", the NoFactory exception is raised. An implementation that refuses to move
+		* itself should raise the NotMovable exception. If the target does not understand the
+		* criteria, the InvalidCriteria exception is raised. If the target understands the
+		* criteria but cannot satisfy the criteria, the CannotMeetCriteria exception is
+		* raised.
+		* In addition to these exceptions, implementations may raise standard CORBA
+		* exceptions. For example, if resources cannot be acquired for migrating the object,
+		* NO_RESOURCES will be raised. Similarly, if a target does not implement the move
+		* operation, the NO_IMPLEMENT exception will be raised.
+		* It is implementation dependent whether this operation is atomic.     
+ 	      */
+
+		void move(in FactoryFinder there, 
+				  in Criteria the_criteria)
+			raises(NoFactory, NotMovable, InvalidCriteria,
+				 CannotMeetCriteria);
+
+	     /**
+		* Remove instructs the object to cease to exist. The object reference for the target is no
+		* longer valid after remove successfully completes. The client is not responsible for
+		* cleaning up any resources the object uses. An implementation that refuses to remove
+		* itself should raise the NotRemovable exception. In addition to this exception,
+		* implementations may raise standard CORBA exceptions.
+	      */
+
+		void remove()
+			raises(NotRemovable);
+	};
+
+     /** 
+	* A GenericFactory supports the management of a set of resources that are allocated to objects
+	* at creation time is required. This needs to be done in a coordinated fashion for all types
+	* of objects. The Life Cycle Service provides a framework for this which is intended to
+	* be usable in a variety of administrative environments. However, the differing
+	* environments will administer a variety of resources and it is beyond the scope of this
+	* framework to identify all the possible types of resource.<p>
+	* While there is no standard interface for a factory, a GenericFactory interface is
+	* defined. The GenericFactory interface defines a generic creation operation,
+	* create_object. By defining a generic interface for creation, a creation service can
+	* be implemented. This is particularly useful in environments where administering a set
+	* of resources is important.<P>
+	* Such a generic factory can implement resource policies and represent multiple
+	* locations. In administered environments, object specific factories, such as the
+	* document factory described in section , may delegate the creation process to the
+	* generic factory. <p>
+	* The job of the generic factory is to match the creation criteria specified by clients of
+	* the GenericFactory interface with offers made on behalf of implementation specific
+	* factories.<p>
+	*  The client of the GenericFactory interface invokes the create_object operation
+	*  and can express criteria for creation.
+	*  Ultimately, this request will be passed to an implementation specific factory which
+	*  supports the GenericFactory interface. To get there, the request may travel through a
+	*  number of generic factories. However, all of this is transparent to the client.
+	*/
+
+	interface GenericFactory {
+
+	     /**
+		* The supports operation returns true if the generic factory can 
+		* create an object, given the key. Otherwise false is returned.
+		*/
+
+		boolean _supports(in Key k);
+
+	     /**
+		* The create_object operation is passed a key used to identify the 
+		* desired object to be created. The key is a name, as defined by the Naming Service.
+		* The scope of the key is the generic factory. The generic factory assigns no semantics
+		* to the key. It simply matches keys. It makes no guarantees about the interface or
+		* implementation of the created object.<p>
+		* The second parameter, the_criteria, allows for a number of optional parameters
+		* to be passed.  If the generic factory cannot create an object specified by the key, then 
+		* NoFactory is raised.  If the target does not understand the criteria, the 
+		* InvalidCriteria exception is raised. If the target understands the criteria but 
+		* cannot satisfy the criteria, the CannotMeetCriteria exception is raised.
+		* <P>
+		* The create_object operation of the GenericFactory interface expects a parameter
+		* specifying the creation criteria. The move and copy operations of the LifeCycleObject
+		* interface also expects this parameter; typically they pass it through to a factory. This
+		* section documents this parameter.<p>
+		* The criteria parameter is expressed as an IDL sequence of name-value pairs. 
+		* The parameter is given as a sequence of name-value pairs in order to be extensible and
+		* support "pass-through"; that is, new name-value pairs can be defined in the future and
+		* objects can be written that do not interpret the name-value pairs, but just pass them on
+		* to other objects.<p>
+		* Suggested Criteria:<p>
+		*"initialization": The "initialization" criterion is a sequence of name-value pairs which is intended to
+		* contain application specific initialization values. Typically, the generic factory will pay
+		* no attention to the initialization criterion and simply passes it on to application specific
+		* factory code.
+		* "filter":
+		* The filter criterion is a constraint expression which provides the client with a powerful
+		* way of expressing its requirements on creation. The generic factory will use the
+		* constraint expression to make decisions about the allocation of particular resources.
+		* For example, a client could give a constraint "operating system" != "windows nt".
+		* Filters are potentially complex and InvalidCriteria will be raised if the filter is
+		* too complex for the factory or is syntactically incorrect.
+		* "logical location":
+		* The "logical location" criterion allows a client to express where a
+		* created/copied/migrated object is logically created. For example, in PCTE an object is
+		* always in a relationship with another object. In such an environment, the logical
+		* location would specify another object and a relationship.
+		* "preferences":
+		* The "preferences" criterion allows the client to influence the policies which the generic
+		* factory uses to make decisions. For example, a generic factory might arbitrarily choose
+		* a machine from a set of machines. Using the preferences criterion, a client could
+		* express its preference for a particular machine.
+		*/
+
+		Object create_object(			
+				in Key k, 
+				in Criteria	the_criteria
+		) raises (
+			NoFactory, InvalidCriteria, CannotMeetCriteria
+		);
+	};
+};
+
+#endif /* _COS_LIFE_CYCLE_IDL_ */

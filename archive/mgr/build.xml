@@ -1,0 +1,495 @@
+
+<!--
+The Agent framemework buildfile provides support for the creation of agent block and bootstrap launch application that will serve as a client application.  The framework uses the Avalon Phoenix server management framework as the launch environment. Although this is client application, the client itself acts as a server to hosts it is connected to, maintains a persistent repositoy of adapters and event history.
+-->
+
+<project name="agents" default="mgr" basedir=".">
+
+  <!--
+  The following properties are general environment variables.
+  -->
+
+  <property file="local.properties"/>
+  <property name="supplier"  value="osm" />
+  <property name="persistence" value="database" />
+  <!--
+  <property name="pss.library.jar"  value="openorb_pss.1.2.0.jar" />
+  <property name="psdl.jar"  value="openorb_pss.1.2.0.jar" />
+  <property name="psdl.class"  value="org.openorb.pss.compiler.PsdlCompiler" />
+  -->
+  <property name="pss.library.jar"  value="OSM-PSS-1.0.jar" />
+  <property name="psdl.jar"  value="OSM-PSDL-1.0.jar" />
+  <property name="psdl.class"  value="net.osm.pss.compiler.PsdlCompiler" />
+
+  <!--
+  The following properties declare paths external to the mgr base.
+  -->
+
+  <property name="dev"  value=".." />
+  <property name="core"  value="${dev}/core" />
+  <property name="general"  value="${dev}/common" />
+  <property name="doc"  value="${core}/doc" />
+
+  <!--
+  The following properties declare local directory name that constitute 
+  the sources and libraries.
+  -->
+
+  <property name="lib"  value="lib" />
+  <property name="src"  value="src" />
+  <property name="etc"  value="${src}/etc" />
+  <property name="apps"  value="apps" />
+  <property name="idl"  value="${core}/src/idl" />
+  <property name="psdl"  value="${src}/psdl" />
+  <property name="manifest"  value="${src}/etc" />
+
+  <!--
+  The following properties are paths generated as a side-effect of the 
+  build process.  The build directory is a temporary directory used to 
+  hold class files.  The dist directory contains the results of the build 
+  process.
+  -->
+
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+  <property name="phoenix"  value="phoenix" />
+
+  <!--
+  The following properties declare the names of the respective packages 
+  and resulting file names (mgr, shell and agent).
+  -->
+
+  <property name="mgr"  value="mgr" />
+  <property name="mgr.dir"  value="${supplier}-${mgr}" />
+  <property name="mgr.sar"  value="mgr.sar" />
+  <property name="mgr.version"  value="1.0.0" />
+
+  <property name="audit"  value="audit" />
+  <property name="audit.jar"  value="${supplier}-${audit}.jar" />
+
+  <property name="agent"  value="agent" />
+  <property name="agent.jar"  value="${supplier}-${agent}.jar" />
+
+  <property name="shell"  value="shell" />
+  <property name="shell.jar"  value="${supplier}-${shell}.jar" />
+
+  <property name="entity"  value="entity" />
+  <property name="entity.jar"  value="${supplier}-${entity}.jar" />
+
+  <!-- 
+  ENVIRONMENT 
+  -->
+
+  <target name="environment">
+    <mkdir dir="${dist}"/>
+    <mkdir dir="${build}"/>
+  </target>
+
+  <!-- 
+  AUDIT 
+  -->
+
+  <target name="audit" depends="audit.jar"/>
+
+  <target name="audit.environment" depends="environment">
+    <mkdir dir="${build}/${audit}/src" />
+    <mkdir dir="${build}/${audit}/lib" />
+  </target>
+
+  <target name="audit.clean" depends="audit.purge" >
+    <delete file="${dist}/${audit.jar}"/>
+  </target>
+
+  <target name="audit.purge" >
+    <delete dir="${build}/${audit}"/>
+  </target>
+
+  <target name="audit.jar.context" depends="audit.environment">
+    <uptodate property="audit.jar.uptodate" targetfile="${dist}/${audit.jar}">
+      <srcfiles dir="${src}/java/net/osm/audit"/>
+      <srcfiles dir="${build}/${audit}/src"/>
+    </uptodate>
+  </target>
+
+  <target name="audit.jar" depends="audit.idl,audit.jar.context" unless="audit.jar.uptodate">
+    <javac debug="off" destdir="${build}/${audit}/lib" verbose="false" deprecation="true">
+      <classpath>
+        <fileset dir="${general}/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${core}/dist/lib">
+          <include name="*.jar"/>
+        </fileset>
+	</classpath>
+      <src path="${src}/java" />
+      <src path="${build}/${audit}/src" />
+	<include name="net/osm/audit/**" />
+    </javac>
+    <copy todir="${build}/${audit}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/audit/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/${audit.jar}" 
+	basedir="${build}/${audit}/lib" 
+	manifest="${manifest}/audit.mf" />
+  </target>
+
+  <!--
+  <target name="audit.psdl.context" depends="audit.environment">
+    <uptodate property="audit.psdl.modified" targetfile="${psdl}/audit.psdl">
+      <srcfiles dir="${build}/${audit}/src">
+	  <include name="net/osm/audit/pss/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="audit.psdl" depends="audit.psdl.context" if="audit.psdl.modified">
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+        <fileset dir="${general}/lib">
+          <include name="*.jar"/>
+        </fileset>
+	  <pathelement path="${core}/dist/lib/${common.jar}"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-d ${build}/${audit}/src"/>
+	<arg line="-I ${idl}/corba"/>
+	<arg line="-I ${idl}/services"/>
+	<arg line="-I ${idl}/services/pss"/>
+	<arg line="-I ${core}/src/psdl"/>
+	<arg line="${psdl}/audit.psdl"/>
+    </java>
+  </target>
+  -->
+
+  <target name="audit.idl.context" depends="audit.environment">
+    <uptodate property="audit.idl.modified" targetfile="${idl}/audit.idl">
+      <srcfiles dir="${build}/${audit}/src">
+	  <include name="net/osm/audit/home/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="audit.idl" depends="audit.idl.context" if="audit.idl.modified">
+    <java failonerror="true"
+      classname="org.openorb.compiler.IdlCompiler" 
+	fork="true">
+      <classpath>
+        <fileset dir="${general}/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${core}/dist/lib">
+          <include name="osm-common.jar"/>
+        </fileset>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-d ${build}/${audit}/src"/>
+	<arg line="-native RemoteEventListener net.osm.audit.RemoteEventListener"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${idl}/corba"/>
+	<arg line="-I ${idl}/services"/>
+	<arg line="-I ${idl}/services/normal"/>
+	<arg line="${idl}/audit.idl "/>
+    </java>
+  </target>
+
+  <!--
+  AGENT
+  -->
+
+  <target name="agent" depends="audit,agent.jar"/>
+
+  <target name="agent.environment" depends="environment">
+    <mkdir dir="${build}/${agent}/src"/>
+    <mkdir dir="${build}/${agent}/lib"/>
+    <uptodate property="agent.jar.uptodate" targetfile="${dist}/${agent.jar}">
+      <srcfiles dir="${src}/etc">
+         <include name="agent.mf"/>
+      </srcfiles>
+      <srcfiles dir="${src}/java">
+         <include name="net/osm/agent/**/*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/agent/src">
+         <include name="net/osm/agent/**/*.*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="agent.psdl.modified" targetfile="${psdl}/agent.psdl">
+      <srcfiles dir="${build}/${agent}/src">
+	  <include name="net/osm/agent/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="agent.psdl" depends="agent.environment" if="agent.psdl.modified">
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+        <fileset dir="${general}/lib">
+          <include name="*.jar"/>
+        </fileset>
+	  <pathelement path="${core}/dist/lib/${common.jar}"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-d ${build}/${agent}/src"/>
+	<arg line="-I ${idl}/corba"/>
+	<arg line="-I ${idl}/services"/>
+	<arg line="-I ${idl}/services/pss"/>
+	<arg line="-I ${idl}/pksc.idl"/>
+	<arg line="${psdl}/agent.psdl"/>
+    </java>
+  </target>
+
+  <target name="agent.jar" depends="audit,shell,agent.psdl,agent.environment" unless="agent.jar.uptodate">
+    <javac debug="off" destdir="${build}/agent/lib" verbose="false" deprecation="true">
+      <classpath>
+        <fileset dir="${general}/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${core}/dist/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${dist}">
+          <include name="${shell.jar}"/>
+          <include name="${audit.jar}"/>
+        </fileset>
+	</classpath>
+      <src path="${src}/java"/>
+      <src path="${build}/agent/src"/>
+      <include name="net/osm/agent/**"/>
+    </javac>
+    <copy todir="${build}/${agent}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/agent/**/*.xinfo"/>
+      </fileset>
+      <fileset dir="${src}/java">
+        <include name="net/osm/agent/**/*.gif"/>
+        <include name="net/osm/agent/**/*.jpg"/>
+      </fileset>
+    </copy>
+    <copy toDir="${build}/${agent}/lib">
+      <fileset dir="${src}/conf">
+        <include name="AgentServer.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/${agent.jar}" 
+	basedir="${build}/${agent}/lib" 
+	manifest="${etc}/${agent}.mf" />
+  </target>
+
+  <!--
+  <target name="entity.environment" depends="environment">
+    <mkdir dir="${build}/entity/lib"/>
+    <uptodate property="entity.jar.uptodate" targetfile="${dist}/${entity.jar}">
+      <srcfiles dir="${src}/etc"/>
+      <srcfiles dir="${src}/java/net/osm/entity"/>
+      <srcfiles dir="${build}/entity/lib"/>
+    </uptodate>
+  </target>
+  -->
+  <!--
+  <target name="entity.jar" depends="shell,entity.environment" unless="entity.jar.uptodate">
+    <javac debug="off" destdir="${build}/entity/lib" verbose="false" deprecation="true">
+      <classpath>
+        <fileset dir="${general}/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${core}/dist/lib">
+          <include name="*.jar"/>
+        </fileset>
+	</classpath>
+      <src path="${src}/java"/>
+      <include name="net/osm/entity/**"/>
+    </javac>
+    <copy todir="${build}/entity/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/entity/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/${entity.jar}" 
+	basedir="${build}/entity/lib" 
+	manifest="${etc}/entity.mf" />
+  </target>
+  -->
+  <!--
+  shell
+  -->
+
+  <target name="shell" depends="shell.jar"/>
+
+  <target name="shell.environment" depends="environment">
+    <mkdir dir="${build}/${shell}/lib"/>
+    <uptodate property="shell.jar.uptodate" targetfile="${dist}/${shell.jar}">
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/shell/**/*"/>
+	  <include name="net/osm/entity/**/*"/>
+	  <include name="net/osm/util/**/*"/>
+      </srcfiles>
+      <srcfiles dir="${general}/lib">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="shell.jar" depends="shell.environment" unless="shell.jar.uptodate">
+    <javac debug="off" destdir="${build}/${shell}/lib" verbose="false" deprecation="true">
+      <classpath>
+        <fileset dir="../common/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${general}/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${dist}">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${core}/dist/lib">
+          <include name="osm-util.jar"/>
+          <include name="osm-orb.jar"/>
+          <include name="osm-vault.jar"/>
+          <include name="osm-pki-base.jar"/>
+        </fileset>
+	</classpath>
+      <src path="${src}/java"/>
+      <include name="net/osm/shell/**"/>
+      <include name="net/osm/entity/**"/>
+      <include name="net/osm/util/**"/>
+    </javac>
+    <copy todir="${build}/${shell}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/shell/**/*.xinfo"/>
+      </fileset>
+      <fileset dir="${src}/java">
+        <include name="net/osm/shell/**/*.gif"/>
+        <include name="net/osm/shell/**/*.jpg"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/${shell.jar}" basedir="${build}/${shell}/lib" 
+	manifest="${etc}/${shell}.mf" />
+  </target>
+
+  <!--
+  MGR
+  -->
+
+  <target name="mgr.environment" depends="environment">
+    <mkdir dir="${dist}"/>
+    <uptodate property="mgr.uptodate" targetfile="${dist}/${mgr.sar}">
+      <srcfiles dir="${dist}"/>
+      <srcfiles dir="${general}/lib"/>
+      <srcfiles dir="${core}/dist/lib"/>
+      <srcfiles dir="${core}/dist/bar"/>
+      <srcfiles dir="${src}/conf"/>
+      <srcfiles dir="${src}/etc"/>
+    </uptodate>
+  </target>
+
+  <target name="mgr.sar" depends="audit.jar,shell.jar,agent.jar,mgr.environment" unless="mgr.uptodate">
+    <delete file="${dist}/${mgr.sar}"/>
+    <jar file="${dist}/${mgr.sar}">
+      <zipfileset dir="${general}/lib/" prefix="SAR-INF/lib">
+	  <include name="phoenix-client.jar" />
+	  <include name="avalon-framework*.jar" />
+	  <include name="avalon-excalibur*.jar" />
+	  <include name="logkit*.jar" />
+	  <include name="servlet.jar" />
+	  <include name="openorb*.jar" />
+	  <include name="${pss.library.jar}" />
+      </zipfileset>
+	<zipfileset dir="${core}/dist/lib" prefix="SAR-INF/lib">
+	  <include name="osm-base.jar" />
+	  <include name="osm-common.jar" />
+	  <include name="osm-common-client.jar" />
+	  <include name="osm-dpml.jar" />
+	  <include name="osm-hub-client.jar" />
+	  <include name="osm-realm-client.jar" />
+	  <include name="osm-util.jar" />
+	  <include name="osm-vault.jar" />
+        <include name="osm-orb.jar"/>
+        <include name="osm-pki-base.jar"/>
+        <include name="osm-pki-authority.jar"/>
+        <include name="osm-pki-repository.jar"/>
+	</zipfileset>
+	<zipfileset dir="${core}/dist/bar" prefix="SAR-INF/lib">
+	  <include name="osm-time.jar" />
+	</zipfileset>
+      <zipfileset dir="${dist}/" prefix="SAR-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${src}/conf/" prefix="SAR-INF">
+        <include name="environment.xml"/>
+        <include name="assembly.xml"/>
+        <include name="config.xml"/>
+      </zipfileset>
+      <zipfileset dir="${src}/etc/" prefix="conf">
+        <include name="orb.xml"/>
+        <include name="login.conf"/>
+      </zipfileset>
+    </jar>
+  </target>
+
+  <target name="build" depends="install,mgr"/>
+
+  <target name="install" depends="mgr.sar">
+    <mkdir dir="${phoenix}"/>
+    <copy toDir="${phoenix}">
+      <fileset dir="${general}/phoenix">
+	  <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy toDir="${phoenix}/bin" file="${etc}/login.conf"/>
+    <copy toDir="${phoenix}/apps" file="${dist}/mgr.sar"/>
+    <delete dir="${phoenix}/apps/mgr"/>
+  </target>
+
+  <target name="mgr">
+    <echo message=""/>
+    <echo message="OSM Management Gateway ${mgr.version}"/>
+    <echo message="http://home.osm.net"/>
+    <echo message=""/>
+    <java classname="org.apache.avalon.phoenix.launcher.Main" dir="${phoenix}/bin" fork="true" >
+      <classpath>
+        <fileset dir="${phoenix}/bin">
+          <include name="*.jar" />
+        </fileset>
+      </classpath>
+	<sysproperty key="java.ext.dirs" value="../lib"/>
+	<sysproperty key="avalon.home" value="."/>
+	<sysproperty key="java.security.auth.login.config" value="login.conf"/>
+      <!--<jvmarg value="-Xmx164m"/> -->
+    </java>
+  </target>
+
+  <!--
+  GENERAL
+  -->
+
+  <target name="all" depends="agent" />
+
+  <target name="clean" depends="purge">
+    <delete dir="${dist}" />
+    <delete dir="${phoenix}"/>
+  </target>
+
+  <target name="purge" >
+    <delete dir="${build}" />
+  </target>
+
+  <target name="patch">
+     <replace 
+	 token="net.osm.hub.gateway.PSSConnectorService"
+	 value="net.osm.pss.PSSConnectorService"
+	 dir="${src}" >
+       <include name="**/*.*"/>
+     </replace>
+     <replace 
+	 token="net.osm.hub.gateway.PSSSessionService"
+	 value="net.osm.pss.PSSSessionService"
+	 dir="${src}" >
+       <include name="**/*.*"/>
+     </replace>
+  </target>
+
+</project>
+

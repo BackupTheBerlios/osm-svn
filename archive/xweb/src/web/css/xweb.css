@@ -1,0 +1,89 @@
+
+A:link {color: lightslategrey}
+A:visited {color: lightslategrey}
+A:active {color: lightslategrey}
+
+.home{
+	FONT: bold 48pt verdana; color: LightSlateGray;
+	MARGIN-BOTTOM: 24; MARGIN-TOP: 48; MARGIN-LEFT: 25pt; MARGIN-RIGHT: 25pt; 
+	LETTER-SPACING: -3px; 
+}
+
+.icon{ 
+	MARGIN-BOTTOM:2pt; MARGIN-TOP:2; MARGIN-LEFT:0pt; MARGIN-RIGHT:0pt; padding:0;
+}
+
+.button-label{ 
+	FONT: 8pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM:2pt; MARGIN-TOP:1; MARGIN-LEFT:3pt; MARGIN-RIGHT:3pt; padding:0;
+}
+
+.lead{
+	FONT: bold 12pt verdana; color: DarkSlateGray; 
+	MARGIN-BOTTOM: 6pt; MARGIN-TOP: 72; LEFT: 15pt; 
+	POSITION: relative
+}
+
+.label{ 
+	FONT: 9pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 6pt; MARGIN-TOP: 6; LEFT: 15pt; 
+	POSITION: relative
+}
+
+.label-required{
+	FONT: 9pt verdana, sans-serif; color: maroon; 
+	MARGIN-BOTTOM: 6pt; MARGIN-TOP: 6; LEFT: 15pt; 
+	POSITION: relative
+}
+
+p{ 
+	FONT: verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 3pt; MARGIN-TOP: 3pt; MARGIN-LEFT: 3pt; MARGIN-RIGHT: 3pt;
+	POSITION: relative
+}
+li{ 
+	FONT: 9pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 3pt; MARGIN-TOP: 3; LEFT: 3pt; MARGIN-RIGHT: 3pt;
+	POSITION: relative
+}
+
+.entry{ 
+	FONT: 9pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 3pt; MARGIN-TOP: 3; MARGIN-LEFT: 3pt; MARGIN-RIGHT: 3pt;
+	POSITION: relative
+}
+
+.property{ 
+	FONT: 9pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 3pt; MARGIN-TOP: 3; MARGIN-LEFT: 3pt; MARGIN-RIGHT: 3pt;
+	POSITION: relative;
+      PADDING-LEFT:17;
+}
+
+BODY{ 
+	FONT: verdana, sans-serif, color: black; background:white;
+}
+
+H1{ 
+	FONT: 24pt verdana; color: DarkSlateGray; LETTER-SPACING: -2px; 
+	MARGIN-BOTTOM: 24pt; MARGIN-TOP: 72; LEFT: 15pt; MARGIN-RIGHT: 25pt;
+	POSITION: relative
+}
+
+H2{ 
+	FONT: 16pt verdana; color: DarkSlateGray; LETTER-SPACING: -1px; 
+	MARGIN-BOTTOM: 12pt; MARGIN-TOP: 24; LEFT: 15pt; MARGIN-RIGHT: 25pt;
+	POSITION: relative
+}
+
+H3{ 
+	FONT: bold 12pt verdana; color: DarkSlateGray; LETTER-SPACING: -1px; 
+	MARGIN-BOTTOM: 18pt; MARGIN-TOP: 24; LEFT: 15pt; MARGIN-RIGHT: 25pt;
+	POSITION: relative
+}
+
+H4{ 
+	FONT: bold 9pt verdana; color: DarkSlateGray; 
+	MARGIN-BOTTOM: 18pt; MARGIN-TOP: 18; LEFT: 15pt; MARGIN-RIGHT: 25pt;
+	POSITION: relative
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<!--
+ Copyright 2002 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<configuration>
+
+  <connection url="corbaloc::home.osm.net:2056/session"/>
+ 
+</configuration>
+

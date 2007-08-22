@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+
+<!--
+assembly.java
+
+Copyright 2000-2001 OSM SARL All Rights Reserved.
+This configuration is the proprietary information of OSM SARL.
+Use is subject to license terms.
+@author  Stephen McConnell <mailto:mcconnell@osm.net>
+@version 1.0 24 DEC 2000
+-->
+
+<avalon>
+
+    <!-- Vault block -->
+    <block class="net.osm.vault.LocalVault" name="vault" />
+
+    <!-- ORB -->
+    <block class="net.osm.orb.ORBServer" name="orb" />
+
+    <!-- PSS -->
+    <block class="net.osm.pss.PSSServer" name="pss">
+        <provide name="orb" role="ORB"/>
+    </block>
+
+    <!-- The Time block -->
+    <block class="net.osm.time.TimeServer" name="time" />
+  
+    <!-- INS -->
+    <!--
+    <block class="net.osm.ins.INSServer" name="ins" >
+        <provide name="orb" role="ORB"/>
+        <provide name="pss" role="CONNECTOR"/>
+        <provide name="pss" role="SESSION"/>
+    </block>
+    -->
+
+    <!-- Gateway -->
+    <block class="net.osm.hub.gateway.Gateway" name="gateway" >
+        <provide name="orb" role="ORB"/>
+        <provide name="vault" role="VAULT"/>
+        <provide name="time" role="CLOCK"/>
+    </block>
+
+    <!-- Structured Push Supplier Factory -->
+    <block class="net.osm.hub.resource.StructuredPushSupplierServer" name="supplier" >
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+    </block>
+
+    <!-- Workspace Server -->
+    <block class="net.osm.hub.workspace.WorkspaceServer" name="workspace" >
+        <provide name="time" role="CLOCK"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="REGISTRY"/>
+        <provide name="gateway" role="FACTORY"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+        <provide name="supplier" role="STRUCTURED-PUSH-SUPPLIER"/>
+    </block>
+
+    <!-- Desktop Server -->
+    <block class="net.osm.hub.desktop.DesktopServer" name="desktop" >
+        <provide name="time" role="CLOCK"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="REGISTRY"/>
+        <provide name="gateway" role="FACTORY"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+        <provide name="supplier" role="STRUCTURED-PUSH-SUPPLIER"/>
+        <provide name="workspace" role="WORKSPACE"/>
+    </block>
+
+    <!-- User Server -->
+    <block class="net.osm.hub.user.UserServer" name="user" >
+        <provide name="time" role="CLOCK"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="REGISTRY"/>
+        <provide name="gateway" role="FACTORY"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+        <provide name="supplier" role="STRUCTURED-PUSH-SUPPLIER"/>
+        <provide name="desktop" role="DESKTOP-ADMINISTRATOR"/>
+        <provide name="desktop" role="DESKTOP"/>
+        <provide name="workspace" role="WORKSPACE-ADMINISTRATOR"/>
+        <provide name="workspace" role="WORKSPACE"/>
+    </block>
+
+    <!-- Task Server -->
+    <block class="net.osm.hub.task.TaskServer" name="task" >
+        <provide name="time" role="CLOCK"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="REGISTRY"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+        <provide name="supplier" role="STRUCTURED-PUSH-SUPPLIER"/>
+        <provide name="user" role="USER-ADMINISTRATOR"/>
+        <provide name="user" role="USER"/>
+    </block>
+
+    <!-- Generic Resource Factory -->
+    <block class="net.osm.hub.generic.GenericResourceServer" name="generic" >
+        <provide name="time" role="CLOCK"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="REGISTRY"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+        <provide name="supplier" role="STRUCTURED-PUSH-SUPPLIER"/>
+    </block>
+
+    <!-- Processor Pluggable Appliance Factory -->
+    <block class="net.osm.hub.processor.ProcessorServer" name="processor" >
+        <provide name="time" role="CLOCK"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+        <provide name="gateway" role="REGISTRY"/>
+        <provide name="supplier" role="STRUCTURED-PUSH-SUPPLIER"/>
+    </block>
+
+    <!-- Community Server -->
+    <block class="net.osm.hub.community.CommunityServer" name="community" >
+        <provide name="time" role="CLOCK"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="REGISTRY"/>
+        <provide name="gateway" role="FACTORY"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+        <provide name="supplier" role="STRUCTURED-PUSH-SUPPLIER"/>
+        <provide name="user" role="USER"/>
+        <provide name="workspace" role="WORKSPACE"/>
+    </block>
+
+    <!-- Finder Server -->
+    <block class="net.osm.hub.gateway.FinderServer" name="finder" >
+        <provide name="vault" role="VAULT"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="FACTORY"/>
+        <provide name="user" role="USER-ADMINISTRATOR"/>
+        <provide name="user" role="USER"/>
+        <provide name="community" role="COMMUNITY-ADMINISTRATOR"/>
+    </block>
+
+    <!-- PKI Repository -->
+    <block class="net.osm.pki.repository.RepositoryServer" name="repository">
+        <provide name="orb" role="ORB"/>
+        <provide name="pss" role="PSS-CONNECTOR"/>
+        <provide name="pss" role="PSS-SESSION"/>
+        <provide name="vault" role="VAULT"/>
+    </block>
+
+    <!-- PKI RA Certification -->
+    <block class="net.osm.pki.authority.RequestCertificateServer" name="certification">
+        <provide name="orb" role="ORB"/>
+        <provide name="pss" role="PSS-CONNECTOR"/>
+        <provide name="pss" role="PSS-SESSION"/>
+        <provide name="vault" role="VAULT"/>
+    </block>
+
+    <!-- PKI RA -->
+    <block class="net.osm.pki.authority.RegistrationAuthorityServer" name="authority">
+        <provide name="orb" role="ORB"/>
+        <provide name="certification" role="PKI-CERTIFICATION"/>
+    </block>
+
+    <!-- PKI Server -->
+    <block class="net.osm.pki.process.PKIServer" name="pki" >
+        <provide name="time" role="CLOCK"/>
+        <provide name="gateway" role="ORB"/>
+        <provide name="gateway" role="PSS-CONNECTOR"/>
+        <provide name="gateway" role="PSS-SESSION"/>
+        <provide name="gateway" role="DOMAIN"/>
+        <provide name="gateway" role="RANDOM"/>
+        <provide name="gateway" role="REGISTRY"/>
+        <provide name="supplier" role="STRUCTURED-PUSH-SUPPLIER"/>
+        <provide name="authority" role="AUTHORITY"/>
+        <provide name="generic" role="GENERIC"/>
+    </block>
+
+
+</avalon>

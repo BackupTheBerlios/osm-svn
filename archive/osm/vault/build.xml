@@ -1,0 +1,185 @@
+
+<!-- 
+PSS Service.
+Copyright 2001-2002 OSM SARL, All Rights Reserved.
+-->
+
+<project name="vault" default="help" basedir=".">
+
+  <property file="local.properties"/>
+  <property file="build.properties"/>
+
+  <target name="help" >
+    <echo>
+
+      Description
+      -----------
+
+      ${project.title}
+
+      General Targets:
+      ----------------
+
+      all              - clean, build and dist
+      build            - invokes the general build target
+      javadoc          - javadoc API generation
+      dist             - executes build, javadoc and support file creation
+      clean            - destroy the build directory
+      
+    </echo>
+  </target>
+
+  <property name="VERSION" value="${MAJOR}.${MINOR}.${MICRO}"/>
+
+  <property name="apps.path" value="../../jakarta-avalon-apps" />
+  <property name="common.path" value="${apps.path}/common" />
+  <property name="common.lib.path" value="${common.path}/lib" />
+
+  <property name="vault.jar" value="vault.jar"/>
+
+  <property name="lib" value="lib" />
+  <property name="src" value="src" />
+  <property name="etc" value="${src}/etc" />
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+
+  <property name="javadoc.root.path"  value="${dist}/javadoc" />
+  <property name="avalon.href"  value="http://jakarta.apache.org/avalon/api/" />
+  <property name="jdk.href"  value="http://java.sun.com/j2se/1.4/docs/api/" />
+  <property name="overview.html" value="${etc}/overview.html" />
+
+  <!-- classpath -->
+
+  <path id="project.classpath">
+      <fileset dir="${common.lib.path}">
+        <include name="logkit.jar" />
+        <include name="avalon-framework.jar" />
+      </fileset>
+  </path>
+
+  <!-- MAIN TARGETS -->
+
+  <target name="all" depends="clean,dist"/>
+  <target name="dist" depends="build,javadoc,support"/>
+
+  <target name="clean">
+     <delete dir="${build}"/>
+     <delete dir="${dist}"/>
+  </target>
+
+  <!-- PREPARE -->
+
+  <target name="prepare"  >
+    <mkdir dir="${build}" />
+    <mkdir dir="${build}" />
+    <mkdir dir="${dist}" />
+  </target>
+
+  <!-- VAULT BLOCK -->
+
+  <target name="context" depends="prepare">
+    <mkdir dir="dist"/>
+    <uptodate property="uptodate" targetfile="${dist}/${vault.jar}">
+      <srcfiles dir="${src}/java">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${etc}">
+         <include name="vault.mf"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="build" depends="context" unless="uptodate" >
+      <echo message="Building Vault Block"/>
+      <javac debug="off" destdir="${build}" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+        <src path="${src}/java" />
+      </javac>
+      <copy todir="${build}">
+        <fileset dir="${src}/java">
+          <include name="**/*.xinfo"/>
+          <include name="**/*.xml"/>
+        </fileset>
+        <fileset dir="${etc}">
+          <include name="login.conf"/>
+        </fileset>
+      </copy>
+      <jar jarfile="${dist}/${vault.jar}" basedir="${build}" manifest="${etc}/vault.mf" />
+  </target>
+
+  <!-- UTILITY TARGETS -->
+
+  <target name="support">
+    <copy todir="${dist}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.TXT"/>
+         <include name="README.TXT"/>
+       </fileset>
+    </copy>
+  </target>
+
+  <target name="javadoc" depends="prepare" >
+    <mkdir dir="${javadoc.root.path}" />
+    <copy todir="${javadoc.root.path}/">
+       <fileset dir="${etc}">
+         <include name="LICENSE.HTML"/>
+         <include name="license.css"/>
+       </fileset>
+    </copy>
+    <javadoc destdir="${javadoc.root.path}" 
+	doctitle="&lt;h1&gt;${project.title} ${VERSION}&lt;/h1&gt;" 
+      noindex="false" author="false" 
+      use="true"
+      overview="${overview.html}"
+	windowtitle="Vault Service" 
+      bottom="&lt;a href='{@docRoot}/LICENSE.HTML'/&gt;License, Disclaimer and due credits.&lt;/a&gt;"
+      additionalparam="-breakiterator -J-Xmx128m"
+      packagenames="net.*" 
+      >
+        <sourcepath path="${src}/java"/>
+        <classpath>
+	    <path refid="project.classpath" />
+          <pathelement path="${dist}/${vault.jar}" />
+	  </classpath>
+	  <link href="${jdk.href}" />
+	  <link href="${avalon.href}" />
+    </javadoc>
+  </target>
+
+  
+  <target name="demo" depends="loader.validation,build" if="merlin.available" >
+    <load target="net.osm.vault.Demonstration" priority="${demo.priority}"      
+      configuration="${etc}/config.xml"
+      disposal="${demo.disposal}" 
+      verbose="${demo.verbose}">
+      <fileset dir="${dist}">
+         <include name="${vault.jar}"/>
+      </fileset>
+    </load>
+  </target>
+
+  <target name="loader.context">
+    <available property="merlin.available" file="${ant.home}/lib/merlin.jar"/>
+  </target>
+
+  <target name="loader.defintion" depends="loader.context" if="merlin.available">
+    <taskdef resource="merlin.properties"/>
+  </target>
+ 
+  <target name="loader.validation" depends="loader.defintion" unless="merlin.available">
+    <echo>
+
+     Merlin is not installed in your Ant library.
+     In order to use the "load" task the following jar files 
+     must be added to your ${ant.home}/lib directory:
+
+       - merlin.jar
+       - avalon-framework.jar
+       - logkit.jar
+       - xerces.jar (for JRE 1.3 and earlier)
+    </echo>
+  </target>
+
+</project>

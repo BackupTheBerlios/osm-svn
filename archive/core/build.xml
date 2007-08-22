@@ -1,0 +1,2063 @@
+
+<!--
+OSM DEV environment build file.
+-->
+
+<project name="core" default="help" basedir=".">
+
+<!-- HELP -->
+
+  <target name="help" >
+    <echo message=""/>
+    <echo message="  help           -- this message"/>
+    <echo message="  install        -- builds system"/>
+    <echo message="  pki            -- builds the PKI sub-system"/>
+    <echo message="  gateway        -- builds and runs the gateway server"/>
+    <echo message="  clean          -- removes compiled classes"/>
+    <echo message="  clean.all      -- removes generated file including common services"/>
+    <echo message=""/>
+  </target>
+
+<!-- GLOBAL PROPERTIES -->
+
+  <!--
+  Read in local properties from a property file.  Properties
+  defined in the file will overwrite property declarations in 
+  this build file.
+  -->
+
+  <property file="local.properties"/>
+  <property name="pss.library.jar"  value="OSM-PSS-1.0.jar" />
+  <property name="psdl.jar"  value="OSM-PSDL-1.0.jar" />
+  <property name="psdl.class"  value="net.osm.pss.compiler.PsdlCompiler" />
+
+  <!--
+  Properties corresponding to the CVS strucutre before building.
+  -->
+
+  <property name="lib"  value="lib" />
+  <property name="external" value="external"/>
+  <property name="blocks"  value="blocks" />
+  <property name="src"  value="src" />
+  <property name="idl"  value="${src}/idl" />
+  <property name="psdl"  value="${src}/psdl" />
+  <property name="corba"  value="${idl}/corba" />
+  <property name="services"  value="${idl}/services" />
+  <property name="manifest"  value="${src}/manifest" />
+  <property name="etc"  value="${src}/etc" />
+
+  <!--
+  Properties defining directories created through the build process.  The ${build} directory
+  contains the generated java sources and compiled java classes.  The ${dist} directory contains 
+  jar files, bar files and sample appliance files.  The ${doc} directory is a sub-directory
+  ${dist} into which the generated javadoc is placed.  The ${deployment} property refers to 
+  the destination parent directory for the server application when deploying for actual 
+  execution.  The final deployed application will be located under ${deployment}/${gateway}. 
+  -->
+
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+  <property name="deployment"  value=".." />
+  <property name="doc"  value="${dist}/doc" />
+
+  <!--
+  The following properties are used within this build file for the purpose of constructing final 
+  names (in the case of the ${vendor) property), the structure of the deployment packages, argument
+  values for testing, and common classpath declarations.
+  -->
+
+  <property name="vendor"  value="osm" />
+  <property name="version"  value="1.0.1" />
+  
+  <property name="gateway"  value="gateway" />
+  <property name="apps"  value="ext" />
+  <property name="root"  value="osm" />
+
+  <property name="finder.ior" value="${gateway}/finder.ior"/>
+  <property name="editor.url" value="http://home.osm.net/dpml/hello.xml"/>
+  <property name="persistence" value="database" />
+
+  <!--
+  LIB DIRECTORY INTEGRITY - EXTERNAL JAR FILE UPDATING
+  The following targets handle the updating of the Avalon, OpenORB and Servlet 
+  jar file in the ${lib} directory.  This target assumes that ${open} and 
+  ${jakarta} properties refer to the relative directory paths to the root CVS 
+  directories.
+  -->
+
+  <property name="general" value="../common"/>
+
+  <!--
+  <property name="open" value="../common/open"/>
+  <property name="open.openorb" value="${open}/OpenORB"/>
+  <property name="open.ots" value="${open}/TransactionService"/>
+  <property name="open.pss" value="${open}/PersistentStateService"/>
+  <property name="open.time" value="${open}/TimeService"/>
+  <property name="jakarta" value="../../jakarta"/>
+  <property name="avalon" value="${jakarta}/jakarta-avalon"/>
+  <property name="phoenix" value="${jakarta}/jakarta-avalon-phoenix"/>
+  <property name="logkit" value="${jakarta}/jakarta-avalon-logkit"/>
+  <property name="servlet" value="${jakarta}/jakarta-servletapi-4"/>
+  -->
+
+  <target name="lib.update">
+    <!--
+    <copy todir="${lib}">
+      <fileset dir="${common}/lib">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${external}">
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
+    -->
+  </target>
+
+  <!--
+  GENERAL PATH DECLARATIONS AND PACKAGE PROPERTY DECLARATIONS
+  -->
+
+  <path id="avalon.classpath">
+      <fileset dir="${general}/lib">
+        <include name="phoenix*.jar" />
+        <include name="avalon*.jar" />
+        <include name="logkit*.jar" />
+      </fileset>
+  </path>
+
+  <path id="open.classpath">
+      <fileset dir="${general}/lib">
+        <include name="${pss.library.jar}" />
+        <include name="${psdl.jar}" />
+        <include name="openorb*.jar" />
+        <include name="jta*.jar" />
+      </fileset>
+  </path>
+
+  <!--
+  The ${common.jar} file contains the generated stubs, skeletons and valuetypes for the OMG services
+  including the Task and Session framework, Community Framework and Collaboration Framework.
+  -->
+ 
+  <property name="common"  value="common" />
+  <property name="common.jar"  value="${vendor}-${common}.jar" />
+  <property name="common.client.jar"  value="${vendor}-${common}-client.jar" />
+
+  <!--
+  The ${orb.jar} file contains classes supporting a CORBA 2.3 portable ORB service.
+  -->
+
+  <property name="orb"  value="orb" />
+  <property name="orb.jar"  value="${vendor}-${orb}.jar" />
+
+  <!--
+  The ${pss.jar} file contains classes supporting a PSS block
+  -->
+
+  <property name="pss"  value="pss" />
+  <property name="pss.jar"  value="${vendor}-${pss}.jar" />
+
+  <!--
+  The ${dpml.jar} file contains classes supporting DPML documet parsing and valuetype creation supporting
+  Criteria instances suitable for creation of business objects and processes.  It is dependent on the 
+  ${common.client.jar} file.
+  -->
+  
+  <property name="dpml"  value="dpml" />
+  <property name="dpml.jar"  value="${vendor}-${dpml}.jar" />
+
+  <!--
+  The ${base.jar} file contains a number of utility classes supporting persitent lists, persitent event 
+  storage and common classes supporting general services such as cascading event defintions and other 
+  low level interfaces.
+  -->
+
+  <property name="base"  value="base" />
+  <property name="base.jar"  value="${vendor}-${base}.jar" />
+
+  <!--
+  The ${appliance.jar} file contains the interfaces and base implememtation of an appliance, a type 
+  representing a back-end process wrapped.  The ${appliance.jar} file contains everything needed to build
+  a new business process based on the supplied AbstractAppliance class, which itself provides the access 
+  point to the business object framework (ref ${common.client.jar}).  The ${hello.jar} file contains a 
+  sample appliance named "Hello World" that demonstates appliance control within a processor, configuration
+  based on internal policy, an excution with a supplied context.
+  -->
+
+  <property name="appliance"  value="appliance" />
+  <property name="appliance.jar"  value="${vendor}-${appliance}.jar" />
+
+  <property name="hello"  value="hello" />
+  <property name="hello.jar"  value="${hello}.jar" />
+
+  <!--
+  The ${realm.bar} file is a server component supporting the persitent storage of bindings between 
+  tokens (representing login usernames), credentials, email address and sequence of roles.
+  -->
+
+  <property name="realm"  value="realm" />
+  <property name="realm.bar"  value="${vendor}-${realm}.jar" />
+  <property name="realm.jar"  value="${vendor}-${realm}-client.jar" />
+
+  <!--
+  The ${time.bar} file contains an OMG Time Service packaged as a server block within the Gateway.  Time
+  services are accessible through the block (for internal applications), and externally based on block
+  configuration options declared under the Gateway configuration.
+  -->
+
+  <property name="time"  value="time" />
+  <property name="time.bar"  value="${vendor}-${time}.jar" />
+  <property name="time.jar"  value="${vendor}-${time}.jar" />
+
+  <!--
+  The ${portal.bar} file contains a implemetation of the Registration and Discovery services based on 
+  a transient in-memory model. Resource descriptions are created based on jar files within the gateway
+  repository directory.
+  -->
+
+  <property name="portal"  value="portal" />
+  <property name="portal.bar"  value="${vendor}-${portal}.jar" />
+  <property name="portal.jar"  value="${vendor}-${portal}-client.jar" />
+
+  <!--
+  The ${hub.bar} file is the pricipal component of the Gateway and provides an implementation of the 
+  OMG Task and Session business object platform together with process management capabilities based on
+  interfaces and valuetypes defined undef the Community and Collaboration framework specifications.  The 
+  ${test.jar} file contains a main class used to exercise the hub through creation and minipulation of
+  User, Workspace, Message, Task, Processor and Appliance concepts.
+  -->
+
+  <property name="hub"  value="hub" />
+  <property name="hub.bar"  value="${vendor}-${hub}.jar" />
+  <property name="hub.jar"  value="${vendor}-${hub}-client.jar" />
+
+  <property name="test"  value="test" />
+  <property name="test.jar"  value="${vendor}-${test}.jar" />
+
+  <property name="properties"  value="properties" />
+  <property name="properties.jar"  value="${vendor}-${properties}.jar" />
+
+  <property name="ins"  value="ins" />
+  <property name="ins.bar"  value="${vendor}-${ins}.jar" />
+
+  <property name="web"  value="web" />
+  <property name="web.jar"  value="${vendor}-${web}.jar" />
+  <property name="web.war"  value="${vendor}.war" />
+
+  <property name="util"  value="util" />
+  <property name="util.jar"  value="${vendor}-${util}.jar" />
+
+  <property name="vault"  value="vault" />
+  <property name="vault.jar"  value="${vendor}-${vault}.jar" />
+
+  <property name="pki"  value="pki" />
+  <property name="pki.jar"  value="${vendor}-${pki}.jar" />
+  <property name="certification.jar"  value="${vendor}-certification.jar" />
+  <property name="pki-base.jar"  value="${vendor}-${pki}-base.jar" />
+  <property name="repository.jar"  value="${vendor}-${pki}-repository.jar" />
+  <property name="authority.jar"  value="${vendor}-${pki}-authority.jar" />
+ 
+  <!--
+  ENVIRONMENT
+  The environment target creates the directory structures for ${build} and ${dist} - (temporary build files and 
+  distribution directories).
+  -->
+
+  <target name="environment" >
+    <mkdir dir="${build}" />
+    <mkdir dir="${dist}/lib"/>
+    <mkdir dir="${dist}/bar"/>
+    <mkdir dir="${dist}/apps"/>
+  </target>
+
+  <target name="purge" >
+    <delete includeEmptyDirs="true">
+      <fileset dir="${build}">
+        <exclude name="${common}/**"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="clean" depends="purge">
+    <delete includeEmptyDirs="true">
+      <fileset dir="${dist}">
+        <exclude name="lib/${common.jar}"/>
+        <exclude name="doc/**"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="clean.all">
+    <delete dir="${dist}"/>
+    <delete dir="${build}"/>
+    <delete dir="${deployment}/${gateway}"/>
+  </target>
+
+  <target name="all" depends="install,hub.client,time" />
+  <target name="total" depends="all" />
+
+  <!-- 
+  COMMON SERVICES
+  This set of targets builds the common.jar file containing the stubs and skeletons for the basic 
+  Task Session, Community and Collaboration interfaces, and the supplimentary factory interfaces. 
+  -->
+
+  <target name="common" depends="common.jar,common.client" />
+
+  <target name="common.clean" depends="common.purge" >
+    <delete file="${dist}/lib/${common.jar}"/>
+    <delete file="${dist}/lib/${common.client.jar}"/>
+  </target>
+
+  <target name="common.purge" >
+    <delete dir="${build}/common"/>
+  </target>
+
+  <target name="common.environment" depends="environment">
+    <mkdir dir="${build}/${common}/lib"/>
+    <mkdir dir="${build}/${common}/src"/>
+    <mkdir dir="${build}/${common}/excludes"/>
+  </target>
+
+  <target name="common.context" depends="common.environment">
+    <uptodate property="common.jar.uptodate" targetfile="${dist}/lib/${common.jar}">
+      <srcfiles dir="${src}/idl/services"/>
+      <srcfiles dir="${src}/idl/services/normal"/>
+      <srcfiles dir="${build}/${common}">
+	  <include name="org/omg/**"/>
+      </srcfiles>
+      <srcfiles dir="${src}/java">
+	  <include name="org/omg/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="common.client.jar.uptodate" targetfile="${dist}/lib/${common.client.jar}">
+      <srcfiles dir="${src}/idl/services"/>
+      <srcfiles dir="${src}/idl/services/normal"/>
+      <srcfiles dir="${build}/${common}">
+	  <include name="org/omg/**"/>
+      </srcfiles>
+      <srcfiles dir="${src}/java">
+	  <include name="org/omg/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="common.idl" depends="CollaborationFramework.idl" />
+
+  <target name="common.idl.context" depends="environment">
+    <uptodate property="common.idl.uptodate" targetfile="${dist}/lib/common.jar">
+      <srcfiles dir="${idl}/services"/>
+      <srcfiles dir="${idl}/services/normal"/>
+    </uptodate>
+    <uptodate property="TimeBase.modified" targetfile="${services}/TimeBase.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/TimeBase/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosTime.modified" targetfile="${services}/CosTime.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CosTime/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosCollection.modified" targetfile="${services}/normal/CosCollection.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CosCollection/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosLifeCycle.modified" targetfile="${services}/CosLifeCycle.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CosLifeCycle/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosObjectIdentity.modified" targetfile="${services}/CosObjectIdentity.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CosObjectIdentity/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosPropertyService.modified" targetfile="${services}/CosPropertyService.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CosPropertyService/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosEventComm.modified" targetfile="${services}/CosEventComm.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CosEventComm/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosNotification.modified" targetfile="${services}/CosNotification.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CosNotification/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosNotifyComm.modified" targetfile="${services}/CosNotifyComm.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CosNotifyComm/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="NamingAuthority.modified" targetfile="${services}/NamingAuthority.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/NamingAuthority/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="Session.modified" targetfile="${services}/Session.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/Session/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CommunityFramework.modified" targetfile="${services}/CommunityFramework.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CommunityFramework/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CollaborationFramework.modified" targetfile="${services}/CollaborationFramework.idl">
+      <srcfiles dir="${build}/${common}/src">
+	  <include name="org/omg/CollaborationFramework/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="TimeBase.idl" depends="common.idl.context" if="TimeBase.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/TimeBase.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosTime.idl" depends="TimeBase.idl" if="CosTime.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CosTime.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosCollection.idl" depends="common.idl.context" if="CosCollection.modified">
+    <antcall target="idl2java" >
+ 	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/normal/CosCollection.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosLifeCycle.idl" depends="common.idl.context" if="CosLifeCycle.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CosLifeCycle.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosObjectIdentity.idl" depends="common.idl.context" if="CosObjectIdentity.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CosObjectIdentity.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosPropertyService.idl" depends="common.idl.context" if="CosPropertyService.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CosPropertyService.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosEventComm.idl" depends="common.idl.context" if="CosEventComm.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CosEventComm.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosNotification.idl" depends="common.idl.context" if="CosNotification.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CosNotification.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosNotifyComm.idl" depends="CosNotification.idl,CosEventComm.idl" if="CosNotifyComm.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CosNotifyComm.idl" />
+    </antcall>
+  </target>
+
+  <target name="NamingAuthority.idl" depends="common.idl.context" if="NamingAuthority.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/NamingAuthority.idl" />
+    </antcall>
+  </target>
+
+  <target name="Session.idl" 
+    depends="CosNotifyComm.idl,NamingAuthority.idl,CosLifeCycle.idl,CosTime.idl,CosCollection.idl,CosPropertyService.idl,CosObjectIdentity.idl" 
+    if="Session.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/Session.idl" />
+    </antcall>
+    <move todir="${build}/${common}/excludes">
+      <fileset dir="${build}/${common}/src/org/omg/Session">
+        <include name="AccessedBy.java" />
+        <include name="Accesses.java" />
+        <include name="AdministeredBy.java" />
+        <include name="Administers.java" />
+        <include name="BaseBusinessObjectKey.java" />
+        <include name="CollectedBy.java" />
+        <include name="Collects.java" />
+        <include name="ComposedOf.java" />
+        <include name="ConsumedBy.java" />
+        <include name="Consumes.java" />
+        <include name="IsPartOf.java" />
+        <include name="OwnedBy.java" />
+        <include name="Owns.java" />
+        <include name="ProducedBy.java" />
+        <include name="Produces.java" />
+      </fileset>
+    </move>
+  </target>
+
+  <target name="CommunityFramework.idl" depends="Session.idl" if="CommunityFramework.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CommunityFramework.idl" />
+    </antcall>
+    <move todir="${build}/${common}/excludes">
+      <fileset dir="${build}/${common}/src/org/omg/CommunityFramework">
+        <include name="AgencyCriteria.java" />
+        <include name="CommunityCriteria.java" />
+        <include name="Criteria.java" />
+        <include name="ExternalCriteria.java" />
+        <include name="GenericCriteria.java" />
+        <include name="Member.java" />
+        <include name="MembershipCount.java" />
+        <include name="MembershipModel.java" />
+        <include name="MembershipPolicy.java" />
+        <include name="Problem.java" />
+        <include name="Recognizes.java" />
+        <include name="Role.java" />
+        <include name="RolePolicy.java" />
+        <include name="RoleStatus.java" />
+        <include name="Control.java" />
+        <include name="UserCriteria.java" />
+        <include name="MessageCriteria.java" />
+      </fileset>
+    </move>
+  </target>
+
+  <target name="CollaborationFramework.idl" depends="CommunityFramework.idl" if="CollaborationFramework.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/${common}/src"/>
+      <param name="service" value="${services}/CollaborationFramework.idl" />
+    </antcall>
+    <move todir="${build}/${common}/excludes">
+      <fileset dir="${build}/${common}/src/org/omg/CollaborationFramework">
+        <include name="ApplyArgument.java" />
+        <include name="Clock.java" />
+        <include name="CollaborationModel.java" />
+        <include name="Completion.java" />
+        <include name="CompoundTransition.java" />
+        <include name="Constructor.java" />
+        <include name="ControlledBy.java" />
+        <include name="Controls.java" />
+        <include name="CoordinatedBy.java" />
+        <include name="Coordinates.java" />
+        <include name="Duplicate.java" />
+        <include name="Duration.java" />
+        <include name="EncounterCriteria.java" />
+        <include name="EngagementModel.java" />
+        <include name="Initialization.java" />
+        <include name="InputDescriptor.java" />
+        <include name="Launch.java" />
+        <include name="LocalTransition.java" />
+        <include name="Map.java" />
+        <include name="Monitors.java" />
+        <include name="Move.java" />
+        <include name="OutputDescriptor.java" />
+        <include name="ProcessorCriteria.java" />
+        <include name="ProcessorModel.java" />
+        <include name="Referral.java" />
+        <include name="Remove.java" />
+        <include name="ResultClass.java" />
+        <include name="ResultID.java" />
+        <include name="SimpleTransition.java" />
+        <include name="State.java" />
+        <include name="StateDescriptor.java" />
+        <include name="TerminalTransition.java" />
+        <include name="Timeout.java" />
+        <include name="Transition.java" />
+        <include name="Trigger.java" />
+        <include name="UsageDescriptor.java" />
+        <include name="VoteCount.java" />
+        <include name="VoteModel.java" />
+        <include name="VoteReceipt.java" />
+        <include name="VoteStatement.java" />
+      </fileset>
+    </move>
+  </target>
+
+  <target name="common.jar" depends="common.context" unless="common.jar.uptodate">
+    <antcall target="common.idl"/>
+    <javac debug="off" destdir="${build}/${common}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	</classpath>
+      <src path="${build}/${common}/src" />
+      <src path="${src}/java"/>
+      <include name="org/omg/**" />
+    </javac>
+    <copy todir="${build}/${common}/lib">
+	<fileset dir="${src}/java">
+	  <include name="org/omg/**/*.gif" />
+	</fileset>
+    </copy>
+    <jar file="${dist}/lib/${common.jar}" >
+      <fileset dir="${build}/${common}/lib"/>
+    </jar>
+  </target>
+
+  <target name="common.client" depends="dpml.jar,common.context" unless="common.client.jar.uptodate">
+    <antcall target="common.idl"/>
+    <jar file="${dist}/lib/${common.client.jar}" >
+      <fileset dir="${build}/${common}/lib">
+	  <exclude name="**/*POA*.*"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <!--
+  PKI
+  -->
+
+  <target name="pki" depends="pki.base,repository.jar,authority.jar,pki.jar"/>
+  
+
+  <target name="pki.context" depends="environment">
+    <mkdir dir="${build}/${pki}/src"/>
+    <mkdir dir="${build}/${pki}/lib"/>
+    <uptodate property="pki-base.jar.uptodate" targetfile="${dist}/lib/${pki-base.jar}">
+      <srcfiles dir="${src}">
+	  <include name="java/net/osm/pki/base/**/*"/>
+	  <include name="java/net/osm/pki/pkcs/**/*"/>
+	  <include name="idl/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="repository.jar.uptodate" targetfile="${dist}/lib/${repository.jar}">
+      <srcfiles dir="${src}">
+	  <include name="java/net/osm/pki/repository/**/*"/>
+	  <include name="idl/services/PKI.idl"/>
+	  <include name="idl/services/PKIRepository.idl"/>
+      </srcfiles>
+      <srcfiles dir="${build}/pki">
+	  <include name="net/osm/pki/repository/**/*"/>
+	  <include name="org/omg/PKIRepository/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="authority.jar.uptodate" targetfile="${dist}/lib/${authority.jar}">
+      <srcfiles dir="${src}">
+	  <include name="java/net/osm/pki/authority/**/*"/>
+	  <include name="idl/services/PKI.idl"/>
+	  <include name="idl/services/PKIRepository.idl"/>
+	  <include name="idl/services/PKIAuthority.idl"/>
+      </srcfiles>
+      <srcfiles dir="${build}/pki">
+	  <include name="net/osm/pki/authority/**/*"/>
+	  <include name="org/omg/PKIAuthority/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="certification.uptodate" targetfile="${dist}/apps/${certification.jar}">
+      <srcfiles dir="${src}">
+	  <include name="java/net/osm/pki/**/*"/>
+	  <include name="${manifest}/pki-processor-home.mf"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="pki.idl.context" depends="environment,pki.context">
+    <uptodate property="pki.idl.modified" targetfile="${services}/pki.idl">
+      <srcfiles dir="${build}/pki/src">
+	  <include name="org/omg/PKI/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="pki-authority.idl.modified" targetfile="${services}/PKIAuthority.idl">
+      <srcfiles dir="${build}/pki/src">
+	  <include name="org/omg/PKIAuthority/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="pki-repository.idl.modified" targetfile="${services}/PKIRepository.idl">
+      <srcfiles dir="${build}/pki/src">
+	  <include name="org/omg/PKIRepository/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="pki-pkcs.idl.modified" targetfile="${idl}/pkcs.idl">
+      <srcfiles dir="${build}/pki/src">
+	  <include name="net/osm/pki/pkcs/**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="pki.idl" depends="pki.idl.context" if="pki.idl.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/pki/src"/>
+      <param name="service" value="${services}/PKI.idl" />
+    </antcall>
+  </target>
+
+  <target name="pki.authority.idl" depends="pki.idl.context,pki.idl" if="pki-authority.idl.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/pki/src"/>
+      <param name="service" value="${services}/PKIAuthority.idl" />
+    </antcall>
+  </target>
+
+  <target name="pki.repository.idl" depends="pki.idl.context,pki.idl" if="pki-repository.idl.modified">
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/pki/src"/>
+      <param name="service" value="${services}/PKIRepository.idl" />
+    </antcall>
+  </target>
+
+  <target name="pkcs.idl" depends="pki.idl.context,pki.idl" if="pki-pkcs.idl.modified">
+	<java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-d ${build}/pki/src"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${services}"/>
+	<arg line="-I ${idl}/corba"/>
+	<arg line="-native Subject javax.security.auth.Subject"/>
+	<arg line="-native Principal java.security.Principal"/>
+	<arg line="-native PKCS10Attributes sun.security.pkcs.PKCS10Attributes"/>
+	<arg line="-native X500Name net.osm.pki.base.X500Name"/>
+	<arg line="-native PublicKey java.security.PublicKey"/>
+	<arg line="${idl}/pkcs.idl" />
+    </java>
+  </target>
+
+  <target name="pki.psdl.context" depends="environment">
+    <uptodate property="pki.psdl.modified" targetfile="${psdl}/pki.psdl">
+      <srcfiles dir="${build}/pki/src">
+	  <include name="net/osm/pki/repository/**/*"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="pki.psdl" depends="pki.repository.idl,pki.psdl.context" if="pki.psdl.modified">
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${services}"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="-d ${build}/pki/src"/>
+	<arg line="${psdl}/pki.psdl"/>
+    </java>
+  </target>
+
+  <!--
+  PKI base library
+  -->
+
+  <target name="pki.base" depends="pki.context,pki.idl,pkcs.idl" 
+	unless="pki-base.jar.uptodate">
+    <javac debug="off" destdir="${build}/pki/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${util.jar}"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+	  <pathelement path="${dist}/lib/${realm.jar}"/>
+	</classpath>
+      <src path="${src}/java"/>
+      <src path="${build}/pki/src"/>
+      <include name="net/osm/pki/base/**/*"/>
+      <include name="net/osm/pki/util/**/*"/>
+      <include name="net/osm/pki/pkcs/**/*"/>
+      <include name="org/omg/PKI/**/*"/>
+    </javac>
+    <jar file="${dist}/lib/${pki-base.jar}">
+       <fileset dir="${build}/pki/lib">
+          <include name="net/osm/pki/base/**/*"/>
+          <include name="net/osm/pki/util/**/*"/>
+          <include name="net/osm/pki/pkcs/**/*"/>
+          <include name="org/omg/PKI/**/*"/>
+       </fileset>
+    </jar>
+  </target>
+
+  <!--
+  PKI Repository block.
+  -->
+
+  <target name="repository.jar" depends="pki.psdl,pki.base,pki.context" unless="repository.jar.uptodate">
+    <javac debug="off" destdir="${build}/pki/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${util.jar}"/>
+	  <pathelement path="${orb.jar}"/>
+	  <pathelement path="${pki-base.jar}"/>
+	</classpath>
+      <src path="${src}/java"/>
+      <src path="${build}/pki/src"/>
+	<include name="net/osm/pki/repository/*/**" />
+      <include name="org/omg/PKIRepository/**/*"/>
+    </javac>
+    <copy todir="${build}/pki/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/pki/repository/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/lib/${repository.jar}" manifest="${manifest}/repository.mf">
+       <fileset dir="${build}/pki/lib">
+          <include name="net/osm/pki/repository/**/*"/>
+          <include name="org/omg/PKIRepository/**/*"/>
+       </fileset>
+    </jar>
+  </target>
+
+  <!--
+  PKI Registration Authority block.
+  -->
+
+  <target name="authority.jar" depends="orb,pss,pki.context,pki.authority.idl,repository.jar" unless="authority.jar.uptodate">
+    <javac debug="off" destdir="${build}/pki/lib" deprecation="true" verbose="false">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${util.jar}"/>
+	  <pathelement path="${orb.jar}"/>
+	  <pathelement path="${pss.jar}"/>
+	  <pathelement path="${repository.jar}"/>
+	  <pathelement path="${pki-base.jar}"/>
+	</classpath>
+      <src path="${src}/java"/>
+      <src path="${build}/pki/src"/>
+	<include name="net/osm/pki/authority/*/**" />
+      <include name="org/omg/PKIAuthority/**/*"/>
+    </javac>
+    <copy todir="${build}/pki/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/pki/authority/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/lib/${authority.jar}" manifest="${manifest}/authority.mf">
+       <fileset dir="${build}/pki/lib">
+          <include name="net/osm/pki/authority/**/*"/>
+          <include name="org/omg/PKIAuthority/**/*"/>
+       </fileset>
+    </jar>
+  </target>
+
+  <target name="pki.jar" depends="pss,pki.context,common.jar,hub.bar,util.jar,appliance.jar,pki.base, authority.jar" >
+    <javac debug="off" destdir="${build}/pki/lib" deprecation="true" verbose="false">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${base.jar}"/>
+	  <pathelement path="${dist}/lib/${util.jar}"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+	  <pathelement path="${dist}/lib/${pss.jar}"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/bar/${hub.bar}"/>
+	  <pathelement path="${dist}/lib/${appliance.jar}"/>
+	  <pathelement path="${dist}/lib/${realm.jar}"/>
+	  <pathelement path="${dist}/lib/${pki-base.jar}"/> 
+	  <pathelement path="${dist}/lib/${pki-authority.jar}"/> 
+	</classpath>
+      <src path="${src}/java"/>
+	<include name="net/osm/pki/*.java" />
+	<include name="net/osm/pki/process/*.java" />
+    </javac>
+    <jar file="${dist}/bar/${pki.jar}" manifest="${manifest}/pki-processor-home.mf">
+       <fileset dir="${build}/pki/lib">
+          <include name="net/osm/pki/*"/>
+          <include name="net/osm/pki/process/**/*"/>
+       </fileset>
+       <fileset dir="${src}/java/">
+          <include name="net/osm/pki/*.xinfo"/>
+          <include name="net/osm/pki/process/*.xinfo"/>
+          <include name="net/osm/pki/process/*.properties"/>
+       </fileset>
+    </jar>
+    <jar file="${dist}/apps/${certification.jar}" manifest="${manifest}/certification.mf">
+       <fileset dir="${build}/${pki}/lib">
+          <include name="net/osm/pki/process/**/*"/>
+       </fileset>
+    </jar>
+  </target>
+
+  <!-- 
+  ORB
+  -->
+
+  <target name="orb" depends="orb.jar"/>
+
+  <target name="orb.context" depends="environment">
+    <uptodate property="orb.jar.uptodate" targetfile="${dist}/lib/${orb.jar}">
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/orb/**"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="orb.jar" depends="orb.context" unless="orb.jar.uptodate">
+    <mkdir dir="${build}/${orb}/lib"/>
+    <javac debug="off" destdir="${build}/${orb}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	</classpath>
+      <src path="${src}/java" />
+	<include name="net/osm/orb/**" />
+    </javac>
+    <copy todir="${build}/${orb}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/orb/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/lib/${orb.jar}" >
+      <fileset dir="${build}/${orb}/lib">
+	  <include name="net/osm/orb/**" />
+      </fileset>
+    </jar>
+  </target>
+
+  <!-- 
+  ORB
+  -->
+
+  <target name="pss" depends="pss.jar"/>
+
+  <target name="pss.context" depends="environment">
+    <uptodate property="pss.jar.uptodate" targetfile="${dist}/lib/${pss.jar}">
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/pss/**"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="pss.jar" depends="orb.jar,pss.context" unless="pss.jar.uptodate">
+    <mkdir dir="${build}/${pss}/lib"/>
+    <javac debug="off" destdir="${build}/${pss}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+	</classpath>
+      <src path="${src}/java" />
+	<include name="net/osm/pss/**" />
+    </javac>
+    <copy todir="${build}/${pss}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/pss/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/lib/${pss.jar}" >
+      <fileset dir="${build}/${pss}/lib">
+	  <include name="net/osm/pss/**" />
+      </fileset>
+    </jar>
+  </target>
+
+
+  <!-- 
+  UTIL
+  -->
+
+  <target name="util" depends="util.jar"/>
+
+  <target name="util.context" depends="environment">
+    <uptodate property="util.jar.uptodate" targetfile="${dist}/lib/${util.jar}">
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/util/**"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="util.jar" depends="util.context" unless="util.jar.uptodate">
+    <mkdir dir="${build}/${util}/lib"/>
+    <javac debug="off" destdir="${build}/${util}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	</classpath>
+      <src path="${src}/java" />
+	<include name="net/osm/util/**" />
+    </javac>
+    <jar file="${dist}/lib/${util.jar}" >
+      <fileset dir="${build}/${util}/lib">
+        <include name="net/osm/util/**" />
+      </fileset>
+      <fileset dir="${src}/java">
+        <include name="net/osm/util/*.properties" />
+      </fileset>
+    </jar>
+  </target>
+
+  <!-- 
+  DPML
+  The DPML target buils the ${dpml.jar} file under the ${dist}/lib directory.
+  -->
+
+  <target name="dpml.environment" depends="environment">
+    <mkdir dir="${build}/${dpml}/src"/>
+    <mkdir dir="${build}/${dpml}/lib"/>
+  </target>
+
+  <target name="dpml.clean" depends="dpml.purge" >
+    <delete file="${dist}/lib/${dpml.jar}"/>
+  </target>
+
+  <target name="dpml.purge" >
+    <delete dir="${build}/${dpml}"/>
+  </target>
+
+
+  <target name="dpml.context" depends="dpml.environment">
+    <uptodate property="dpml.jar.uptodate" targetfile="${dist}/lib/${dpml.jar}">
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/dpml/**"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="dpml.jar" depends="common.jar,dpml.context" unless="dpml.jar.uptodate">
+    <mkdir dir="${build}/${dpml}/lib"/>
+    <javac debug="off" destdir="${build}/${dpml}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	</classpath>
+      <src path="${src}/java" />
+	<include name="net/osm/dpml/**" />
+    </javac>
+    <copy todir="${build}/${dpml}/lib">
+	<fileset dir="${src}/java">
+	  <include name="net/osm/dpml/**/*.gif" />
+	</fileset>
+    </copy>
+    <jar file="${dist}/lib/${dpml.jar}" >
+      <fileset dir="${build}/${dpml}/lib">
+        <include name="net/osm/dpml/**" />
+	  <include name="net/osm/hub/home/**" />
+      </fileset>
+    </jar>
+  </target>
+
+  <!-- 
+  BASE, EVENT & LIST 
+  -->
+
+  <target name="base.environment" depends="environment">
+    <mkdir dir="${build}/${base}/src"/>
+    <mkdir dir="${build}/${base}/lib"/>
+  </target>
+
+  <target name="base.clean" depends="base.purge" >
+    <delete file="${dist}/lib/${base.jar}"/>
+  </target>
+
+  <target name="base.purge" >
+    <delete dir="${build}/${base}"/>
+  </target>
+
+  <target name="list.psdl.context" depends="base.environment">
+    <uptodate property="list.psdl.modified" targetfile="${psdl}/list.psdl">
+      <srcfiles dir="${build}/${base}/src">
+	  <include name="net/osm/list/**"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="list.psdl" depends="orb.jar,util.jar,list.psdl.context" if="list.psdl.modified">
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-I ${idl}/services"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="-d ${build}/${base}/src"/>
+	<arg line="${psdl}/list.psdl"/>
+    </java>
+  </target>
+
+  <target name="event.psdl.context" depends="base.environment">
+    <uptodate property="event.psdl.modified" targetfile="${psdl}/event.psdl">
+      <srcfiles dir="${build}/${base}/src">
+	  <include name="net/osm/event/**"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="event.psdl" depends="common.jar,event.psdl.context" if="event.psdl.modified">
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-I ${idl}/services"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="-d ${build}/${base}/src"/>
+	<arg line="${psdl}/event.psdl"/>
+    </java>
+  </target>
+
+  <target name="base.jar.context" depends="base.environment">
+    <uptodate property="base.jar.uptodate" targetfile="${dist}/lib/${base.jar}">
+      <srcfiles dir="${build}/${base}/src"/>
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/list/**"/>
+	  <include name="net/osm/event/**"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="base.jar" depends="orb.jar,util.jar,list.psdl,event.psdl,base.jar.context" unless="base.jar.uptodate">
+
+    <javac debug="off" destdir="${build}/${base}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/lib/${util.jar}"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+	</classpath>
+      <src path="${build}/${base}/src" />
+      <src path="${src}/java" />
+	<include name="net/osm/list/**" />
+	<include name="net/osm/event/**" />
+    </javac>
+    <jar file="${dist}/lib/${base.jar}" basedir="${build}/${base}/lib" />
+  </target>
+
+  <!-- 
+  APPLIANCE 
+  -->
+
+  <target name="appliance.environment" depends="environment">
+    <mkdir dir="${build}/${appliance}/lib"/>
+  </target>
+
+  <target name="appliance.clean" depends="appliance.purge" >
+    <delete file="${dist}/lib/${appliance.jar}"/>
+  </target>
+
+  <target name="appliance.purge" >
+    <delete dir="${build}/${appliance}"/>
+  </target>
+
+  <target name="appliance.context" depends="appliance.environment">
+    <uptodate property="appliance.jar.uptodate" targetfile="${dist}/lib/${appliance.jar}">
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/appliance/**"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="appliance.jar" depends="common.jar,dpml.jar,realm,appliance.context" unless="appliance.jar.uptodate">
+    <mkdir dir="${build}/${appliance}/lib"/>
+    <javac debug="off" destdir="${build}/${appliance}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/lib/${dpml.jar}"/>
+	  <pathelement path="${dist}/lib/${realm.jar}"/>
+	</classpath>
+      <src path="${src}/java" />
+	<include name="net/osm/appliance/*/**" />
+    </javac>
+    <jar file="${dist}/lib/${appliance.jar}" >
+      <fileset dir="${build}/${appliance}/lib" />
+    </jar>
+  </target>
+
+  <!-- 
+  HELLO Demonstration Processor
+  -->
+
+  <target name="hello.environment" depends="environment">
+    <mkdir dir="${build}/${hello}/lib"/>
+    <mkdir dir="${dist}/apps"/>
+  </target>
+
+  <target name="hello.clean" depends="hello.purge" >
+    <delete file="${dist}/apps/${hello.jar}"/>
+  </target>
+
+  <target name="hello.purge" >
+    <delete dir="${build}/${hello}"/>
+  </target>
+
+  <target name="hello.context" depends="hello.environment">
+    <uptodate property="hello.jar.uptodate" targetfile="${dist}/apps/${hello.jar}">
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/sample/hello/**"/>
+	</srcfiles>
+      <srcfiles dir="${manifest}">
+	  <include name="hello.mf"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="hello.jar" depends="common.jar,appliance.jar,hello.context" unless="hello.jar.uptodate">
+    <mkdir dir="${build}/${hello}/lib"/>
+    <javac debug="off" destdir="${build}/${hello}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/lib/${appliance.jar}"/>
+	</classpath>
+      <src path="${src}/java" />
+	<include name="net/osm/sample/hello/**" />
+    </javac>
+    <jar file="${dist}/apps/${hello.jar}" manifest="${manifest}/hello.mf" >
+      <fileset dir="${build}/${hello}/lib" />
+    </jar>
+  </target>
+
+  <!-- 
+  TIME Service
+  The 'time' target creates a time.bar file for inclusion in the application .sar file.  
+  It contains a configurable CosTime::TimeService required by the business object runtime.
+  -->
+
+  <target name="time" depends="time.bar,time.jar" />
+
+  <target name="time.environment" depends="environment">
+    <mkdir dir="${build}/${time}/lib" />
+    <mkdir dir="${dist}/bar" />
+  </target>
+
+  <target name="time.clean" depends="time.purge" >
+    <delete file="${dist}/bar/${time.bar}"/>
+  </target>
+
+  <target name="time.purge" >
+    <delete dir="${build}/${time}"/>
+  </target>
+
+  <target name="time.context" depends="time.environment">
+    <uptodate property="time.bar.uptodate" targetfile="${dist}/bar/${time.bar}">
+      <srcfiles dir="${general}/lib"/>
+      <srcfiles dir="${dist}/lib">
+	  <include name="${common.jar}"/>
+      </srcfiles>
+      <srcfiles dir="${src}/java/net/osm/time"/>
+    </uptodate>
+    <uptodate property="time.jar.uptodate" targetfile="${dist}/lib/${time.jar}">
+      <srcfiles dir="${general}/lib"/>
+      <srcfiles dir="${dist}/lib">
+	  <include name="${common.jar}"/>
+      </srcfiles>
+      <srcfiles dir="${src}/java/net/osm/time"/>
+    </uptodate>
+  </target>
+
+  <target name="time.bar" depends="orb.jar,util.jar,common.jar,time.context" unless="time.bar.uptodate">
+
+    <javac debug="off" destdir="${build}/${time}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="avalon.classpath"/>
+	  <path refid="open.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/lib/${util.jar}"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+      </classpath>
+      <src path="${src}/java" />
+      <include name="net/osm/time/**" />
+    </javac>
+    <copy todir="${build}/${time}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/time/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/bar/${time.bar}" basedir="${build}/time/lib" manifest="${src}/manifest/time.mf" />
+  </target>
+
+  <target name="time.jar" depends="orb.jar,util.jar,common.jar,time.context" unless="time.jar.uptodate">
+    <javac debug="off" destdir="${build}/${time}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="avalon.classpath"/>
+	  <path refid="open.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/lib/${util.jar}"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+      </classpath>
+      <src path="${src}/java" />
+      <include name="net/osm/time/TimeUtil**" />
+    </javac>
+    <jar file="${dist}/lib/${time.jar}" basedir="${build}/time/lib">
+       <fileset dir="${build}/time/lib">
+	  <exclude name="**/*POA*.*"/>
+	  <exclude name="**/*.xinfo"/>
+	  <exclude name="**/*Delegate*.*"/>
+	  <exclude name="**/*Server*.*"/>
+      </fileset>
+   </jar>
+  </target>
+
+  <!-- 
+  REALM 
+  -->
+
+  <target name="realm.clean" depends="realm.purge" >
+    <delete file="${dist}/bar/${realm.bar}"/>
+    <delete file="${dist}/lib/${realm.jar}"/>
+  </target>
+
+  <target name="realm.purge" >
+    <delete dir="${build}/${realm}"/>
+  </target>
+
+
+  <target name="realm" depends="realm.jar"/>
+
+  <target name="realm.environment" depends="environment">
+    <mkdir dir="${build}/${realm}/src" />
+    <mkdir dir="${build}/${realm}/lib" />
+  </target>
+
+  <target name="realm.idl.context" depends="realm.environment">
+    <uptodate property="realm.idl.modified" targetfile="${idl}/realm.idl">
+      <srcfiles dir="${build}/${realm}/src">
+	  <include name="net/osm/realm/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="realm.idl" depends="base.jar,realm.idl.context,base.jar" if="realm.idl.modified">
+    <java failonerror="true"
+      classname="org.openorb.compiler.IdlCompiler" 
+	fork="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${base.jar}"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-d ${build}/${realm}/src"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${corba}"/>
+	<arg line="-I ${services}"/>
+	<arg line="-I ${services}/normal"/>
+	<arg line="-native Principal java.security.Principal"/>
+	<arg line="-native CertPath java.security.cert.CertPath"/>
+	<arg line="-native X500Principal javax.security.auth.x500.X500Principal"/>
+	<arg line="-native BigInteger java.math.BigInteger"/>
+	<arg line="${idl}/realm.idl "/>
+    </java>
+  </target>
+
+  <target name="realm.jar.context" depends="realm.environment">
+    <uptodate property="realm.jar.uptodate" targetfile="${dist}/jar/${realm.jar}">
+      <srcfiles dir="${src}/java/net/osm/realm" />
+      <srcfiles dir="${build}/realm/src">
+	  <include name="**/*.*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="realm.jar" depends="orb.jar,base.jar,util.jar,realm.idl,realm.jar.context" unless="realm.jar.uptodate">
+    <javac debug="off" destdir="${build}/${realm}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${base.jar}"/>
+	  <pathelement path="${dist}/lib/${util.jar}"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+	</classpath>
+      <src path="${src}/java" />
+      <src path="${build}/${realm}/src" />
+	<include name="net/osm/realm/**/*" />
+    </javac>
+    <jar file="${dist}/lib/${realm.jar}" >
+      <fileset dir="${build}/${realm}/lib">
+      </fileset>
+    </jar>
+  </target>
+
+  <!--
+  VAULT
+  -->
+
+  <target name="vault" depends="vault.jar" />
+
+  <target name="vault.environment" depends="environment">
+    <mkdir dir="${build}/vault/lib"/>
+    <uptodate property="vault.uptodate" targetfile="${dist}/lib/${vault.jar}">
+      <srcfiles dir="${src}">
+	  <include name="java/net/osm/vault/**.*"/>
+	  <include name="manifest/vault.mf"/>
+	</srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="vault.jar" depends="util.jar,pki.base,vault.environment" unless="vault.uptodate">
+    <javac debug="off" destdir="${build}/vault/lib" verbose="false" >
+      <classpath>
+ 	  <path refid="avalon.classpath"/>
+        <fileset dir="${dist}/lib">
+          <include name="${util.jar}" />
+          <include name="${pki-base.jar}" />
+        </fileset>
+	</classpath>
+      <src path="${src}/java"/>
+      <include name="net/osm/vault/**"/>
+    </javac>
+    <copy todir="${build}/${vault}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/vault/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/lib/${vault.jar}" basedir="${build}/vault/lib" manifest="${src}/manifest/vault.mf"/>
+  </target>
+
+  <!-- 
+  PORTAL
+  The 'portal' target creates a portal.bar file for inclusion in the application .sar file.  
+  It contains a configurable registration and discovery service supporting publication of 
+  and discovery of resources related to processor management.
+  -->
+
+  <target name="portal" depends="portal.bar,portal.client"/>
+
+  <target name="portal.environment" depends="environment">
+    <mkdir dir="${build}/${portal}/src" />
+    <mkdir dir="${build}/${portal}/lib" />
+  </target>
+
+  <target name="portal.clean" depends="portal.purge" >
+    <delete file="${dist}/bar/${portal.bar}"/>
+    <delete file="${dist}/lib/${portal.jar}"/>
+  </target>
+
+  <target name="portal.purge" >
+    <delete dir="${build}/${portal}"/>
+  </target>
+
+  <target name="portal.bar.context" depends="portal.environment">
+    <uptodate property="portal.bar.uptodate" targetfile="${dist}/bar/${portal.bar}">
+      <srcfiles dir="${general}/lib" />
+      <srcfiles dir="${dist}/lib" />
+      <srcfiles dir="${build}/${portal}/src" />
+      <srcfiles dir="${src}/java">
+	  <include name="net/osm/portal/**"/>
+      </srcfiles>
+      <srcfiles dir="${src}/manifest">
+	  <include name="portal.mf"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="portal.bar" depends="orb.jar,util.jar,portal.idl,portal.bar.context" unless="portal.bar.uptodate">
+    <javac debug="off" destdir="${build}/${portal}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="avalon.classpath"/>
+	  <path refid="open.classpath"/>
+ 	  <pathelement path="${dist}/lib/${util.jar}"/>
+ 	  <pathelement path="${dist}/lib/${orb.jar}"/>
+      </classpath>
+      <src path="${src}/java" />
+      <src path="${build}/${portal}/src" />
+      <include name="net/osm/portal/**" />
+      <include name="net/osm/discovery/**" />
+    </javac>
+    <copy todir="${build}/${portal}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/portal/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/bar/${portal.bar}" basedir="${build}/${portal}/lib" manifest="${src}/manifest/portal.mf" />
+  </target>
+
+  <target name="portal.idl.context" depends="portal.environment">
+    <uptodate property="portal.idl.modified" targetfile="${idl}/discovery.idl">
+      <srcfiles dir="${build}/${portal}/src">
+	  <include name="net/osm/discovery/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="portal.idl" depends="portal.idl.context" if="portal.idl.modified">
+    <java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+      </classpath>
+      <arg line="-silence"/>
+      <arg line="-d ${build}/${portal}/src"/>
+      <arg line="-I ${corba}"/>
+      <arg line="-I ${services}"/>
+      <arg line="-I ${services}/normal"/>
+      <arg line="-I ${idl}"/>
+      <arg line="${idl}/discovery.idl "/>
+    </java>
+  </target>
+
+  <target name="portal.client.context" depends="portal.environment">
+    <uptodate property="portal.jar.uptodate" targetfile="${dist}/jar/${portal.jar}">
+      <srcfiles dir="${build}/${portal}/lib/**"/>
+    </uptodate>
+  </target>
+
+  <target name="portal.client" depends="portal.bar,portal.client.context" unless="portal.jar.uptodate">
+    <jar file="${dist}/lib/${portal.jar}" >
+      <fileset dir="${build}/${portal}/lib">
+	  <exclude name="**/*POA*.*"/>
+	  <exclude name="**/*.xinfo"/>
+	  <exclude name="**/*Delegate*.*"/>
+	  <exclude name="**/*Server*.*"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <target name="portal.test" depends="portal.client" >
+    <java classname="net.osm.portal.MGR" fork="true" dir="${deployment}/${gateway}" >
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+        <fileset dir="${dist}/lib">
+          <include name="*client*.jar" />
+          <include name="${dpml.jar}" />
+          <include name="${util.jar}" />
+          <include name="${orb.jar}" />
+        </fileset>
+	</classpath>
+	<!-- declaration of the ORB implementation -->
+      <jvmarg line="-Dorg.omg.CORBA.ORBClass=org.openorb.CORBA.ORB"/>
+      <jvmarg line="-Dorg.omg.CORBA.ORBSingletonClass=org.openorb.CORBA.ORBSingleton"/>
+	<!-- application arguments 
+      <arg line="${finder.ior}"/>
+      <arg line="-ORBDebug=1"/>
+	-->
+    </java>
+  </target>
+
+  <!-- 
+  PROPERITES
+  -->
+
+  <target name="properties.environment" depends="environment">
+    <mkdir dir="${build}/${properties}/src"/>
+    <mkdir dir="${build}/${properties}/lib"/>
+    <uptodate property="properties.uptodate" targetfile="${dist}/lib/${properties.jar}">
+      <srcfiles dir="${src}/java/net/osm/properties"/>
+      <srcfiles dir="${build}/${properties}/src"/>
+    </uptodate>
+  </target>
+
+  <target name="properties.psdl.context" depends="properties.environment">
+    <uptodate property="properties.psdl.modified" targetfile="${psdl}/properties.psdl">
+      <srcfiles dir="${build}/${properties}/src">
+	  <include name="net/osm/properties/pss/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="properties.psdl" depends="common.jar,base.jar,properties.psdl.context" if="properties.psdl.modified">
+    <echo message="building properties PSDL"/>
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-d ${build}/${properties}/src"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${corba}"/>
+	<arg line="-I ${services}"/>
+	<arg line="-I ${services}/pss"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="${psdl}/properties.psdl"/>
+    </java>
+  </target>
+
+  <target name="properties.jar" depends="properties.psdl,common.client,properties.environment" unless="properties.uptodate">
+    <javac debug="off" destdir="${build}/properties/lib" verbose="false" >
+      <classpath>
+ 	  <path refid="open.classpath"/>
+ 	  <path refid="avalon.classpath"/>
+        <fileset dir="${dist}/lib">
+          <include name="*.jar" />
+        </fileset>
+	</classpath>
+      <src path="${src}/java"/>
+      <src path="${build}/${properties}/src"/>
+      <include name="net/osm/properties/**"/>
+    </javac>
+    <jar file="${dist}/lib/${properties.jar}" basedir="${build}/${properties}/lib"/>
+  </target>
+
+  <!-- 
+  HUB
+  The 'hub' target creates the hub.jar file for inclusion in the application ${gateway}.sar file.  
+  It contains a configurable business object platform based on the OMG Task and Session Specifications 
+  and EC Domain Community and Collaboration Frameworks.
+  -->
+
+  <target name="hub" depends="hub.bar,hub.client"/>
+
+  <target name="hub.environment" depends="environment">
+    <mkdir dir="${build}/${hub}/lib" />
+    <mkdir dir="${build}/${hub}/src" />
+  </target>
+
+  <target name="hub.clean" depends="hub.purge" >
+    <delete file="${dist}/bar/${hub.bar}"/>
+    <delete file="${dist}/lib/${hub.jar}"/>
+  </target>
+
+  <target name="hub.purge" >
+    <delete dir="${build}/${hub}"/>
+  </target>
+
+  <target name="hub.bar.context" depends="hub.environment">
+    <uptodate property="hub.bar.uptodate" targetfile="${dist}/bar/${hub.bar}">
+      <srcfiles dir="${build}/hub/src"/>
+      <srcfiles dir="${build}/hub/lib"/>
+      <srcfiles dir="${dist}/lib"/>
+      <srcfiles dir="${src}/java/net/osm/hub"/>
+      <srcfiles dir="${src}/manifest"/>
+    </uptodate>
+  </target>
+
+  <target name="hub.bar" 
+    depends="common.jar,orb.jar,dpml.jar,base.jar,properties.jar,util.jar,realm,vault,time.bar,appliance.jar,hub.idl,session.idl,hub.psdl,pss,orb,hub.bar.context" 
+    unless="hub.bar.uptodate">
+    <javac debug="off" destdir="${build}/${hub}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/lib/${dpml.jar}"/>
+	  <pathelement path="${dist}/lib/${base.jar}"/>
+	  <pathelement path="${dist}/lib/${properties.jar}"/>
+	  <pathelement path="${dist}/lib/${util.jar}"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+	  <pathelement path="${dist}/lib/${pss.jar}"/>
+	  <pathelement path="${dist}/lib/${realm.jar}"/>
+	  <pathelement path="${dist}/lib/${vault.jar}"/>
+ 	</classpath>
+      <src path="${src}/java" />
+      <src path="${build}/${hub}/src" />
+	<include name="net/osm/hub/**/*.*"/>
+	<include name="net/osm/session/**/*.*"/>
+    </javac>
+    <copy todir="${build}/${hub}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/hub/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/bar/${hub.bar}" basedir="${build}/${hub}/lib" manifest="${src}/manifest/hub.mf" />
+  </target>
+
+  <target name="hub.idl.context" depends="hub.environment">
+    <uptodate property="hub.idl.modified" targetfile="${idl}/hub.idl">
+      <srcfiles dir="${build}/${hub}/src">
+	  <include name="net/osm/hub/home/**"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="session.idl.modified" targetfile="${idl}/osm.session.idl">
+      <srcfiles dir="${build}/${hub}/src">
+	  <include name="net/osm/session/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="session.idl" depends="common.jar,hub.idl.context" if="session.idl.modified">
+    <echo message="building net.osm.session IDL"/>
+    <java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+      </classpath>
+      <arg line="-silence"/>
+      <arg line="-d ${build}/${hub}/src"/>
+      <arg line="-I ${idl}"/>
+      <arg line="-I ${corba}"/>
+      <arg line="-I ${services}"/>
+      <arg line="-I ${services}/normal"/>
+      <arg line="${idl}/osm.session.idl "/>
+    </java>
+  </target>
+
+  <target name="hub.idl" depends="common.jar,hub.idl.context" if="hub.idl.modified">
+    <mkdir dir="${build}/hub/excludes"/>
+    <echo message="building hub IDL"/>
+    <java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+      </classpath>
+      <arg line="-silence"/>
+      <arg line="-d ${build}/${hub}/src"/>
+      <arg line="-I ${idl}"/>
+      <arg line="-I ${corba}"/>
+      <arg line="-I ${services}"/>
+      <arg line="-I ${services}/normal"/>
+      <arg line="${idl}/hub.idl "/>
+    </java>
+  </target>
+  
+  <target name="hub.psdl.context" depends="hub.environment">
+    <uptodate property="hub.psdl.modified" targetfile="${psdl}/hub.psdl">
+      <srcfiles dir="${build}/${hub}/src">
+	  <include name="net/osm/hub/pss/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="hub.psdl" depends="common.jar,base.jar,hub.psdl.context" if="hub.psdl.modified">
+    <echo message="building hub PSDL"/>
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/lib/${base.jar}"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-d ${build}/${hub}/src"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${corba}"/>
+	<arg line="-I ${services}"/>
+	<arg line="-I ${services}/pss"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="${psdl}/hub.psdl"/>
+    </java>
+  </target>
+
+  <target name="hub.client.context" depends="hub.environment">
+    <uptodate property="hub.jar.uptodate" targetfile="${dist}/jar/${hub.jar}">
+      <srcfiles dir="${build}/${hub}/src"/>
+    </uptodate>
+  </target>
+
+  <target name="hub.client" depends="hub.bar,hub.client.context" unless="hub.jar.uptodate">
+    <jar file="${dist}/lib/${hub.jar}" >
+      <fileset dir="${build}/${hub}/lib">
+	  <exclude name="**/*POA*.*"/>
+	  <include name="net/osm/hub/home/**"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <!-- 
+  GATEWAY
+  The gateway.sar target builds the Gateway application ".sar" file containing all required blocks, 
+  default configuration, and supporting resources.
+  -->
+
+  <target name="gateway.environment" depends="environment">
+    <mkdir dir="${build}/${gateway}/lib"/>
+    <mkdir dir="${build}/${gateway}/conf"/>
+    <mkdir dir="${build}/${gateway}/blocks"/>
+    <uptodate property="gateway.uptodate" targetfile="${dist}/${gateway}.sar">
+      <srcfiles dir="${general}/lib"/>
+      <srcfiles dir="../common/lib"/>
+      <srcfiles dir="${blocks}"/>
+      <srcfiles dir="${dist}/lib"/>
+      <srcfiles dir="${dist}/bar"/>
+      <srcfiles dir="${src}/conf"/>
+      <srcfiles dir="${src}/dpml"/>
+      <srcfiles dir="${src}/etc">
+	  <include name="*.xml"/>
+	  <include name="*.prp"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="gateway.sar" depends="hub.bar,portal.bar,ins.bar,hello.jar,hub.client,time,pki">
+    <delete file="${dist}/${gateway}.sar"/>
+    <jar file="${dist}/${gateway}.sar">
+      <zipfileset dir="${dist}/lib/" prefix="SAR-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${dist}/bar/" prefix="SAR-INF/lib">
+        <include name="*.*"/>
+      </zipfileset>
+      <zipfileset dir="${general}/lib/" prefix="SAR-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${src}/conf/" prefix="SAR-INF">
+        <include name="*.xml"/>
+      </zipfileset>
+      <zipfileset dir="${src}/dpml/" prefix="dpml">
+        <include name="*.xml"/>
+      </zipfileset>
+      <zipfileset dir="${dist}/apps/" prefix="apps">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${src}/etc/" prefix="conf">
+        <include name="orb.xml"/>
+        <include name="*.prp"/>
+      </zipfileset>
+      <zipfileset dir="${src}/etc/" prefix="pss">
+        <include name="PSS_README.TXT"/>
+      </zipfileset>
+      
+    </jar>
+  </target>
+
+  <!--
+  The install target deploys the server activation framework ready for 
+  execution.
+  -->
+
+  <target name="install" depends="gateway.sar">
+    <mkdir dir="${deployment}/${gateway}"/>
+    <copy toDir="${deployment}/${gateway}">
+      <fileset dir="${general}/phoenix">
+	  <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy toDir="${deployment}/${gateway}/bin" file="${etc}/login.conf"/>
+    <copy toDir="${deployment}/${gateway}/apps" file="${dist}/gateway.sar"/>
+    <delete dir="${deployment}/${gateway}/apps/gateway"/>
+    <!--<delete dir="${deployment}/${gateway}/var"/>
+    <delete dir="${deployment}/${gateway}/logs"/>-->
+  </target>
+
+  <target name="gateway.clean" depends="gateway.purge" >
+    <delete file="${dist}/${gateway}.sar" />
+    <delete dir="${dist}/${gateway}" />
+  </target>
+
+  <target name="gateway.purge" >
+    <delete dir="${build}/${gateway}" />
+  </target>
+
+  <property name="phoenix.home" value="${deployment}/${gateway}"/>
+
+  <target name="gateway" >
+    <echo message=""/>
+    <echo message="OSM Enterprise Gateway ${version}"/>
+    <echo message="http://home.osm.net"/>
+    <echo message=""/>
+    <java classname="org.apache.avalon.phoenix.launcher.Main" 
+	dir="${deployment}/${gateway}/bin" fork="true">
+      <classpath>
+        <fileset dir="${deployment}/${gateway}/bin">
+          <include name="*.jar" />
+        </fileset>
+      </classpath>
+	<sysproperty key="phoenix.home" value=".."/>
+	<sysproperty key="java.ext.dirs" value="../lib"/>
+	<sysproperty key="java.security.auth.login.config" value="login.conf"/>
+	<sysproperty key="osm.pss.jdbc.url" value="${osm.pss.jdbc.url}"/>
+	<sysproperty key="osm.gateway.jdbc.url" value="${osm.gateway.jdbc.url}"/>
+	<sysproperty key="openorb.debug.ShowStackTrace" value="true"/>
+      <jvmarg value="-Xmx164m"/> 
+    </java>
+  </target>
+
+  <!-- 
+  INS 
+  -->
+
+  <target name="ins.environment" depends="environment">
+    <mkdir dir="${build}/${ins}/src" />
+    <mkdir dir="${build}/${ins}/lib" />
+  </target>
+
+  <target name="ins.clean" depends="ins.purge" >
+    <delete file="${dist}/bar/${ins.bar}"/>
+  </target>
+
+  <target name="ins.purge" >
+    <delete dir="${build}/${ins}"/>
+  </target>
+
+  <target name="ins.bar.context" depends="ins.environment">
+    <uptodate property="ins.bar.uptodate" targetfile="${dist}/bar/${ins.bar}">
+      <srcfiles dir="${src}/java/net/osm/ins"/>
+      <srcfiles dir="${build}/${ins}/src"/>
+    </uptodate>
+  </target>
+
+  <target name="ins.bar" depends="orb.jar,util.jar,ins.psdl,ins.bar.context" unless="ins.bar.uptodate">
+    <javac debug="off" destdir="${build}/${ins}/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	  <pathelement path="${dist}/lib/${base.jar}"/>
+	  <pathelement path="${dist}/lib/${util.jar}"/>
+	  <pathelement path="${dist}/lib/${orb.jar}"/>
+	</classpath>
+      <src path="${src}/java" />
+      <src path="${build}/${ins}/src" />
+	<include name="net/osm/ins/**" />
+    </javac>
+    <copy todir="${build}/${ins}/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/ins/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar file="${dist}/bar/${ins.bar}" basedir="${build}/${ins}/lib" manifest="${manifest}/ins.mf" />
+  </target>
+
+  <target name="ins.psdl.context" depends="ins.environment">
+    <uptodate property="ins.psdl.modified" targetfile="${psdl}/ins.psdl">
+      <srcfiles dir="${build}/${ins}/src">
+	  <include name="net/osm/ins/pss/**"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="ins.psdl" depends="common.jar,base.jar,ins.psdl.context" if="ins.psdl.modified">
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="open.classpath"/>
+	  <path refid="avalon.classpath"/>
+	  <pathelement path="${dist}/lib/${common.jar}"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-d ${build}/${ins}/src"/>
+	<arg line="-I ${corba}"/>
+	<arg line="-I ${services}"/>
+	<arg line="-I ${services}/pss"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="${psdl}/ins.psdl"/>
+    </java>
+  </target>
+
+<!-- UTILITIES -->
+
+  <target name="hub.db" >
+    <antcall target="db">
+      <param name="base" value="${deployment}/${gateway}" />
+      <param name="jdbc.url" value="jdbc:idb:hub.prp" />
+    </antcall>
+  </target>
+
+  <target name="db" >
+    <java classname="org.enhydra.instantdb.DBBrowser" fork="true" dir="${base}" >
+      <classpath>
+        <fileset dir="${lib}">
+          <include name="*.jar" />
+        </fileset>
+	</classpath>
+      <arg line="${jdbc.url}"/>
+    </java>
+  </target>
+
+<!-- INTERNAL CALLABLE TARGETS -->
+
+  <!--
+  The "expand" target is a callable target that is used to populate a "${target}" directory with 
+  the file structure and file content corresponding to an expanded ".sar" file.
+  -->
+
+  <target name="expand">
+
+    <mkdir dir="${target}"/>
+    <!-- configuration files -->
+    <mkdir dir="${target}/conf"/>
+    <copy toDir="${target}/conf">
+      <fileset dir="${src}/conf">
+	  <include name="environment.xml"/>
+	  <include name="assembly.xml"/>
+	  <include name="config.xml"/>
+	</fileset>
+    </copy>
+
+    <!-- library and supporting files -->
+    <mkdir dir="${target}/lib"/>
+    <copy toDir="${target}/lib">
+      <fileset dir="${dist}/lib">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${general}/lib">
+	  <include name="*.jar"/>
+	  <exclude name="phoenix*.jar"/>
+	  <exclude name="avalon*.jar"/>
+	  <exclude name="*-client.jar"/>
+	  <exclude name="jmx*.jar"/>
+      </fileset>
+      <fileset dir="../common/lib">
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- bar files -->
+    <mkdir dir="${target}/blocks"/>
+    <copy toDir="${target}/blocks">
+      <fileset dir="${dist}/bar">
+	  <!-- the following include adds all of the OSM blocks -->
+        <include name="*.*"/>
+      </fileset>
+      <fileset dir="${blocks}">
+	  <!-- the following include currently includes nothing (intended for external blocks) -->
+        <include name="*.*"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <!-- 
+  The framework target creates a root directory ${target} and subdirectories supporting the Phoenix
+  server activation environment and places a ${server} sar file into the ${apps} subdirectory.
+  -->
+    
+  <target name="framework">
+    <mkdir dir="${target}" />
+    <mkdir dir="${target}/boot"/>
+    <mkdir dir="${target}/${apps}"/>
+    <copy toDir="${target}/boot">
+      <fileset dir="${general}/lib">
+	  <include name="phoenix*.jar"/>
+	  <include name="avalon*.jar"/>
+	  <include name="jmx*.jar"/>
+	  <include name="logkit*.jar"/>
+      </fileset>
+    </copy>
+    <copy file="${server}" todir="${target}/${apps}"/>
+  </target>
+
+  <!--
+  General IDL to Java compiler target.
+  -->
+
+  <target name="idl2java" >
+	<java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+          <classpath>
+		<path refid="open.classpath"/>
+	    </classpath>
+	    <arg line="-silence"/>
+	    <arg line="-d ${destination}"/>
+	    <arg line="-I ${idl}"/>
+	    <arg line="-I ${corba}"/>
+	    <arg line="-I ${services}"/>
+	    <arg line="-I ${services}/normal"/>
+	    <arg line="${service}" />
+      </java>
+  </target>
+
+  <target name="patch">
+     <replace 
+	 token="net.osm.hub.gateway.PSSConnectorService"
+	 value="net.osm.pss.PSSConnectorService"
+	 dir="${src}" >
+         <include name="**/*.*"/>
+     </replace>
+  </target>
+
+</project>
+

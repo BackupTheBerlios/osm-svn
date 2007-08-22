@@ -1,0 +1,29 @@
+/*
+ * Copyright 2000-2002 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.0 25 MAY 2002
+ */
+
+#ifndef _OSM_COMMUNITY_IDL_
+#define _OSM_COMMUNITY_IDL_
+#include <extension.idl>
+#include <CommunityFramework.idl>
+#pragma prefix "osm.net"
+
+module community
+{
+
+   /**
+    * Extended <code>AbstractResource</code> interface that includes an adapter
+    * accessor.
+    */
+    interface Community : CommunityFramework::Community, session::workspace::Workspace
+    {
+    };
+
+};
+
+#endif // _OSM_COMMUNITY_IDL_

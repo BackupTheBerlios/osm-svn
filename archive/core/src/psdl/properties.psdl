@@ -1,0 +1,156 @@
+/**
+ */
+
+#ifndef _PROPERTIES_PSS_PSDL_
+#define _PROPERTIES_PSS_PSDL_
+#include <CosPropertyService.idl>
+
+#pragma prefix "osm.net"
+
+module properties {
+module pss {
+
+    typedef CORBA::OctetSeq ID;
+    typedef sequence<ID> IDs;
+
+    //
+    // Property
+    //
+
+   /**
+    * PropertyStorage maintains the persistent state of a CosPropertyService
+    * PropertyDef.  The storage type is identified by the persistent identifier 
+    * of the storage object and the name of the property is scoped within.  
+    */
+
+    abstract storagetype PropertyStorage
+    {
+
+        /**
+        * Short pid of a storage object instance.
+        */
+        readonly state ID container;
+
+       /**
+        * Name of the property (unique within the scope of the container).
+        */
+        readonly state string name;
+
+       /**
+        * Property value.
+        */
+        state any value;
+
+       /**
+        * Property mode.
+        */
+        readonly state CosPropertyService::PropertyModeType mode;
+
+    };
+
+
+   /**
+    * Storage home interface for the PropertyStorage storage type.
+    */
+    abstract storagehome PropertyStorageHome of PropertyStorage
+    {
+        key property_key( container, name );
+	  factory create( container, name, value, mode );
+    };
+
+   /**
+    * PropertySetDefStorage is a persistent storage object for a 
+    * CosPropertyService::PropertySetDef, and as such contains 
+    * a sequence of TypeCodes used to constain the possible CORBA
+    * types that can be stored by the implementation (default is 
+    * empty corresponding to no-constraints) and a sequence of 
+    * PropertyDefs that is non-empty, constain the possible property
+    * names and types that may be added to the property set.
+    */
+
+    abstract storagetype PropertySetDefStorage
+    {
+
+        /**
+         * The <code>types</code> state member contains a sequence
+         * of TypeCodes that this PropertySetDef will allow to be  
+         * added to the set of maintained properties.
+         */
+         state CosPropertyService::PropertyTypes types;
+
+        /**
+         * The <code>defintions</code> state member contains a sequence
+         * of PropertyDef instances that this PropertySetDef will allow to be  
+         * added to the set of maintained properties.
+         */
+         state CosPropertyService::PropertyDefs definitions;
+
+        /**
+         * Properties managed by this PropertySetDef are referenced under 
+         * the <code>values</code> state memember as a sequence of short
+         * PSS persistent identifiers of PropertyStorage instances.
+         */
+         state IDs values;
+
+        /**
+         * Return a PropertyStorage given the supplied storage object scope 
+         * property name.
+         */
+         CosPropertyService::PropertyDef get( in ID the_scope, in string name ) raises ( CosPersistentState::NotFound ); 
+
+        /**
+         * Adds a PropertyStorage instance to the set of properties
+         * managed by this PropertSetDefStorage instance.
+         */
+
+         void put( in ID the_scope, in string name, in any value, in CosPropertyService::PropertyModeType mode );
+
+        /**
+         * Returns the size of the property set.
+         */
+         long size();
+
+	  /**
+         * Returns the sequence of property names.
+         */
+         CosPropertyService::PropertyNames names();
+
+	  /**
+         * Returns true if the property set contains the supplied name.
+         */
+         boolean available( in ID the_scope, in string name );
+
+	  /**
+         * Deletes a named property.
+         */
+         void delete( in ID the_scope, in string name ) raises ( CosPersistentState::NotFound );
+
+    };
+
+    //
+    // PropertyStorageBase
+    //
+
+    storagetype PropertyStorageBase
+    implements PropertyStorage
+    { 
+    };
+
+    storagehome PropertyStorageHomeBase of PropertyStorageBase
+    implements PropertyStorageHome
+    { 
+    };
+
+    //
+    // PropertySetDefStorageBase
+    //
+
+    storagetype PropertySetDefStorageBase
+    implements PropertySetDefStorage
+    { 
+    };
+
+};
+};
+
+#endif // _PROPERTIES_PSS_PIDL_

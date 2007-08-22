@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+
+<!--
+ StructuredPushSupplierServantManager.xinfo
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <version>1.0</version>
+  </block>
+
+  <services>
+      <service name="net.osm.sps.StructuredPushSupplierService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>orb</role>
+          <service name="org.apache.pss.ConnectorContext" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+  <configuration>
+    <pss>
+      <session>
+        <parameter name="PSS.File.DataStore.Directory" value="pss" />
+        <parameter name="PSS.File.DataStore.Name" value="sps" />
+      </session>
+      <persistence>
+         <storage psdl="PSDL:osm.net/event/EventStorageBase:1.0"
+            class="net.osm.event.EventStorageBase" />
+         <home psdl="PSDL:osm.net/event/EventStorageHomeBase:1.0"
+            class="net.osm.event.EventHome" />
+         <storage psdl="PSDL:osm.net/sps/SubscriberStorageBase:1.0"
+            class="net.osm.sps.Subscription" />
+         <home psdl="PSDL:osm.net/sps/SubscriberStorageHomeBase:1.0"
+            class="net.osm.sps.SubscriberStorageHomeBase" />
+         <storage psdl="PSDL:osm.net/sps/PublisherStorageBase:1.0"
+            class="net.osm.sps.Publisher" />
+         <home psdl="PSDL:osm.net/sps/PublisherStorageHomeBase:1.0"
+            class="net.osm.sps.PublisherStorageHomeBase" />
+      </persistence>
+    </pss>
+  </configuration>
+
+  <implementation policy="SINGLETON"/>
+
+</blockinfo>
+

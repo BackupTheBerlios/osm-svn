@@ -1,0 +1,79 @@
+/**
+ */
+
+#ifndef _SESSION_PROCESSOR_PSDL_
+#define _SESSION_PROCESSOR_PSDL_
+#include <extension.idl>
+#include <resource.psdl>
+
+#pragma prefix "osm.net"
+
+module session 
+{
+  module processor
+  {
+
+   /**
+    * ProcessorStorage is the persistent storage object for instance of Processor.
+    * It extends AbstractResourceStorage with the addition of state concerning
+    * the assigned coorsdinating task and the current active process execution status.
+    * @see net.osm.session.processor.Processor
+    */
+    abstract storagetype ProcessorStorage : resource::AbstractResourceStorage
+    {
+
+       /**
+        * The processor appliance component class
+        */
+        state string appliance;
+
+       /**
+        * The processor instance description.
+        */
+        state string description;
+
+       /**
+        * The task coordinating this processor.
+        */
+        state session::Executes executes;
+
+       /**
+        * Current processor state.
+        */
+        state long processor_state;
+
+       /**
+        * Convinience state slot within which a processor can register
+        * linear appliance specific execution progress.
+        */
+        state long checkpoint;
+
+    };
+
+   /**
+    * Storage home interface for the ProcessorStorage storage type.
+    */
+    abstract storagehome ProcessorStorageHome of ProcessorStorage : resource::AbstractResourceStorageHome 
+    {
+    };
+
+    //
+    // ProcessorStorageBase
+    //
+
+    storagetype ProcessorStorageBase : resource::AbstractResourceStorageBase
+    implements ProcessorStorage 
+    {
+    };
+
+    storagehome ProcessorStorageHomeBase of ProcessorStorageBase 
+    implements ProcessorStorageHome 
+    { 
+    };
+
+  };
+
+
+};
+
+#endif // _SESSION_PROCESSOR_PSDL_

@@ -1,0 +1,112 @@
+/**
+ */
+
+#ifndef _SESSION_USER_PSDL_
+#define _SESSION_USER_PSDL_
+#include <desktop.psdl>
+#include <properties.psdl>
+#include <realm.idl>
+
+#pragma prefix "osm.net"
+
+module session 
+{
+
+  module user
+  {
+
+    typedef CORBA::OctetSeq EncodedCertPath;
+    typedef CORBA::OctetSeq ID;
+
+   /**
+    * The UserStorage storagetype extends AbstractResourceStorage to include an 
+    * embedded DesktopStorage object, a list of owned Tasks, a list of Workspaces 
+    * accessed by this user, a list of incomming messages, a message folder, a 
+    * of PropertySet storage object, and the conected state of the user.
+    * @see org.omg.Session.User
+    */
+    abstract storagetype UserStorage : resource::AbstractResourceStorage
+    {
+
+       /**
+        * The identity of the principal.
+        */
+        state EncodedCertPath path;
+
+	 /**
+        * Short PID reference to a DesktopStorage holding the persistent state of 
+        * the User's Desktop.
+        * @see org.omg.Session.Desktop
+        */
+	  state ID local_desktop;
+
+       /**
+        * A list of links referencing the tasks owned by this user.
+        */
+	  state list::LinkedList owns;
+
+       /**
+        * A list of links referencing the Workspaces accessed by this user.
+        */
+	  state list::LinkedList accesses;
+
+       /**
+        * An embedded storage object containing a list of queued messages.
+        */
+	  state list::LinkedList messages;
+
+       /**
+        * An embedded storage object containing a list of message folders.
+        */
+	  state list::LinkedList folders;
+
+       /**
+        * Short PID to a property set def storage object.
+        */
+        state ID property_set;
+
+       /**
+        * Connected state of the User.
+        */
+        state boolean connected;
+
+       /**
+        * An embedded storage object containing a list of additional Privilege associations.
+        */
+	  state list::LinkedList privileges;
+    };
+
+   /**
+    * The factory for UserStorage.
+    */
+    abstract storagehome UserStorageHome of UserStorage : resource::AbstractResourceStorageHome 
+    {
+	  key path;
+    };
+
+    //
+    // UserStorageBase
+    //
+
+    storagetype UserStorageBase : resource::AbstractResourceStorageBase
+    implements UserStorage 
+    {
+        stores owns as ref<list::LinkedListBase>;
+        stores accesses as ref<list::LinkedListBase>;
+        stores messages as ref<list::LinkedListBase>;
+        stores folders as ref<list::LinkedListBase>;
+        stores property_set as ref<properties::PropertySetDefStorageBase>;
+        stores privileges as ref<list::LinkedListBase>;
+   };
+
+    storagehome UserStorageHomeBase of UserStorageBase
+    implements UserStorageHome 
+    { 
+    };
+
+  };
+  
+
+};
+
+#endif // _SESSION_USER_PSDL_

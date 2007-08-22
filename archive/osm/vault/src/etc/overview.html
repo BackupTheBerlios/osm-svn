@@ -1,0 +1,58 @@
+
+<body>
+<h3>Package Description</h3>
+
+The <code>net.osm.vault</code> package provides support for the establishment of
+an authenticated X509 principal.  The implementation leverages the JAAS pluggable
+authentication services to establish an X509 principal based on a keystore, alias
+and password.
+
+<p><table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#ccccff">
+<td colspan="2"><font size="+2"><b>Components</b></font></td>
+<tr><td width="20%" valign="top"><strong>{@link net.osm.vault.DefaultVault}</strong></td>
+<td><code>Vault</code> implementation that provides support for the establishment of 
+a authenticated principal.</td></tr>
+<tr><td width="20%" valign="top"><strong>{@link net.osm.vault.Demonstration}</strong></td>
+<td>Composite sample component that declares a dependecy on a <code>Vault</code>.  The 
+component is supplied with the <code>Vault</code> under the <code>Serviceable</code> phase, following
+which the <code>Vault</code> is resolved during </code>Initialization</code>.  The component invokes 
+a login, and recordes the name of the established X509 principal as an INFO log entry 
+under the <code>Executable</code> phase.</td></tr>
+</table>
+
+<h4>Login Configuration</h4>
+<p>JASS will attempt to locate the login configration based on the following 
+sequence:</p>
+<ul>
+<li>lookup all <code>login.config.url.&lt;n&gt;</code> entries in the 
+file <code>&lt;JAVA_HOME&gt;/lib/security/java.security</code></li>
+<li>check the System property <code>java.security.auth.login.config</code></li>
+<li>if the above fails, JAAS will attempt to locate a login configuration under a 
+file named <code>${user.home}/.java.login.config</code></li>
+</ul>
+<h4>Example Login Configuration</h4>
+The following is an example of a Windows (TM) NT4 login configuration file named 
+<code><strong>.java.login.config</strong></code> in the user's home directory.
+Note that URL values entered in the following configuration block must be quoted.
+The values assigned to <code>keyStorePasswordURL</code> and <code>privateKeyPasswordURL</code>
+are URLs that refer to password values.
+<pre>
+
+net.osm.vault.Vault
+{
+   com.sun.security.auth.module.KeyStoreLoginModule required 
+   keyStoreURL="file:C:/WINNT/Profiles/fred/.keystore"
+   keyStoreAlias=fred
+   keyStorePasswordURL="file:C:/WINNT/Profiles/fred/.password"
+   privateKeyPasswordURL="file:C:/WINNT/Profiles/fred/.private"
+   debug=false;
+};
+</pre>
+
+<h4>Related Packages</h4>
+
+Related packages and services are available under the <a href="{$docRoot}/../../index.html" target="_top">Package Index.</a>
+
+</pre>
+</body>

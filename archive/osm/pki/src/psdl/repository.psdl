@@ -1,0 +1,60 @@
+/**
+ */
+
+#ifndef _PKI_REPOSITORY_PSDL_
+#define _PKI_REPOSITORY_PSDL_
+#include <PKIRepository.idl>
+#pragma prefix "osm.net"
+
+module pki
+{
+  module repository
+  {
+
+      //
+      // role
+      //
+
+     /**
+      * Storage type defintion for a Principal valuetype.
+      */
+      abstract storagetype PrincipalStorage
+      {
+       /**
+        * The unique name of this storage entry within the scope of the storage home.
+        */
+        state string name;
+
+       /**
+        * The principal valuetype.
+        */
+        state PKIRepository::PrincipalValue value;
+      };
+
+     /**
+      * Storage type implementation for PrincipalStorage.
+      */
+      storagetype PrincipalStorageBase implements PrincipalStorage { };
+
+     /**
+      * The storage home defintion for PrincipalStorage instances.
+      */
+      abstract storagehome PrincipalStorageHome of PrincipalStorage
+      {
+        key name;
+
+       /**
+        * Creation of a new SubscriptionStorage entry.
+        */
+        factory create( name, value );
+      };
+
+     /**
+      * The storage home implementation for PrincipalStorageHome.
+      */
+      storagehome PrincipalStorageHomeBase of PrincipalStorageBase implements PrincipalStorageHome{ };
+  };
+
+};
+
+#endif // _PKI_REPOSITORY_PSDL_

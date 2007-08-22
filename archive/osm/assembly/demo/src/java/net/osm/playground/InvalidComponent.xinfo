@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<component-info>
+
+  <component>
+    <name>simple-component</name>
+  </component>
+
+  <dependencies>
+      <dependency>
+          <role>silly</role>
+          <service-ref type="net.osm.playground.InvalidService"/>
+      </dependency>
+  </dependencies>
+
+</component-info>
+

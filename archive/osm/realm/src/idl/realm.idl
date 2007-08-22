@@ -1,0 +1,238 @@
+/*
+ * realm.idl
+ *
+ * Copyright 2000-2001 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.0 22 MAY 2001
+ */
+
+#ifndef _REALM_IDL_
+#define _REALM_IDL_
+#include <orb.idl>
+#pragma prefix "osm.net"
+
+module realm
+{
+
+    native Principal;
+    native CertPath;
+    native BigInteger;
+
+   /**
+    * The Opaque type is used to represent encoded structures as a sequence of bytes.
+    */      
+    typedef sequence <octet> Opaque;
+
+   /**
+    * Exception raises if the data provided under the PrincipalServiceContext
+    * signature state member is invalid.
+    */
+    exception InvalidStructure{
+		string problem;
+    };
+
+   /**
+    * The <code>StandardPrincipal</code> interface contains a X509 certificate path
+    * encoded as a byte array, together with convinience operations enableding access
+    * to a principal, native X509 certificate path, issuing principal, and principal
+    * serial number.
+    */
+    valuetype StandardPrincipal
+    {
+        private Opaque encoded;
+
+       /**
+        * Returns the principal its its native form.
+        */
+        Principal getPrincipal();
+
+       /**
+        * Return the principal's certificate path its its native form.
+        */
+        CertPath getCertificatePath();
+
+       /**
+        * Return the principal's certificate path as a byte array.
+        */
+        Opaque getEncoded();
+
+       /**
+        * Returns the Principal representing the issuer of the 
+	  * root certificate in the principal's certificate path.
+        */
+        Principal getIssuingPrincipal();
+
+       /**
+        * Returns the serial number of the principal's root certificate.
+        */
+        BigInteger getSerialNumber();
+
+    };
+
+   /**
+    * <p>The <code>PrincipalServiceContext</code> is used as means of identifying a 
+    * pricipal.  The context contains an encoded X509 certificate path. 
+    */
+    valuetype PrincipalServiceContext
+    {
+
+       /**
+        * ANS.1 encoded certificate path
+        */
+	  private Opaque encoded;
+
+       /**
+        * Return the encoded form.
+        */
+        Opaque getEncoded();
+    };
+
+   /**
+    * Container of the principal held by the PICurrent.
+    */
+    local interface PrincipalContext
+    {
+
+       /**
+        * Return the certificate path for this principal.
+        */
+        CertPath getCertificatePath();
+
+        any getAny();
+    };
+
+   /**
+    * Reads and writes the current principal to/from the PICurrent.
+    */
+    local interface PrincipalManager
+    {
+       /**
+        * Returns the principal.
+        */
+        StandardPrincipal getPrincipal();
+    };
+
+   /**
+    * Reads and writes the current principal to/from the PICurrent.
+    */
+    local interface AccessController
+    {
+       /**
+        * The <code>accessDecision</code> method returns a true or false
+        * access decision given a pricipal, object identifier and operation
+        * name.
+        *
+        * @param principal the pricipal invoking the operation 
+        * @param oid object identifier corresponding to the target of the request
+        * @param operation the name of the operation to be invoked on the target by the principal
+        */
+        boolean accessDecision( in StandardPrincipal principal, in Opaque oid, in string operation );
+
+    };
+
+   /**
+    * Association of an operation name with an access policy.  Used
+    * within an AccessTable to declare access policy for an operation
+    * that is different from a default policy.
+    */
+    valuetype AccessDescriptor
+    {
+
+       /**
+        * The name of an operation against which an access policy 
+	  * applies.
+        */
+        private string operation;
+
+       /**
+        * Boolean value defining access policy for the 
+	  * operation.
+        */
+        private boolean accessible;
+    };
+
+   /**
+    * Sequence of AccessDescriptor instances used within an AccessTable.
+    */
+    valuetype AccessDescriptorSequence sequence<AccessDescriptor> ;
+
+   /**
+    * A table of access descriptions for a particular role.
+    */
+    valuetype AccessTable
+    {
+
+       /**
+        * The name of the role that this AccessTable is applicable.
+        */
+        private string role;
+
+       /**
+        * Default access if no access descriptors are supplied for 
+	  * a particular operation listed under the exceptions state
+        * member.
+        */
+        private boolean defaultAccessPolicy;
+
+       /**
+        * List of <code>AccessDescriptor</code> instances that 
+	  * override the default policy.  
+        */
+        private AccessDescriptorSequence exceptions;
+
+	 /**
+        * Returns the name of the role that this access table is 
+	  * defining access policy for.
+        */
+        string getRole();
+
+       /**
+        * Returns true if the supplied operation is accessible
+	  * for a principal holding a role of the same name.
+        */
+        boolean accessible( in string operation );
+    };
+
+   /**
+    * Sequence of AccessTable instances used within an AccessPolicy.
+    */
+    valuetype AccessTableSequence sequence<AccessTable> ;
+
+   /**
+    * A sequence of role names.
+    */
+    valuetype RoleNames sequence<string> ;
+
+   /**
+    * Valuetype describing an access policy.
+    */
+    valuetype AccessPolicy
+    {
+
+       /**
+        * A sequence of access tables each corresponding to the access
+        * constraints applicable to particular roles recognized by the 
+        * accessible object.
+	  */
+        private AccessTableSequence tables;
+
+       /**
+        * Method returns true if the principal can access the 
+        * operation under one or more of the supplied roles.
+        * @param roles - a set of roles name against which the 
+        *    access essessment is applied
+        * @param operation - the operation name that the access 
+        *    decision concerns
+        */
+        boolean accessible( 
+            in RoleNames roles, 
+            in string operation 
+        );
+    };
+
+};
+
+#endif // _REALM_IDL_

@@ -1,0 +1,85 @@
+
+<body>
+<p>The <code>org.omg.Session</code> package defines a standard framework for People, Places, Things and the tasks undertaken in the perfomance of user-centric activties.</p>
+
+<h3>Rationale</h3>
+<p>Large and distributed organizations, such as virtual enterprises, typically have system environments with:</p>
+<ul>
+<li>A variety of platforms, ORBs, and applications written in different languages
+<li>Legacy applications
+<li>Multiple Data Managers from different vendors and for different domains
+<li>Multiple Workflow Management Systems, from different vendors
+<li>People represented and replicated in many ways
+<li>Distributed and heterogeneous resources in many places
+<li>Multi-user distributed projects with parallelism to synchronize and manage
+<li>Different user models for each application, system, and product implementation
+</ul>
+<p>Many of these interoperation and synchronization requirements are addressed by existing and planned CORBA specifications:</p>
+<ul>
+<li>Platform, ORB, and language interoperation is, of course, provided by CORBA
+<li>Legacy applications can be wrapped in IDL to become CORBA objects
+<li>Data Managers can be wrapped with CORBAservice or business object facility interfaces
+<li>Workflow Managers will interoperate when their implementations exhibit behaviors which conform to a common specification
+</ul>
+<p>This specification builds on this foundation to:</p>
+<ul>
+<li>Define common objects for people, using (with some specialization) separately defined models, e.g., organization models
+<li>Specify common place objects that contain distributed and heterogeneous resources
+<li>Define objects that represent atomic units of work used by synchronization rules for managing parallel activity and resource sharing
+<li>Define a common user model with people, places, resources, and processes
+</ul>
+<h3>People and Place Objects</h3>
+<p>User objects exist in all multi-user systems to identify people and determine access to resources. Information describing the system environment of a User, e.g., state, resources, places, and processes can be found from this object. Properties, such as preferences, may also be established by specialization.</p>
+<p>Places are represented by Workspace objects. Workspace objects are populated and configured, by Users, with Resources which may be contained in more than one Workspace. Access to objects in a Workspace is independent of access to the Workspace, i.e., Resources determine access, not their Workspace containers. They may represent private or shared places for projects, departments, enterprises, and other environments.
+Common representations of these objects enable interoperation within collaborative processes between different enterprise, workflow, and domain applications. When used with common process and resource objects, they establish a collaboration model that can be recognized by all objects and applications in a process.</p>
+<h3>Resource and Process Objects</h3>
+<p>Process objects, represented as Tasks in this specification, describe User units of work that bind a User to selected data and process resources. Viewed in terms of model-view-controller, Tasks are the controller with commands and selections. A Task defines what instances to process and how to process (workflow, tool, or other executable). A Task may represent:</p>
+<ul>
+<li>a simple request such as "edit a file" where what is file x and how is editor y
+<li>a more abstract request where what is collection j of files and how is workflow k (which may contain a hierarchy of workflows)
+</ul>
+<p>Tasks that describe simple requests are very similar to objects found in all systems - commands. Task extends and generalizes the notion of command objects to include abstract selections which facilitate dynamic binding of data and process resources.
+Task objects represent information that is typically not presented at user interfaces.</p>
+<p>Simple requests, e.g., "edit a file", create a Task but what is exposed at the user interface is likely to be the editor, not a presentation of the Task object. Similarly Tasks using workflows may, or may not, be presented as hooks to workflow viewer and worklist handler user interfaces.
+Task objects represent the decomposition of work, within projects, organizations, and by people, to atomic units (individual work items) that are independent of, and isolated from, each other. Dependencies between Task objects can be handled, as in the real world, by waiting, polling, and requesting. Task objects may only be executed by their assigned (by resource utilization mechanisms), authenticated User, not by another User. If a process has a Task dependency it must either wait for this dependency to be met or define rules for satisfying the dependency through alternative paths. Task objects provide an abstraction of work consistent with how people and projects define and manage their work. This includes the reality that collaboration between people requires recognition of their independence and separateness in time and space.</p>
+<p>A Task is associated with one, and only one, User. Tasks may, however, depend on other Tasks. Dependent and independent Tasks have general differences, as described below, but are represented in the same way. </p>
+<h4>Independent Tasks:</h4>
+<ul>
+<li>are typically created by direct User requests such as "edit a file" or "print a document", as unplanned units of work
+<li>can be created by other Users
+<li>do not depend on other Tasks, however when workflows are used this may not be known until runtime
+</ul>
+<h4>Dependent Tasks:</h4>
+<ul>
+<li>are typically created by workflow and project management tools or scheduled by event handlers, as planned units of work
+<li>contain rules for sequencing, synchronization, and event handling
+<li>use concurrency mechanisms, configurations, and versions
+</ul>
+<p>Unplanned Tasks typically bind a tool, rather than a workflow process resource, to a specific data resource. Using the "edit a file" example the Task object created will bind the requester (User), to the edit tool selected (process resource), and to the file selected (data resource). It is also possible that the request to "edit a file" included the selection of an edit workflow, rather than an edit tool, and a collection of files, rather than a single file. This, however, is just another Task with more abstract selections – the process Resource is the selected workflow (which may itself invoke a sequence of tools and other workflows), and the data Resource is the selected collection of files (which will be selected by the User and/or workflow when the Task executes).</p>
+
+<p>Planned Tasks may contain dependencies on other Users, with other skills. They are usually controlled by workflows and operate on data resource contexts with types and versions used by process rules for selection of instances at runtime. <p>
+<p>Tasks, planned and unplanned, are scalable atomic units of work that:</p>
+<ul>
+<li>capture user requests and assigned work
+<li>can be executed by workflows or tools
+<li>specify information instances to process and interpret
+<li>can have abstract selections that dynamically bind process and data
+<li>utilize resources selected by resource assignment mechanisms
+<li>contain history for enabling recovery and analysis of cost and performance
+<li>model units of work in terms of people and resources to enable collaboration
+</ul>
+<p>Resource is implemented with adapters that wrap distributed, loosely coupled, concrete resources. Adapted resources are CORBA components which include dynamically wrapped internet resources, workflows, resource managers, and domain objects. </p>
+<p>Resources are collected in Workspaces and used to represent:</p>
+<ul>
+<li>process resources such as workflows and applications
+<li>data resources which include files, pages, domain, and other CORBA objects.
+</ul>
+<p>Resource implementations are responsible for maintaining the integrity and consistency of the User computing environment. This includes referential integrity between resources, change notification, and recovery mechanisms.</P>
+<p>Resources are like "bookmarks" in browsers that provide:</p>
+<ul>
+<li>links to independent resource objects with managed loose coupling
+<li>role based links to units of work (Tasks)
+<li>resource sharing via CORBA security and concurrency mechanisms
+<li>typed resources that use interoperation capabilities provided by CORBA
+</ul>
+</body>

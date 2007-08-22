@@ -1,0 +1,780 @@
+
+//File: CosCollection.idl
+//This is the single module for the Collection Service
+// Subset file contaiing only those interfaces needed by org.omg.Session
+
+#ifndef _COS_COLLECTION_IDL_
+#define _COS_COLLECTION_IDL_
+#pragma prefix "omg.org"
+
+//#include <CORBA.idl>
+
+/**
+* This subset of the CosCollection services provides support for Collections supporting 
+* the grouping of objects and support operations for the
+* manipulation of the objects as a group. Common collection types are queues, sets,
+* bags, maps, etc. Collection types differ in the “nature of grouping” exposed to the user.
+* “Nature of grouping” is reflected in the operations supported for the manipulation of
+* objects as members of a group. Collections, for example, can be ordered and thus
+* support access to an element at position ”i” while other collections may support
+* associative access to elements via a key. Collections may guarantee the uniqueness of
+* elements while others allow multiple occurrences of elements. A user chooses a
+* collection type that matches the application requirements based on manipulation
+* capabilities.<p>
+* Collections are foundation classes used in a broad range of applications; therefore, they
+* have to meet the general requirement to be able to collect elements of arbitrary type.
+* On the other hand, a collection instance usually is a homogenous collection in the
+* sense that all elements collected are of the same type, or support the same single
+* interface.<p>
+* Sometimes you may not want to do something to all elements in a collection, but only
+* treat an individual object or traverse a collection explicitly (not implicitly via a
+* collection operation). To enable this, a pointer abstraction often called an iterator is
+* supported with collections. For example, an iterator points to an element in a collection
+* and processes the element pointed to. Iterators can be moved and used to visit elements
+* of a collection in an application defined manner. There can be many iterators pointing
+* to elements of the same collection instance.<p>
+* Normally, when operating on all elements of a collection, you want to pass user-defined
+* information to the collection implementation about what to do with the
+* individual elements or which elements are to be processed. To enable this, function
+* interfaces are used. A collection implementation can rely on and use the defined
+* function interface. A user has to specialize and implement these interfaces to pass the
+* user-defined information to the implementation. A function interface can be used to
+* pass element type specific information such as how to compare elements or pass a
+* “program” to be applied to all elements.
+*/
+
+module CosCollection { 
+
+	interface Collection;
+
+	//  Type definitions
+
+	typedef sequence<any> AnySequence;
+	typedef string Istring;
+	struct NVPair {Istring name; any value;};
+	typedef sequence<NVPair> ParameterList; 
+
+	//  Exceptions
+	exception  EmptyCollection{};
+	exception  PositionInvalid{};
+	//enum IteratorInvalidReason {is_invalid, is_not_for_collection,  is_const};
+	enum IteratorInvalidReason {is_invalid, is_not_for_collection,  is_constant};
+
+	exception IteratorInvalid {IteratorInvalidReason why;};
+	exception IteratorInBetween{};
+	enum ElementInvalidReason {element_type_invalid, positioning_property_invalid, element_exists};
+
+	exception ElementInvalid {ElementInvalidReason why;};
+	exception KeyInvalid {};
+	exception ParameterInvalid {unsigned long which; Istring why;}; 
+
+	/**
+	* The function interface Operations is used to pass a number of other user-defined
+	* element type specific information to the collection implementation.<p>
+	* The first kind of element type specific information passed is used for typechecking.
+	* There are attributes specifying the element and key type expected in a given collection.
+	* In addition to the type information there are two typechecking operations which allow
+	* customizing the typechecking in a user-defined manner. The “default semantics” of
+	* these operations is a simple check on whether the type code of the given element or
+	* key exactly matches the type code specified in the element key type attribute.
+	* Dependent on the properties as represented by a collection interface the respective
+	* implementation relies on some element type specific or key type specific information
+	* to be passed to it. For example one has to pass the information “element comparison”
+	* to implementation of a SortedSet or “key equality” to the implementation of a
+	* KeySet to guarantee uniqueness of keys. To pass this information, the Operations
+	* interface is used.<p>
+	* The third use of this interface is to pass element or key type specific
+	* information relevant for different categories of implementations. (Performing)
+	* implementations of associative collections essentially can be partitioned into the
+	* categories comparison-based or hashing-based. An AVL-tree implementation for a
+	* KeySet (for example) is key-comparison-based; therefore, it relies on key comparison
+	* defined and a hash table implementation of KeySet hashing-based (which relies on the
+	* information how a hash key values). Passing this information is the third kind of usage
+	* of the Operations interface.
+	* <p>
+	* The operations defined in the Operations interface are in summary:
+	* <ul>
+	* <li>element type checking and key type checking
+	* <li>element equality and the ordering relationship on elements
+	* <li>key equality and ordering relationship on keys
+	* <li>key access
+	* <li>hash information on elements and keys
+	* </ul>
+	* In order to pass this information to the collection, a user has to derive and implement
+	* an interface from the interface Operations. Which operations you have to implement
+	* depends on the collection interface and the implementation category you want to use.
+	* An instance of this interface is passed to a collection at creation time and then can be
+	* used by the implementation.<p>
+	* Ownership for an Operations instance is passed to the collection at creation
+	* time. That is, the same instance of Operations respectively a derived interface cannot
+	* be used in another collection instance. The collection is responsible for destroying the
+	* Operations instance when the collection is destroyed.<p>
+	* Operations only defines an abstract interface. Specialization and implementation are
+	* part of the application development as is the definition and implementation of
+	* respective factories and are not listed in this specification.
+	*/
+
+	interface Operations {
+
+		/**
+		* Specifies the type of the element to be collected.
+		*/
+
+		readonly attribute CORBA::TypeCode element_type;
+
+		/**
+		* A collection implementation may rely on this operation being defined to use it
+		* for its type checking. A default implementation may be a simple test whether
+		* the type code of the given element exactly matches element_type. For object
+		* references, sometimes a check on equality of the type codes is not desired but a
+		* check on whether the type of the given element is a specialization of the
+		* element_type.
+		* @return true if the given element passed the user-defined element type-checking.
+		*/
+
+		boolean check_element_type (in any element);
+
+		/**
+		* Returns true if element1 is equal to element2 with respect to the user-defined
+		* semantics of element equality.
+		*/
+
+		boolean equal (in any element1, in any element2);
+
+		/**
+		* Returns a value less than zero if element1 < element2, zero if the values are
+		* equal, and a value greater than zero if element1 > element2 with respect to the
+		* user-defined ordering relationship on elements.
+		*/
+
+		long compare (in any element1, in any element2);
+
+		/**
+		* Returns a user-defined hash value for the given element. The given value specifies
+		* the size of the hashtable. This information can be used for the implementation of
+		* more or less sophisticated hash functions. Computed hash values have to be less
+		* than value.
+		*/
+		unsigned long hash (in any element, in unsigned long value);
+
+		/** 
+		* Computes the (user-defined) key of the given element.
+		*/
+
+		any _key (in any element);
+
+		/**		
+		* Specifies the type of the key of the elements to be collected.
+		*/
+
+		readonly attribute CORBA::TypeCode key_type;
+
+		/**
+		* Returns true if the given key passed the user-defined element type-checking.
+		*/
+
+		boolean check_key_type (in any the_key);
+
+		/**
+		* Returns true if key1 is equal to key2 with respect to the user-defined semantics of
+		* key equality.
+		*/
+
+		boolean key_equal (in any key1, in any key2);
+
+		/**
+		* Returns a value less than zero if key1 < key2, zero if the values are equal, and a
+		* value greater than zero if key1 > key2 with respect to the user-defined ordering
+		* relationship on keys.
+		*/
+
+		long key_compare (in any key1, in any key2);
+		unsigned long key_hash (in any thisKey, in unsigned long value);
+
+		/**		
+		* Destroys the operations instance.
+		*/
+		void destroy();
+		
+	};
+
+	/**
+	* An instance of an interface derived from Command is passed to the operation
+	* <code>all_elements_do</code> to be applied to all elements of the collection.
+	*/
+
+	interface Command {
+		boolean do_on (in any element);
+	};
+
+	/**
+	* An instance of a user defined interface derived from Comparator is
+	* passed to the operation sort as sorting criteria.
+	*/
+
+	interface Comparator { 
+		long compare (in any element1, in any element2);
+	};
+
+
+	/**
+	* An iterator is in a first approximation of a pointer abstraction - it is a movable pointer
+	* to elements of a collection. Iterators are tightly intertwined with collections. An
+	*iterator cannot exist independently of a collection (i.e., the iterator life time cannot
+	*exceed that of the collection for which it is created). A collection is the factory for its
+	*iterators. An iterator is created for a given collection and can be used for this and only
+	*this collection.<p>
+	*The iterators specified in this specification form an interface hierarchy which parallels
+	*the collection interface hierarchy. The supported iterator movements reflect the
+	* capabilities of the corresponding collection type.<p>
+	* The top level Iterator interface defines a generic iterator usable for iteration over all
+	* types of collections. It can be set to a start position for iteration and moved via a series
+	* of forward movements through the collection visiting each element exactly once.
+	* Iterators go far beyond being simple “pointing devices.” There are essentially two
+	* reasons to extend the capabilities of iterators.<p>
+	* <ol>
+	* <li> To support the processing of very large collections which allows for delayed
+	* instantiation or incremental query evaluation in case of very large query results.
+	* These are scenarios where the collection itself may never exist as instantiated main
+	* memory collection but is processed in “finer grains” via an iterator passed to a
+	* client.
+	* <li> To enrich the iterator with more capabilities strengthens the support for the generic
+	* programming model, as introduced with ANSI STL to the C++ world.
+	* </ol>
+	* You can retrieve, replace, remove, and add elements via an iterator. You can test
+	* iterators for equality, compare ordered iterators, clone an iterator, assign iterators, and
+	* destroy them. Furthermore an iterator can have a const designation which is set when
+	* created. A const iterator can be used for access only.<p>
+	* The reverse iterator semantics is supported. No extra interfaces are specified to
+	* support this, but a reverse designation is set at creation time. An ordered iterator for
+	* which the reverse designation is set reinterprets the operations of a given iterator type
+	* to work in reverse.<p>
+	* To reduce network traffic, combined operations and batch or bulk operations are
+	* offered. Combined operations are combinations of simple iterator operations often used in
+	* loops. These combinations support generic algorithms. For example, a typical
+	* combination is “test whether range end is reached; if not retrieve_element, advance
+	* iterator to next element.” Batch or bulk operations support the retrieval, replacement, 
+	* addition, and removal of many elements within one operation. In these operations, the 
+	* “many elements” are always passed as a CORBA::sequence of elements.
+	* <p>
+	* All iterators are managed. The real benefit of being managed is that these iterators
+	* never become undefined. Note that “undefined” is different from “invalid.” While
+	* “invalid” is a testable state and means the iterator points to nothing, “undefined”
+	* means you do not know where the iterator points to and cannot inquiry it. Changing
+	* the contents of a collection by adding or deleting elements would cause an unmanaged
+	* iterator to become “undefined.” The iterator may still point to the same element, but it
+	* may also point to another element or even “outside” the collection. As you do not
+	* know the iterator state and cannot inquiry which state the iterator has, you are forced
+	* to newly position the unmanaged iterator, for example, via a set_to_first_element().
+	* This kind of behavior, common in collection class libraries today, seems unacceptable
+	* in a distributed multi-user environment. Assume one client removes and adds elements
+	* from a collection with side effects on the unmanaged iterators of another client. The
+	* other client is not able to test whether there have been side effects on its unmanaged
+	* iterators, but would only notice them indirectly when observing strange behavior of the
+	* application.<p>
+	* Managed iterators are intimately related to the collection they belong to, and thus, can
+	* be informed about the changes taking place within the collection. They are always in a
+	* defined state which allows them to be used even though elements have been added or
+	* removed from the collection. An iterator may be in the state invalid, that is pointing to
+	* nothing. Before it can be used it has to be set to a valid position. An iterator in the
+	* state valid may either point to an element (and be valid for all operations on it) or it
+	* may be in the state in-between, that is, not pointing to an element but still
+	* “remembering" enough state to be valid for most operations on it.<p>
+	* A valid managed iterator remains valid as long as the element it points to remains in
+	* the collection. As soon as the element is removed, the according managed iterator
+	* enters a so-called in-between state. The in-between state can be viewed as a vacuum
+	* within the collection. There is nothing the managed iterator can point to. Nevertheless,
+	* managed iterators remember the next (and for ordered collection, also the previous)
+	* element in iteration order. It is possible to continue using the managed iterator (in a
+	* set_to_next_element() for example) without resetting it first.<p>
+	*  There are some limitations. Once a managed iterator no longer points to an element, it
+	* remembers the iteration order in which the element stood before it was deleted.
+	* However, it does not remember the element itself. Thus, there are some operations
+	* which cannot be performed even though a managed iterator is used.<p>
+	* Consider an iteration over a Bag, for example. If you iterate over all different elements
+	* with the iterator operation set_to_next_different_el ement(), then removing the
+	* element the iterator points to leads to an undefined behavior of the collection later on.
+	* By removing the element, the iterator becomes in-between. The
+	* set_to_next_different_element() operation then has no chance to find the next
+	* different element as the collection does not know what is different in terms of the
+	* current iterator state. Likewise, for a managed iterator in the state in-between all
+	* operations ending with “..._at” are not defined. The reason is simple: There is no
+	* element at the iterator’s position - nothing to retrieve, to replace, or to remove in it.
+	* This situation is handled by raising an exception IteratorInvalid.
+	* Additionally, all operations that (potentially) destroy the iteration order of a collection
+	* invalidate the corresponding managed iterators that have been in the state in-between
+	* before the operation was invoked. These are the sort() and the reverse() operation.
+	*/
+
+	interface Iterator { 
+
+		/**
+		* The iterator is set to the first element in iteration order of the collection it belongs
+		* to. If the collection is empty, that is, if no first element exists, the iterator is
+		* invalidated.
+		* @return true if the collection it belongs to is not empty.
+		*/
+
+		boolean set_to_first_element ();
+
+		/**
+		* Sets the iterator to the next element in the collection in iteration order or invalidates
+		* the iterator if no more elements are to be visited. If the iterator is in the state in-between,
+		* the iterator is set to its “potential next” element. The iterator must be valid; otherwise, 
+		* the exception IteratorInvalid is raised.
+		* @return true if there is a next element.
+		*/
+
+		boolean set_to_next_element() raises (IteratorInvalid);
+
+		/**
+		* Sets the iterator to the element n movements away in collection iteration order or
+		* invalidates the iterator if there is no such element. If the iterator is in the state in-between
+		* the movement to the “potential next” element is the first of the n movements.
+		* The iterator must be valid; otherwise, the exception IteratorInvalid is raised.
+		* @return true if there is such an element.
+		*/
+
+		boolean set_to_next_nth_element (in unsigned long n)
+			raises  (IteratorInvalid); 
+
+		/**
+		* Retrieves the element pointed and returns it via the output parameter element.
+		* The iterator must point to an element of the collection; otherwise, the exception
+		* IteratorInvalid or IteratorInBetween is raised.
+		* @return true if an element was retrieved.
+		*/
+
+		boolean retrieve_element (out any element)
+			raises (IteratorInvalid,  IteratorInBetween);
+
+		/**
+		* Retrieves the element pointed to and returns it via the output parameter element.
+		* The iterator is moved to the next element in iteration order. If there is a next
+		* element more is set to true. If there are no more next elements, the iterator is
+		* invalidated and more is set to false. The iterator must be valid and point to an 
+		* element; otherwise, the exception IteratorInvalid or IteratorInBetween is raised.
+		* @return true if an element was retrieved.
+		*/
+
+		boolean retrieve_element_set_to_next (out any element, out boolean  more)
+			raises (IteratorInvalid, IteratorInBetween);
+
+		/**
+		* Retrieves at most the next n elements in iteration order of the iterator’s collection
+		* and returns them as sequence of anys via the output parameter result. Counting
+		* starts with the element the iterator points to. The iterator is moved behind the last
+		* element retrieved. If there is an element behind the last element retrieved, more is
+		* set to true. If there are no more elements behind the last element retrieved or there
+		* are less than n elements for retrieval, the iterator is invalidated and more is set to
+		* false. If the value of n is 0, all elements in the collection are retrieved until the end
+		* is reached. The iterator must be valid and point to an element; otherwise, the exception
+		* IteratorInvalid or IteratorInBetween is raised.
+		* @return true if at least one element is retrieved.
+		*/
+
+		boolean retrieve_next_n_elements (in unsigned long n, out  AnySequence result, out boolean more)
+			raises (IteratorInvalid,  IteratorInBetween);
+
+		/** 
+		* Compares the given iterator test with this iterator.
+		* <ul>
+		* <li>If they are not equal, the element pointed to by this iterator is retrieved and
+		* returned via the output parameter element, the iterator is moved to the next
+		* element, and true is returned.
+		* <li> If they are equal, the element pointed to by this iterator is retrieved and
+		* returned via the output parameter element, the iterator is not moved to the
+		* next element, and false is returned.
+		* </ul>
+		* The iterator and the given iterator test each must be valid and point to an element;
+		* otherwise, the exception IteratorInvalid or IteratorInBetween is raised.
+		* @return true if this iterator is not equal to the test iterator at the beginning of the
+		* operation.
+		*/
+	
+		boolean not_equal_retrieve_element_set_to_next (in Iterator test,  out any element)
+			raises (IteratorInvalid, IteratorInBetween); 
+
+		/**
+		* Removes the element pointed to by this iterator and sets the iterator in-between.
+		* The iterator must be valid and point to an element of the collection; otherwise, the
+		* exception IteratorInvalid or IteratorInBetween is raised.
+		* The iterator must not have the const designation; otherwise, the exception
+		* IteratorInvalid is raised. Other valid iterators pointing to the removed element 
+		* go in-between. All other iterators keep their state.
+		*/
+
+		void remove_element() raises (IteratorInvalid, IteratorInBetween);
+
+		/**
+		* Removes the element pointed to by this iterator and moves the iterator to the next
+		* element. The iterator must be valid and point to an element of the collection; otherwise, the
+		* exception IteratorInvalid is raised. The iterator must not have the const designation; 
+		* otherwise, the exception IteratorInvalid is raised.
+		* @return true if a next element exists.
+		*/
+	
+		boolean remove_element_set_to_next()
+			raises (IteratorInvalid,  IteratorInBetween); 
+
+		/**
+		* Removes at most the next n elements in iteration order of the iterator’s collection.
+		* Counting starts with the element the iterator points to. The iterator is moved to the
+		* next element behind the last element removed. If there are no more elements behind
+		* the last element removed or there are less than n elements for removal, the iterator
+		* is invalidated. If the value of n is 0, all elements in the collection are removed until
+		* the end is reached. The output parameter actual_number is set to the actual
+		* number of elements removed. If the value of n is 0, all elements in the collection
+		* are removed until the end is reached. The iterator must be valid and point to an 
+		* element; otherwise, the exception IteratorInvalid or IteratorInBetween is raised.
+		* The iterator must not have the const designation; otherwise, the exception
+		* IteratorInvalid is raised. Other valid iterators pointing to removed elements 
+		* go in-between. All other iterators keep their state.
+		* @return true if the iterator is not invalidated.
+		*/
+	
+		boolean remove_next_n_elements (in unsigned long n, out unsigned  long actual_number)
+			raises (IteratorInvalid, IteratorInBetween); 
+
+		/**
+		* Compares this iterator with the given iterator test. If they are not equal the element
+		* this iterators points to is removed and the iterator is set to the next element, and
+		* true is returned. If they are equal the element pointed to is removed, the iterator is
+		* set in-between, and false is returned. This iterator and the given iterator test 
+		* must be valid otherwise the exception IteratorInvalid or IteratorInBetween is raised.
+		* This iterator and the given iterator test must not have a const designation
+		* otherwise the exception IteratorInvalid is raised. Other valid iterators pointing to 
+		* removed elements go in-between. All other iterators keep their state.
+		* @return true if this iterator and the given iterator test are not equal when the
+		* operations starts.
+		*/
+
+		boolean not_equal_remove_element_set_to_next (in Iterator test)
+			raises (IteratorInvalid, IteratorInBetween); 
+		
+		/**
+		* Replaces the element pointed to by the given element. The iterator must be valid and 
+		* point to an element; otherwise, the exception IteratorInvalid or IteratorInBetween is 
+		* raised. The iterator must not have a const designation; otherwise, the exception
+		* IteratorInvalid is raised. The element must be of the expected element type; 
+		* otherwise, the ElementInvalid exception is raised. The given element must have the 
+		* same positioning property as the replaced element; otherwise, the exception 
+		* ElementInvalid is raised.
+		*/
+
+		void replace_element (in any element)
+			raises (IteratorInvalid,  IteratorInBetween, ElementInvalid);
+
+		/**
+		* Replaces the element pointed to by this iterator by the given element and sets the
+		* iterator to the next element. If there are no more elements, the iterator is
+		* invalidated. The iterator must be valid and point to an element; otherwise, the 
+		* exception IteratorInvalid or IteratorInBetween is raised. The iterator must not 
+		* have a const designation; otherwise, the exception IteratorInvalid is raised.
+		* The element must be of the expected element type; otherwise, the ElementInvalid
+		* exception is raised. The given element must have the same positioning property as 
+		* the replaced element; otherwise, the exception ElementInvalid is raised.
+		* @return true if there is a next element.
+		*/
+
+		boolean replace_element_set_to_next (in any element)
+			raises(IteratorInvalid, IteratorInBetween, ElementInvalid);
+
+		/**
+		* Replaces at most as many elements in iteration order as given in elements by the
+		* given elements. Counting starts with the element the iterator points to. If there are
+		* less elements in the collection left to be replaced than the given number of elements
+		* as many elements as possible are replaced and the actual number of elements
+		* replaced is returned via the output parameter actual_number. The iterator is moved 
+		* to the next element behind the last element replaced. If there are no more elements 
+		* behind the last element replaced or the number of elements in the collection to be 
+		* replaced is less than the number given elements, the iterator is invalidated.
+		* The iterator must be valid and point to an element; otherwise, the exception
+		* IteratorInvalid or IteratorInBetween is raised. The elements given must be of the 
+		* expected type; otherwise, the exception ElementInvalid is raised.
+		* For each element the positioning property of the replaced element must be the same
+		* as that of the element replacing it; otherwise, the exception ElementInvalid is
+		* raised.
+		* @return true if there is another element behind the last element replaced.
+		*/
+
+		boolean replace_next_n_elements (in AnySequence elements, out  unsigned long actual_number)
+			raises (IteratorInvalid,  IteratorInBetween, ElementInvalid);
+
+		/**
+		* Compares this iterator and the given iterator test. If they are not equal, the element
+		* pointed to by this iterator is replaced by the given element, the iterator is set to the
+		* next element, and true is returned. If they are equal, the element pointed to by this
+		* iterator is replaced by the given element, the iterator is not set to the next element,
+		* and false is returned.  This iterator and the given iterator must be valid and point to 
+		* an element each; otherwise, the exception IteratorInvalid or IteratorInBetween is 
+		* raised. This iterator must not have a const designation; otherwise, the exception
+		* IteratorInvalid is raised. The element must be of the expected element type; 
+		* otherwise, the ElementInvalid exception is raised. The given element must have the 
+		* same positioning property as the replaced element; otherwise, the exception 
+		* ElementInvalid is raised.
+		* @return true if this iterator and the given iterator test are not equal before the
+		* operations starts.
+		*/
+ 
+		boolean not_equal_replace_element_set_to_next (in Iterator test, in  any element)
+			raises(IteratorInvalid,IteratorInBetween,  ElementInvalid); 
+
+		/**
+		* Adds an element to the collection that this iterator points to and sets the iterator to
+		* the added element. The exact semantics depends on the properties of the collection
+		* for which this iterator is created. If the collection supports unique elements or keys 
+		* and the element or key is already contained in the collection, adding is ignored and 
+		* the iterator is just set to the element or key already contained. In sequential 
+		* collections, the element is always added as last element. In sorted collections, the 
+		* element is added at a position determined by the element or key value.
+		* If the collection is a Map and contains an element with the same key as the given
+		* element, then this element has to be equal to the given element; otherwise, the
+		* exception ElementInvalid is raised. All other iterators keep their state.
+		* @return true if the element was added. The element to be added must be of the
+		* expected type; otherwise, the exception ElementInvalid is raised.
+		*/
+		
+		boolean add_element_set_iterator (in any element)raises  (ElementInvalid); 
+
+		/**
+		* Adds the given elements to the collection that this iterator points to. The elements
+		* are added in the order of the input sequence of elements and the delivered semantics
+		* is consistent with the semantics of the add_element_set_iterator operation. It is
+		* essentially a sequence of add_element_set_iterator operations. The output
+		* parameter actual_number is set to the number of elements added.
+		*/
+
+		boolean add_n_elements_set_iterator (in AnySequence elements, out  unsigned long actual_number)
+			raises (ElementInvalid);
+		
+		/**
+		* Sets the iterator to the state invalid, that is, “pointing to nothing.” You may also say
+		* that the iterator, in some sense, is set to “NULL.”
+		* 
+		*/
+
+		void invalidate (); 
+
+		/**
+		* Returns true if the Iterator is valid, that is points to an element of the collection or
+		* is in the state in-between.
+		*/
+		
+		boolean is_valid ();
+
+		/**
+		* Returns true if the iterator is in the state in-between.
+		*/
+
+		boolean is_in_between ();
+
+		/**
+		* Returns true if this iterator can operate on the given collection.
+		*/
+
+		boolean is_for(in Collection collector);
+
+		/**
+		* Returns true if this iterator is created with “const” designation.
+		*/
+
+		boolean is_const ();
+
+		/**
+		* Returns true if the given iterator points to the identical element as this iterator.
+		*/
+
+		boolean is_equal (in Iterator test) raises (IteratorInvalid); 
+		
+		/**
+		* Creates a copy of this iterator.
+		*/
+
+		Iterator clone ();
+
+		/**
+		* Assigns the given iterator to this iterator.
+		* The given iterator must be created for the same collection as this iterator; otherwise,
+		* the exception IteratorInvalid is raised.
+		*/
+
+		void assign (in Iterator from_where) raises (IteratorInvalid);
+
+		/**
+		* Destroys this iterator.
+		*/
+
+		void destroy (); 
+		
+	};
+
+	/**
+	* The Collection interface represents the most abstract view of a collection. Operations
+	* defined in this top level interface can be supported by all collection interfaces in the
+	* hierarchy. Each concrete collection interface offers the appropriate operation semantics
+	* dependent on the collection properties. It defines operations for:
+	* <ul>
+	* <li>adding elements
+	* <li>removing elements
+	* <li>replacing elements
+	* <li>retrieving elements
+	* <li>inquiring collection information
+	* <li>creating iterators
+	* </ul>
+	*/
+
+	interface Collection {
+
+		/** Specifies the element type expected in the collection. */
+
+		readonly attribute CORBA::TypeCode element_type;
+
+		/**
+		* Adds an element to the collection. The exact semantics of the add operations
+		* depends on the properties of the concrete interface derived from the Collection that
+		* the collection is an instance of.
+		* If the collection supports unique elements or keys and the element or key is already
+		* contained in the collection, adding is ignored. In sequential collections, the element
+		* is always added as last element. In sorted collections, the element is added at a
+		* position determined by the element or key value.
+		* If the collection is a Map and contains an element with the same key as the given
+		* element, then this element has to be equal to the given element; otherwise, the
+		* exception ElementInvalid is raised.<p>
+		* Side effects: All iterators keep their state.
+		* @return 	true if the element is added.
+		* @exception	The element must be of the expected type; otherwise, the exception 
+		* 		ElementInvalid is raised.
+		*/
+		
+		boolean add_element (in any element) raises (ElementInvalid);
+
+		/**
+		* Adds an element to the collection and sets the iterator to the added element. The
+		* exact semantics of the add operations depends on the properties of the concrete
+		* interface derived from the Collection that the collection is an instance of.
+		* If the collection supports unique elements or keys and the element or key is already
+		* contained in the collection, adding is ignored and the iterator is just set to the
+		* element or key already contained. In sequential collections, the element is always
+		* added as last element. In sorted collections, the element is added at a position
+		* determined by the element or key value.
+		* If the collection is a Map and contains an element with the same key as the given
+		* element, then this element has to be equal to the given element; otherwise, the
+		* exception ElementInvalid is raised.
+		* @return true if the element is added.
+		*/
+
+		boolean add_element_set_iterator (in any element, in Iterator where) 
+			raises (IteratorInvalid, ElementInvalid); 
+		void add_all_from (in Collection collector) raises (ElementInvalid);
+		
+
+		/**
+		* Removes the element pointed to by the given iterator. 
+		* The given iterator is set to in-between.
+		* The iterator must belong to the collection and must point to an 
+		* element of the collection; otherwise, the exception IteratorInvalid 
+		* is raised. Iterators pointing to the removed element go in-between. 
+		* Iterators which do not point to the removed element keep their state.
+		*/
+
+		void remove_element_at (in Iterator where) 
+			raises (IteratorInvalid,  IteratorInBetween); 
+
+		/**
+		* Removes all elements from the collection.
+		* @return value the number of elements removed.
+		*/
+
+		unsigned long remove_all ();
+		
+		/**
+		* Replaces the element pointed to by the iterator by the given element. The given
+		* element must have the same positioning property as the replaced element.
+		* <ul>
+		* <li>For collections organized according to element properties such as ordering 
+		* 	relation, the replace operation must not change this element property.
+		* <li> For key collections, the new key must be equal to the key replaced.
+		* <li> For non-key collections with element equality, the new element must be equal to
+		* the replaced element as defined by the element equality relation.
+		* </ul>
+		* Sequential collections have a user-defined positioning property and heaps do not
+		* have positioning properties. Element values in sequences and heaps can be replaced
+		* freely.<p>
+		* The given element must not change the positioning property; otherwise, the
+		* exception ElementInvalid is raised.
+		* The given element must be of the expected type; otherwise, the exception
+		* ElementInvalid is raised.
+		* The iterator must belong to the collection and must point to an element of the
+		* collection; otherwise, the exception IteratorInvalid or IteratorInBetween is raised.
+		*/
+
+		void replace_element_at (in Iterator where, in any element)
+			raises(IteratorInvalid, IteratorInBetween, ElementInvalid); 
+		
+		/**
+		* Retrieves the element pointed to by the given iterator and returns it via the output
+		* parameter element.The given iterator must belong to the collection and must point to 
+		* an element of the collection; otherwise, the exception IteratorInvalid or 
+		* IteratorInBetween is raised.
+		* @return value true if an element is retrieved.
+		*/
+
+		boolean retrieve_element_at (in Iterator where, out any element)
+			raises (IteratorInvalid, IteratorInBetween); 
+		
+
+		/**
+		* Calls the <code>do_on()</code> operation of the given Command for each element of the
+		* collection until the <code>do_on()</code> operation returns false. The elements are visited in
+		* iteration order.
+		* <ul>
+		* <li>The <code>do_on()</code> operation must not remove elements from or add elements 
+		* 	to the collection.
+		* <li>The <code>do_on()</code> operation must not manipulate the element in the collection 
+		* 	in a way that changes the positioning property of the element.
+		* </ul>
+		* @return true if the <code>do_on()</code> operation returns true for each element it is 
+		* applied to.
+		*/
+
+		boolean all_elements_do (in Command what) ;
+		
+		/**
+		* The collection operations do have preconditions which when violated raise exceptions.
+		* There are operations for testing those preconditions to enable the user to avoid raising
+		* exceptions.
+		* @return the number of elements contained in the collection.
+		*/
+
+		unsigned long number_of_elements ();
+
+		/**
+		* Test for an empty colleciton.
+		* eturns true if the collection is empty.
+		*/
+
+		boolean is_empty ();
+		
+		/**
+		* Destroys the collection. This includes:
+		* <ul>
+		* <li>removing all elements from the collection
+		* <li>destroying all iterators created for this collection
+		* <li>destroying the instance of Operations passed at creation time to the collection
+		*       implementation.
+		*/
+
+		void destroy(); 
+		
+		/**
+		* Creates and returns an iterator instance for this collection. The type of iterator that is
+		* created depends on the interface type of this collection.
+		*/
+
+		Iterator create_iterator (in boolean read_only); 
+
+	}; 
+		
+};
+#endif /* ifndef _COS_COLLECTION_IDL_ */

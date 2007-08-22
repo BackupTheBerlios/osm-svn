@@ -1,0 +1,54 @@
+/*
+ * sps.idl
+ *
+ * Copyright 2000-2001 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.3 18 MAR 2001
+ */
+
+#ifndef _OSM_SPS_IDL_
+#define _OSM_SPS_IDL_
+#include <CosNotifyComm.idl>
+#include <CosNotification.idl>
+#include <orb.idl>
+#pragma prefix "osm.net"
+
+module sps
+{
+
+    typedef CORBA::OctetSeq PID;
+
+
+   /**
+    * SubscriberProxy is an interface that extends StructuredPushSupplier within 
+    * internal operations enabling local resources to post events to the proxy, 
+    * and to initiate a termination sequence.  Posting events results in the 
+    * addition of a supplied event to the subscriber queue.  Initiating termination
+    * prevents further events from being queued, and triggers delegate destruction
+    * when the event queue is empty.
+    */
+    interface SubscriberProxy : CosNotifyComm::StructuredPushSupplier
+    {
+
+       /**
+        * Adds a structured event to the event queue.
+        * @param event the structured event to add to the queue.
+        */
+        void post( in CosNotification::StructuredEvent event );
+
+       /**
+        * Initate the termination sequence for this proxy.  if the 
+        * supplied termination policy is true, the implementation
+        * shall complete delivery of all pending events followed by servant
+        * disposal, otherwise the termination shall be immediate.
+        * @param wait if TRUE, wait for complete of delivery of pending events
+        */
+        void terminate( in boolean wait );
+    };
+
+};
+
+#endif // _OSM_SPS_IDL_

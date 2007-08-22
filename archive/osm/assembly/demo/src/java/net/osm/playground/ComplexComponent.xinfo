@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<component-info>
+
+  <component>
+    <name>complex</name>
+  </component>
+
+  <dependencies>
+      <dependency>
+          <role>basic</role>
+          <service-ref type="net.osm.playground.BasicService"/>
+      </dependency>
+      <dependency>
+          <role>simple</role>
+          <service-ref type="net.osm.playground.SimpleService"/>
+      </dependency>
+  </dependencies>
+
+</component-info>
+

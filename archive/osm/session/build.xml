@@ -1,0 +1,700 @@
+
+<!-- 
+Session Framework
+Copyright 2001-2002 OSM SARL, All Rights Reserved.
+-->
+
+<project name="session" default="help" basedir=".">
+
+  <property file="local.properties"/>
+  <property file="build.properties"/>
+
+  <target name="help" >
+    <echo>
+
+      Description
+      -----------
+
+      ${project.title}
+
+      General Targets:
+      ----------------
+
+      all              - clean, build and dist
+      build            - invokes the general build target
+      javadoc          - javadoc API generation
+      dist             - executes build, javadoc and support file creation
+      clean            - destroy the build directory
+
+      server           - starts the AbstractResource factory
+      client           - invokes 1000 resource creation/destruction requests
+      
+    </echo>
+  </target>
+
+  <property name="VERSION" value="${MAJOR}.${MINOR}.${MICRO}"/>
+
+  <property name="apps.path" value="../../jakarta-avalon-apps" />
+  <property name="common.path" value="${apps.path}/common" />
+  <property name="common.lib.path" value="${common.path}/lib" />
+
+  <property name="enterprise" value="${apps.path}/enterprise" />
+  <property name="orb.path" value="${enterprise}/orb" />
+  <property name="orb.lib.path" value="${orb.path}/lib" />
+  <property name="orb.dist.path" value="${orb.path}/dist" />
+  <property name="orb.idl.path" value="${orb.path}/src/idl" />
+  <property name="idl.class"  value="org.openorb.compiler.IdlCompiler" />
+  <property name="pss.dist.path" value="${enterprise}/pss/dist" />
+  <property name="psdl.class"  value="org.apache.pss.compiler.PsdlCompiler" />
+
+  <property name="time.path" value="${enterprise}/time" />
+  <property name="time.dist.path" value="${time.path}/dist" />
+  <property name="vault.dist.path" value="../vault/dist" />
+  <property name="realm.path" value="../realm" />
+  <property name="realm.dist.path" value="${realm.path}/dist" />
+  <property name="sps.path" value="../sps" />
+  <property name="sps.dist.path" value="${sps.path}/dist" />
+  <property name="properties.path" value="../properties" />
+  <property name="properties.dist.path" value="${properties.path}/dist" />
+  <property name="domain.path" value="../domain" />
+  <property name="domain.dist.path" value="${domain.path}/dist" />
+  <property name="adapter.path" value="../adapter" />
+  <property name="adapter.dist.path" value="${adapter.path}/dist" />
+
+  <property name="lib" value="lib" />
+  <property name="src" value="src" />
+  <property name="etc" value="${src}/etc" />
+  <property name="idl" value="${src}/idl" />
+  <property name="psdl" value="${src}/psdl" />
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+  <property name="examples"  value="examples" />
+
+  <property name="persistence" value="file" />
+  <property name="net.osm.pss.connector" value="${persistence}" />
+
+  <property name="project.jar" value="${ant.project.name}.jar"/>
+  <property name="examples.jar" value="examples.jar"/>
+
+  <property name="javadoc.root.path"  value="${dist}/javadoc" />
+  <property name="avalon.href"  value="http://jakarta.apache.org/avalon/api/" />
+  <property name="jdk.href"  value="http://java.sun.com/j2se/1.4/docs/api/" />
+  <property name="overview.html" value="${etc}/overview.html" />
+
+  <!-- classpath -->
+
+  <path id="project.classpath">
+      <fileset dir="${common.lib.path}">
+         <include name="logkit.jar"/>
+         <include name="avalon-framework.jar"/>
+         <include name="excalibur-configuration.jar"/>
+         <include name="excalibur-context.jar"/>
+         <include name="merlin.jar"/>
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${vault.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${realm.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${sps.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${properties.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${time.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${domain.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${adapter.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+  </path>
+
+  <!-- MAIN TARGETS -->
+
+  <target name="all" depends="clean,dist"/>
+  <target name="dist" depends="build,javadoc,support"/>
+  <target name="build" depends="main.build,examples.build"/>
+
+  <target name="clean">
+     <delete dir="${build}"/>
+     <delete dir="${dist}"/>
+     <delete dir="pss"/>
+  </target>
+
+  <!-- PREPARE -->
+
+  <target name="prepare"  >
+    <mkdir dir="${dist}" />
+    <mkdir dir="${build}/CosLifeCycle" />
+    <mkdir dir="${build}/CosObjectIdentity" />
+    <mkdir dir="${build}/NamingAuthority" />
+    <mkdir dir="${build}/CosCollection" />
+    <mkdir dir="${build}/Session" />
+    <mkdir dir="${build}/ext" />
+    <mkdir dir="${build}/list" />
+    <mkdir dir="${build}/link" />
+    <mkdir dir="${build}/message" />
+    <mkdir dir="${build}/resource" />
+    <mkdir dir="${build}/workspace" />
+    <mkdir dir="${build}/desktop" />
+    <mkdir dir="${build}/user" />
+    <mkdir dir="${build}/task" />
+    <mkdir dir="${build}/processor" />
+    <mkdir dir="${build}/examples" />
+    <mkdir dir="${build}/lib" />
+  </target>
+
+  <!--
+  IDL
+  -->
+
+  <target name="idl" depends="CosLifeCycle.idl,CosObjectIdentity.idl,CosCollection.idl,Session.idl,extension.idl"/>
+
+  <target name="context.idl" depends="prepare">
+    <uptodate property="CosLifeCycle.modified" targetfile="${idl}/CosLifeCycle.idl">
+      <srcfiles dir="${build}/CosLifeCycle">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosObjectIdentity.modified" targetfile="${idl}/CosObjectIdentity.idl">
+      <srcfiles dir="${build}/CosObjectIdentity">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="CosCollection.modified" targetfile="${idl}/CosCollection.idl">
+      <srcfiles dir="${build}/CosCollection">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="Session.modified" targetfile="${idl}/Session.idl">
+      <srcfiles dir="${build}/Session">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="ext.modified" targetfile="${idl}/extension.idl">
+      <srcfiles dir="${build}/ext">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="CosLifeCycle.idl" depends="context.idl" if="CosLifeCycle.modified" >
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/CosLifeCycle"/>
+      <param name="service" value="${idl}/CosLifeCycle.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosObjectIdentity.idl" depends="context.idl" if="CosObjectIdentity.modified" >
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/CosObjectIdentity"/>
+      <param name="service" value="${idl}/CosObjectIdentity.idl" />
+    </antcall>
+  </target>
+
+  <target name="CosCollection.idl" depends="context.idl" if="CosCollection.modified" >
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/CosCollection"/>
+      <param name="service" value="${idl}/CosCollection.idl" />
+    </antcall>
+  </target>
+
+  <target name="Session.idl" depends="context.idl" if="Session.modified" >
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/Session"/>
+      <param name="service" value="${idl}/Session.idl" />
+    </antcall>
+  </target>
+
+  <target name="extension.idl" depends="context.idl" if="ext.modified" >
+    <java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+          <classpath>
+		<path refid="project.classpath"/>
+	    </classpath>
+	    <arg line="-d ${build}/ext"/>
+	    <arg line="-I ${idl}"/>
+	    <arg line="-I ${time.path}/src/idl"/>
+	    <arg line="-I ${sps.path}/src/idl"/>
+	    <arg line="-I ${properties.path}/src/idl"/>
+	    <arg line="-I ${domain.path}/src/idl"/>
+	    <arg line="-I ${adapter.path}/src/idl"/>
+	    <arg line="-I ${orb.idl.path}"/>
+	    <arg line="-native List java.util.List"/>
+	    <arg line="-native Iterator java.util.Iterator"/>
+	    <arg line="-native Date java.util.Date"/>
+	    <arg line="-native TaskAdapter net.osm.session.task.TaskAdapter"/>
+	    <arg line="-native TaskAdapterPointer net.osm.session.task.TaskAdapter"/>
+	    <arg line="-native UserAdapterPointer net.osm.session.user.UserAdapter"/>
+	    <arg line="-native ProcessorAdapter net.osm.session.processor.ProcessorAdapter"/>
+	    <arg line="-native WorkspaceAdapter net.osm.session.workspace.WorkspaceAdapter"/>
+	    <arg line="-native DesktopAdapter net.osm.session.desktop.DesktopAdapter"/>
+	    <arg line="-native SessionAdapter net.osm.session.SessionAdapter"/>
+	    <arg line="${idl}/extension.idl" />
+    </java>
+  </target>
+
+  <!--
+
+  PSDL
+  -->
+
+  <target name="psdl" depends="list.psdl,link.psdl,message.psdl,resource.psdl,workspace.psdl,desktop.psdl,user.psdl,task.psdl,processor.psdl"/>
+
+  <target name="context.psdl" depends="idl">
+    <uptodate property="list.modified" targetfile="${psdl}/list.psdl">
+      <srcfiles dir="${build}/list">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="link.modified" targetfile="${psdl}/link.psdl">
+      <srcfiles dir="${build}/link">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="resource.modified" targetfile="${psdl}/resource.psdl">
+      <srcfiles dir="${build}/resource">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="message.modified" targetfile="${psdl}/message.psdl">
+      <srcfiles dir="${build}/message">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="workspace.modified" targetfile="${psdl}/workspace.psdl">
+      <srcfiles dir="${build}/workspace">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="desktop.modified" targetfile="${psdl}/desktop.psdl">
+      <srcfiles dir="${build}/desktop">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="user.modified" targetfile="${psdl}/user.psdl">
+      <srcfiles dir="${build}/user">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="task.modified" targetfile="${psdl}/task.psdl">
+      <srcfiles dir="${build}/task">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="processor.modified" targetfile="${psdl}/processor.psdl">
+      <srcfiles dir="${build}/processor">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="list.psdl" depends="context.psdl" if="list.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/list"/>
+      <param name="service" value="${psdl}/list.psdl" />
+    </antcall>
+  </target>
+
+  <target name="link.psdl" depends="context.psdl" if="link.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/link"/>
+      <param name="service" value="${psdl}/link.psdl" />
+    </antcall>
+  </target>
+
+  <target name="message.psdl" depends="context.psdl" if="message.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/message"/>
+      <param name="service" value="${psdl}/message.psdl" />
+    </antcall>
+  </target>
+
+  <target name="resource.psdl" depends="context.psdl" if="resource.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/resource"/>
+      <param name="service" value="${psdl}/resource.psdl" />
+    </antcall>
+  </target>
+
+  <target name="workspace.psdl" depends="resource.psdl" if="workspace.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/workspace"/>
+      <param name="service" value="${psdl}/workspace.psdl" />
+    </antcall>
+  </target>
+
+  <target name="desktop.psdl" depends="workspace.psdl" if="desktop.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/desktop"/>
+      <param name="service" value="${psdl}/desktop.psdl" />
+    </antcall>
+  </target>
+
+  <target name="user.psdl" depends="desktop.psdl" if="user.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/user"/>
+      <param name="service" value="${psdl}/user.psdl" />
+    </antcall>
+  </target>
+
+  <target name="task.psdl" depends="resource.psdl" if="task.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/task"/>
+      <param name="service" value="${psdl}/task.psdl" />
+    </antcall>
+  </target>
+
+  <target name="processor.psdl" depends="resource.psdl" if="processor.modified" >
+    <antcall target="psdl2java" >
+	<param name="destination" value="${build}/processor"/>
+      <param name="service" value="${psdl}/processor.psdl" />
+    </antcall>
+  </target>
+
+
+  <!-- COMPILATION -->
+
+  <target name="context" depends="prepare">
+    <mkdir dir="dist"/>
+    <uptodate property="project.uptodate" targetfile="${dist}/${project.jar}">
+      <srcfiles dir="${etc}">
+         <include name="${ant.project.name}.mf"/>
+      </srcfiles>
+      <srcfiles dir="${src}/java">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/CosLifeCycle">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/CosObjectIdentity">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/CosCollection">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/Session">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/ext">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/list">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/link">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/message">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/resource">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/workspace">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/desktop">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/user">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/task">
+         <include name="**/*.*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="examples.uptodate" targetfile="${dist}/${examples.jar}">
+      <srcfiles dir="${examples}">
+         <include name="src/**/*"/>
+      </srcfiles>
+      <srcfiles dir="${etc}">
+         <include name="examples.mf"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="main.build" depends="idl,psdl,context" unless="project.uptodate" >
+      <javac debug="off" destdir="${build}/lib" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+        <src path="${src}/java" />
+        <src path="${build}/CosLifeCycle" />
+        <src path="${build}/CosObjectIdentity" />
+        <src path="${build}/CosCollection" />
+        <src path="${build}/Session" />
+        <src path="${build}/ext" />
+        <src path="${build}/list" />
+        <src path="${build}/link" />
+        <src path="${build}/message" />
+        <src path="${build}/resource" />
+        <src path="${build}/workspace" />
+        <src path="${build}/desktop" />
+        <src path="${build}/user" />
+        <src path="${build}/task" />
+        <src path="${build}/processor" />
+      </javac>
+      <copy todir="${build}/lib">
+        <fileset dir="${src}/java">
+          <include name="**/*.xinfo"/>
+        </fileset>
+      </copy>
+      <jar jarfile="${dist}/${project.jar}" basedir="${build}/lib" 
+          manifest="${etc}/${ant.project.name}.mf" />
+  </target>
+
+  <target name="examples.build" depends="main.build,context" unless="examples.uptodate" >
+      <javac debug="off" destdir="${build}/examples" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+          <fileset dir="${dist}">
+             <include name="${project.jar}"/>
+          </fileset>
+	  </classpath>
+        <src path="${examples}/src" />
+      </javac>
+      <copy todir="${build}/examples">
+        <fileset dir="${examples}/src">
+          <include name="**/*.xinfo"/>
+        </fileset>
+      </copy>
+      <jar jarfile="${dist}/${examples.jar}" basedir="${build}/examples" 
+        manifest="${etc}/examples.mf"/>
+  </target>
+
+  <!-- INTERNAL UTILITY TARGETS -->
+
+  <target name="support">
+    <copy todir="${dist}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.TXT"/>
+         <include name="README.TXT"/>
+       </fileset>
+    </copy>
+  </target>
+
+  <target name="javadoc" depends="prepare" >
+    <mkdir dir="${javadoc.root.path}/${ant.project.name}" />
+    <copy todir="${javadoc.root.path}/${ant.project.name}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.HTML"/>
+         <include name="license.css"/>
+       </fileset>
+    </copy>
+    <javadoc destdir="${javadoc.root.path}/${ant.project.name}" 
+	doctitle="&lt;h1&gt;${project.title} ${VERSION}&lt;/h1&gt;" 
+      noindex="false" author="false" 
+      use="true"
+      overview="${overview.html}"
+	windowtitle="${project.title}" 
+      bottom="&lt;a href='{@docRoot}/LICENSE.HTML'/&gt;License, Disclaimer and due credits.&lt;/a&gt;"
+      additionalparam="-breakiterator -J-Xmx128m -tag osm.warning:a:Warning -tag osm.note:a:Note"
+      packagenames="net.osm.*,org.omg.*"  
+      >
+        <sourcepath path="${build}/CosLifeCycle" />
+        <sourcepath path="${build}/CosObjectIdentity" />
+        <sourcepath path="${build}/CosCollection" />
+        <sourcepath path="${build}/Session" />
+        <sourcepath path="${build}/lib" />
+        <sourcepath path="${build}/ext" />
+        <sourcepath path="${build}/list" />
+        <sourcepath path="${build}/link" />
+        <sourcepath path="${build}/message" />
+        <sourcepath path="${build}/resource" />
+        <sourcepath path="${build}/workspace" />
+        <sourcepath path="${build}/desktop" />
+        <sourcepath path="${build}/user" />
+        <sourcepath path="${build}/task" />
+        <sourcepath path="${build}/processor" />
+        <sourcepath path="${src}/java"/>
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+	  <link href="${jdk.href}" />
+	  <link href="${avalon.href}" />
+	  <link href="${orb.href}" />
+	  <link href="${pss.href}" />
+	  <link href="${properties.href}" />
+	  <link href="${realm.href}" />
+	  <link href="${sps.href}" />
+	  <link href="${domain.href}" />
+	  <link href="${adapter.href}" />
+    </javadoc>
+  </target>
+
+  <target name="server" depends="loader.validation,build" if="merlin.available" >
+    <load target="${server.class}" priority="${server.priority}" disposal="${server.disposal}" 
+      verbose="${server.verbose}" configuration="${server.config}">
+      <fileset dir="${dist}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${common.lib.path}">
+         <include name="logkit.jar"/>
+         <include name="avalon-framework.jar"/>
+         <include name="excalibur-configuration.jar"/>
+         <include name="excalibur-context.jar"/>
+         <include name="merlin.jar"/>
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${vault.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${vault.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${realm.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${sps.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${properties.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${time.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${domain.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${adapter.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+    </load>
+  </target>
+
+  <target name="examples" depends="examples.build"/>
+
+  <target name="client" depends="loader.validation,examples.build" if="merlin.available" >
+    <load target="${client.class}" priority="${client.priority}" disposal="${client.disposal}" 
+      verbose="${client.verbose}" configuration="${client.config}">
+      <fileset dir="${dist}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${vault.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${vault.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${realm.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${sps.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${domain.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${time.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${properties.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${adapter.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+    </load>
+  </target>
+
+  <target name="loader.context">
+    <available property="merlin.available" file="${ant.home}/lib/merlin.jar"/>
+  </target>
+
+  <target name="loader.defintion" depends="loader.context" if="merlin.available">
+    <taskdef resource="merlin.properties"/>
+  </target>
+ 
+  <target name="loader.validation" depends="loader.defintion" unless="merlin.available">
+    <echo>
+
+     Merlin is not installed in your Ant library.
+     In order to use the "load" task the following jar files 
+     must be added to your ${ant.home}/lib directory:
+
+       - merlin.jar
+       - avalon-framework.jar
+       - logkit.jar
+       - xerces.jar (for JRE 1.3 and earlier)
+    </echo>
+  </target>
+
+  <target name="idl2java" >
+    <echo message="IDL ${service}"/>
+    <java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+          <classpath>
+		<path refid="project.classpath"/>
+	    </classpath>
+	    <arg line="-silence"/>
+	    <arg line="-d ${destination}"/>
+	    <arg line="-I ${idl}"/>
+	    <arg line="-I ${time.path}/src/idl"/>
+	    <arg line="-I ${sps.path}/src/idl"/>
+	    <arg line="-I ${properties.path}/src/idl"/>
+	    <arg line="-I ${domain.path}/src/idl"/>
+	    <arg line="-I ${orb.idl.path}"/>
+	    <arg line="-I ${idl}"/>
+	    <arg line="${service}" />
+    </java>
+  </target>
+
+  <target name="psdl2java" >
+    <echo message="PSDL ${service}"/>
+    <java failonerror="true" classname="${psdl.class}" fork="true">
+          <classpath>
+		<path refid="project.classpath"/>
+	    </classpath>
+	    <arg line="-silence"/>
+	    <arg line="-d ${destination}"/>
+	    <arg line="-${persistence}"/>
+	    <arg line="-I ${idl}"/>
+	    <arg line="-I ${psdl}"/>
+	    <arg line="-I ${pss.path}/src/psdl"/>
+	    <arg line="-I ${time.path}/src/idl"/>
+	    <arg line="-I ${sps.path}/src/idl"/>
+	    <arg line="-I ${sps.path}/src/psdl"/>
+	    <arg line="-I ${properties.path}/src/idl"/>
+	    <arg line="-I ${properties.path}/src/psdl"/>
+	    <arg line="-I ${domain.path}/src/idl"/>
+	    <arg line="-I ${domain.path}/src/psdl"/>
+	    <arg line="-I ${realm.path}/src/idl"/>
+	    <arg line="-I ${adapter.path}/src/idl"/>
+	    <arg line="-I ${orb.idl.path}"/>
+	    <arg line="-I ${idl}"/>
+	    <arg line="${service}" />
+    </java>
+  </target>
+
+</project>

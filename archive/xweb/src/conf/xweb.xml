@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+
+<!--
+This file is the configuration file for the OSM Web gateway servlet.
+Elements declared in this file are used to describe the site 
+specific configuration between the web gateway and internal 
+collaboration and enterprise services.
+-->
+
+<xweb version="1.0" properties="false" configuration="true">
+
+    <finder ior="file:///F:/dev/gateway/finder.ior" />
+
+    <agent cache="100" version="1.1.0">
+
+      <!--
+      URL of the gatway finder from which a root community can be established
+      and resource factories can be located.
+      -->
+
+      <finder ior="file:///F:/dev/gateway/finder.ior" />
+
+      <!--
+      URL of the PKI RA to which PKCS#10 certificate requests for a UserPricipal
+	credential should be directed.
+      -->
+
+      <authority ior="http://home.osm.net/gateway/authority.ior" />
+
+    </agent>
+
+    <!--
+    The audit element declares the configuration of a audit service local to 
+    the web gateway.  This provides support for the maintenance of a persistent 
+    cache for object adapters and structured events issued under subscriptions
+    established by adapters on primary resource references. Adapters act as a 
+    factory for agents, a transient object that is used to represent the adapted
+    resource withing the scope of a client application.
+    -->
+
+    <audit port="2608" version="1.0.3">
+
+        <!-- 
+        The following properties declare the ORB implementation to by used by the JVM and provide
+        ORB specific supplimentary arguments.
+        -->
+
+        <orb class="org.openorb.CORBA.ORB" singleton="org.openorb.CORBA.ORBSingleton">
+            <property name="openorb.debug" value="1" />
+            <property name="openorb.config" file="./orb.xml" />
+            <property name="openorb.profile" value="audit" />
+            <property name="openorb.home" file="." />
+         </orb>
+
+        <!-- 
+        Declaration of the server domain identifications structure used by identifiable
+        business objects in combination with a random integer identifier.  This value
+        must be updated to match the specific installation.  The authority value must 
+        contain one of DNS, IDL, ISO, DCE, or OTHER.  The address contains the name of 
+        the authority in a form consitent with the authority address type.  The constant 
+        value must be a number unique within a scope defined by the authority and  
+        address values.  The combionation of authority, address and constant uniquely 
+        identifies this server to an event producer.
+        -->
+
+        <domain authority="DNS" address="xweb.osm.net" constant="0" />
+
+        <!-- 
+        Declaration of the persistence configuration. The parameters declared under the 
+        persistence element are used to construct a PSS session.  Customization of the 
+        data source used by the platform is possible through replacement of the 
+        implementation class declarations.
+        -->
+
+        <persistence>
+
+            <!--
+            Declaration of the PSS connector to select from the ConnectorRegistry
+            server.  This value depends on the PSS service configured for this site.
+            Refer to the PSSServer configuration file for additional information 
+            about registered PSS implementations.
+            -->
+
+            <connector value="org.openorb.pss.Memory" />
+
+            <!--
+            The following set of elements (catalog, storage and home elements) declare
+            the respective catalog, storage unit and storage home types and corresponding
+            classes that should be registered with a PSS connection.  Modification of 
+            the <code>class</code> attribute value enables the possibility for the 
+            customization of the implementation of the storage subsystem, home or catalog
+            for a particular site.  The default values listed here will result in the 
+            access to native OSM storage types.
+            -->
+
+            <storage psdl="PSDL:osm.net/list/LinkedListBase:1.0"
+            class="net.osm.list.List" />
+
+            <storage psdl="PSDL:osm.net/event/EventStorageBase:1.0"
+            class="net.osm.event.EventStorageBase" />
+            <home psdl="PSDL:osm.net/event/EventStorageHomeBase:1.0"
+            class="net.osm.event.EventStorageHomeBase" />
+
+            <storage psdl="PSDL:osm.net/list/EntryStorageBase:1.0"
+            class="net.osm.list.Entry" />
+            <home psdl="PSDL:osm.net/list/EntryStorageHomeBase:1.0"
+            class="net.osm.list.EntryStorageHomeBase" />
+
+            <catalog psdl="PSDL:osm.net/audit/pss/AdapterCatalog:1.0"
+            class="net.osm.audit.pss.Catalog" />
+
+            <storage psdl="PSDL:osm.net/audit/pss/AdapterStorageBase:1.0"
+            class="net.osm.audit.pss.AdapterStorageBase" />
+            <home psdl="PSDL:osm.net/audit/pss/AdapterStorageHomeBase:1.0"
+            class="net.osm.audit.pss.AdapterStorageHomeBase" />
+
+            <!--
+            PSS connections typically require a set of implementation dependant  
+            parameters to be passed to a registry when reqesting the establishment 
+            of a PSS session.  The following parameter declarations will be collected     
+            by the OSM Session platform and passed to the PSS Connector Registry
+            when requesting the creation of a new PSS session.
+            -->
+
+            <parameter name="JDBC Driver" value="org.enhydra.instantdb.jdbc.idbDriver" />
+            <parameter name="JDBC URL" value="jdbc:idb:audit.prp" />
+
+        </persistence>
+
+    </audit>
+
+</xweb>
+

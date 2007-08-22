@@ -1,0 +1,38 @@
+
+<body>
+<h3>Package Description</h3>
+
+<p>The <code>net.osm.realm</code> package provides support for interception 
+of a principal identity and access control decisions based on the target
+object, principal, and operation name.</p>
+
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+
+  <tr bgcolor="#ccccff">
+  <td colspan="2"><font size="+2"><b>Interceptors</b></font></td>
+  <tr><td width="20%" valign="top"><strong>{@link net.osm.realm.ClientInitializer}</strong></td>
+  <td>
+  Handles the establishment of an invoking principal identity.
+  </td></tr>
+
+  <tr><td width="20%" valign="top"><strong>{@link net.osm.realm.ServerInitializer}</strong></td>
+  <td> 
+  Handles interception of incomming invocations and the validation of the right of access of
+  the principal to invoke an ioperation of a given object.
+  </td></tr>
+
+  <tr><td width="20%" valign="top"><strong>{@link net.osm.realm.PeerInitializer}</strong></td>
+  <td> 
+  Combines the client and server initerceptors into a single interceptor for systems acting 
+  in the role of a full peer.
+  </td></tr>
+
+</table>
+
+
+<h4>Related Packages</h4>
+
+Related packages and services are available under the <a href="{$docRoot}/../../index.html" target="_top">Package Index.</a>
+
+</pre>
+</body>

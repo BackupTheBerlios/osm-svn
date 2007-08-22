@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<!--
+ RepositoryServer.xinfo
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <name>repository</name>
+    <version>1.0</version>
+  </block>
+
+  <services>
+      <service name="net.osm.pki.repository.RepositoryService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>orb</role>
+          <service name="org.apache.orb.ORB" version="2.4"/>
+          <configuration>
+            <property name="iiop.port" value="2511" />
+            <initializer class="org.apache.pss.Initializer" name="pss"/>
+          </configuration>
+      </dependency>
+  </dependencies>
+
+  <configuration>
+
+    <!--
+    Service publication
+    -->
+
+    <ior value="repository.ior"/>
+
+    <!--
+    The PSS configuration.
+    -->
+
+    <pss>
+
+      <connector value="file" />
+
+      <session>
+        <parameter name="PSS.File.DataStore.Directory" value="pss" />
+        <parameter name="PSS.File.DataStore.Name" value="pki-repository" />
+      </session>
+
+      <persistence>
+        <storage psdl="PSDL:osm.net/pki/repository/PrincipalStorageBase:1.0"
+          class="net.osm.pki.repository.PrincipalStorageBase" />
+        <home psdl="PSDL:osm.net/pki/repository/PrincipalStorageHomeBase:1.0"
+          class="net.osm.pki.repository.PrincipalStorageHomeBase" />
+      </persistence>
+
+    </pss>
+
+  </configuration>
+
+</blockinfo>
+

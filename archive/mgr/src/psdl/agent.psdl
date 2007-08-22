@@ -1,0 +1,169 @@
+/**
+ */
+
+#ifndef _AGENT_PSDL_
+#define _AGENT_PSDL_
+#pragma prefix "osm.net"
+#include <Session.idl>
+#include <pkcs.idl>
+
+module agent
+{
+
+   /**
+    * ProfileStorage is a PSS storage instance containing the 
+    * state of a operator's session.  This information includes the object
+    * reference established for the operator together with the operator
+    * preferences.  Inital values are based on information extrated from 
+    * system configuration file.
+    */
+    abstract storagetype ProfileStorage
+    {
+
+       /**
+        * The alias state member is the key of a ProfileStorage.  It 
+        * corresponds directly with the alias used by the user to 
+        * establish a login context.  If an operator logs in the system
+        * under a new alias, a new ProfileStorage instance will be created
+        * and referenced under the OperatorStorage.
+        */
+        state string alias;
+
+       /**
+        * The url state member contains default URL to use to locate
+        * the root factory finder.  The inital value is based on the 
+        * configuration setting for the shell.
+        */
+        state string url;
+
+       /**
+        * The user state member is established following a successful
+        * negotiation of a <code>User</code> object reference via the 
+        * factory finder.
+        */
+        state Session::User user;
+
+       /**
+        * A possibly null PKCS10 certificate request created at the time
+	  * creation of an inital self-signed certificate.
+        */
+        state pki::pkcs::PKCS10 pkcs10;
+    };
+
+   /**
+    * ProfileStorageBase is the implementation of the storage object type
+    * for the ProfileStorage PSS interface.
+    */
+    storagetype ProfileStorageBase implements ProfileStorage
+    {
+    };
+
+   /**
+    * ProfileStorageBase is the implementation of the storage object type
+    * for the ProfileStorage PSS interface.
+    */
+    abstract storagehome ProfileStorageHome of ProfileStorage
+    {
+       /**
+        * Location of a profile based on a supplied keystore alias.
+        */
+        key alias;
+
+       /**
+        * Factory operation that creates a new persistant storage unit for 
+	  * the ProfileStorage type.
+        * @param alias the keystore alias against which the profile is identified
+        * @param pkcs10 public key certificate request
+        * @param url the URL of the default factory finder
+        * @param user the object reference to the <code>User</code> established
+        *   through the factory finder with a current pricipal derived from the 
+        *   credentials established under the operators alias.
+        */
+        factory create( alias, pkcs10, url, user );
+    };
+
+   /**
+    * The <code>ProfileStorageHomeBase</code> is the implementation of the 
+    * <code>ProfileStorageHome</code> interface and services as the factory 
+    * for new <code>ProfileStorage</code> instances.
+    */
+    storagehome ProfileStorageHomeBase of ProfileStorageBase implements ProfileStorageHome
+    {
+    };
+
+   /**
+    * A sequence of <code>ProfileStorage</code> instances maintained by the operator.
+    */
+    typedef sequence<ProfileStorage> ProfileStorageSequence;
+
+   /**
+    * OperatorStorage is a PSS storage instance containing a sequence of 
+    * stored profiles.
+    */
+    abstract storagetype OperatorStorage
+    {
+       /**
+        * The username state member is established automatically
+        * from the JVM ${user.name} property and is used as the key
+        * to locate the operator storage object.
+        */
+        state string username;
+
+       /**
+        * The profiles state member contains a sequence of profiles 
+	  * established and mainted by this operator.
+        */
+        //state ProfileStorageSequence profiles;
+
+       /**
+        * The alias name of the last profile used by this operator.
+        */
+        state string alias;
+
+       /**
+        * The path state member contains the path to a local keystore
+        * used to authenticate the user and establish credentials.
+        */
+        state string path;
+    };
+
+   /**
+    * ProfileStorageBase is the implementation of the storage object type
+    * for the ProfileStorage PSS interface.
+    */
+    storagetype OperatorStorageBase implements OperatorStorage
+    {
+    };
+
+   /**
+    * ProfileStorageBase is the implementation of the storage object type
+    * for the ProfileStorage PSS interface.
+    */
+    abstract storagehome OperatorStorageHome of OperatorStorage
+    {
+       /**
+        * The JVM ${user.name} property.
+        */
+        key username;
+
+       /**
+        * Factory operation that creates a new persistant storage unit for 
+	  * the OperatorStorage storage type.
+        * @param username the primary key for th storage unit
+        * @param path the local keystore directory path 
+        * @param current the alias of the current profile
+        */
+        factory create( username, path, alias );
+    };
+
+   /**
+    * The <code>OperatorStorageHomeBase</code> is the implementation of the 
+    * <code>OperatorStorageHome</code> interface and services as the factory 
+    * for new <code>OperatorStorage</code> instances.
+    */
+    storagehome OperatorStorageHomeBase of OperatorStorageBase implements OperatorStorageHome
+    {
+    };
+};
+
+#endif // _AGENT_PSDL_

@@ -1,0 +1,1234 @@
+/**
+ */
+
+#ifndef _HUB_PSS_PSDL_
+#define _HUB_PSS_PSDL_
+#include <hub.idl>
+#include <realm.idl>
+#include <CosNotification.idl>
+#include <PortableServer.idl>
+#include <list.psdl>
+#include <event.psdl>
+#include <properties.psdl>
+
+#pragma prefix "osm.net"
+
+module hub {
+module pss {
+
+    // forward declarations
+
+    local interface Iterator;
+    abstract storagetype AbstractResourceStorage;
+    abstract storagetype SubscriptionStorage;
+    abstract storagetype SupplierStorage;
+    abstract storagetype ConsumerStorage;
+    abstract storagetype FolderStorage;
+ 
+    // typedefs
+
+    typedef CORBA::OctetSeq EncodedCertPath;
+    typedef CORBA::OctetSeq SerialNumber;
+    typedef CORBA::OctetSeq ID;
+    typedef sequence<ID> IDs;
+    typedef list::LinkedList LinkedList;
+    typedef list::LinkedListBase LinkedListBase;
+    typedef properties::pss::PropertySetDefStorage PropertySetDefStorage;
+    typedef properties::pss::PropertySetDefStorageBase PropertySetDefStorageBase;
+
+    //
+    // Domain
+    //
+
+   /**
+    * Storage type interface under which information defining a specific domain 
+    * is stored.
+    */
+    abstract storagetype DomainStorage 
+    {
+
+       /**
+        * Value qualifying the type of address.
+        * @see org.omg.NamingAuthority.RegistrationAuthority
+        */
+        readonly state long authority;
+
+       /**
+        * The domain address.
+        */
+        readonly state string naming_entity;
+
+    };
+
+   /**
+    * Storage home interface for the DomainStorage storage type.
+    */
+    abstract storagehome DomainStorageHome of DomainStorage
+    {
+       /**
+        * Locates a domain storage instance given an authority
+	  * type and authority name value.
+        */
+	  key domain_key( authority, naming_entity );
+
+       /**
+        * Creation of a new domain storage instance with 
+	  * the supplied domain type and value.
+        * @param authority authority type
+        * @param naming_entity the authority name value
+        */
+	  factory create( authority, naming_entity );
+    };
+
+    //
+    // Link
+    //
+
+   /**
+    * Storage of Link valuetype and supplimentary information indicating if the resource 
+    * held by the link is local or remote.
+    * @see org.omg.Session.Link
+    */
+    abstract storagetype LinkStorage
+    {
+       
+       /**
+        * Storage object unique key.
+        */
+	  state unsigned long long identifier;
+
+       /**
+	  * Link valuetype describing the type of link and holding within it
+	  * the resource referenced under the link association.
+        */
+	  state Session::Link link;
+
+	 /**
+ 	  * Returns true if the supplied link is equal to the link contained by this
+ 	  * link storage instance.
+        * @param link - the link to compare with
+	  */
+	  boolean equal
+        ( 
+	      in Session::Link link 
+	  );
+
+    };
+
+   /**
+    * Storage home for all LinkStorage instances.
+    */
+    abstract storagehome LinkStorageHome of LinkStorage
+    {
+	  key identifier;
+	  factory create( identifier, link );
+    };
+
+   /**
+    * Storage type for for a persistent subscriber instance that 
+    * maintains a reference to the identifiable domain consumer, 
+    * a subscription containing subscribed event types, and a 
+    * queue of pending events.
+    */
+    abstract storagetype SubscriberStorage
+    {
+       /**
+        * Unique identifier of this subscriber.
+        */
+        readonly state ID resource;
+
+       /**
+        * The identifiable domain consumer to whom events are to be 
+        * delivered.
+        */
+        readonly state Session::IdentifiableDomainConsumer consumer;
+
+       /**
+        * The subscription established by the subscriber that contains
+        * the set of event types the subscriber in interested in receiving.
+        */
+	  state CosNotification::EventTypeSeq subscription;
+
+       /**
+        * A queue of events to be delivered to the subscriber.
+        */
+        readonly state LinkedList queue;
+
+       /**
+        * Internal state flag that declares the terminal status of the 
+        * event source.
+        */
+        state boolean terminal;
+    };
+
+    abstract storagehome SubscriberStorageHome of SubscriberStorage
+    {
+	  factory create( resource, consumer, subscription, terminal );
+    };
+
+    storagetype SubscriberStorageBase
+    implements SubscriberStorage
+    {
+        stores queue as ref<list::LinkedListBase>;
+    };
+
+    storagehome SubscriberStorageHomeBase of SubscriberStorageBase
+    implements SubscriberStorageHome
+    { 
+    };
+
+
+    //
+    // Subscription
+    //
+
+   /**
+    * A SubscriptionStorage storage type contains the state of a consumers 
+    * subscription to specific events registered by it against a specific 
+    * abstract resource.  The key (resource and consumer) declares the 
+    * abstract resource that the subscription 
+    * is referring to, and the Identifiable Domain Consumer that is requesting
+    * the subscription.  The remaining state members reflect the state of the 
+    * subscription for each of the event types produced by the abstract resource 
+    * type.
+    */
+    abstract storagetype SubscriptionStorage 
+    {
+
+       /**
+        * PID of an AbstractResourceStorage instance.
+        */
+        readonly state ID resource;
+
+        /**
+        * PID of an ConsumerStorage instance.
+        */
+        readonly state ID consumer;
+
+	 /**
+        * Subscription identifier used to declare subscription entry in 
+	  * session logs.
+        */
+	  readonly state unsigned long long identifier;
+
+	 /**
+        * Subscription is a sequence of EventType values.
+        */
+	  state CosNotification::EventTypeSeq subscription;
+	  
+       /**
+        * Returns true if the consumer is subscribed to the supplied 
+        * event type.
+        * @param type - the event type to test
+	  * @return boolean - true if the event type is included in the subscription
+        */
+        boolean is_subscribed
+	  ( 
+		in CosNotification::EventType type
+	  );
+
+	 /**
+        * Convinience operation to change events based on supplied 
+        * EventType sequences.
+        * @param added - event types to be added to the subscription
+        * @param removed - event types to be removed from the subscription
+        * @exception org.omg.CosNotifyComm.InvalidEventType if the supplied
+        *   event type is no supported by the implementation
+	  */
+	  void subscription_change
+        (
+		in CosNotification::EventTypeSeq added, 
+		in CosNotification::EventTypeSeq removed
+    	  ) 
+        raises 
+        (
+		CosNotifyComm::InvalidEventType
+	  );
+    };
+
+   /**
+    * SubscriptionStorageHome is the persistent repository of all SubscriptionStorage
+    * instances.
+    */
+    abstract storagehome SubscriptionStorageHome of SubscriptionStorage
+    {
+       /**
+        * A SubscriptionStorageHome maintains an index of SubscriptionStorage
+        * instances using the resource and consumer short pids as keys.
+        */
+        key id( resource, consumer );
+
+       /**
+        * Creation of a new SubscriptionStorage instance.
+        */
+	  factory create_subscription(
+	    identifier,
+	    resource,
+	    consumer,
+	    subscription
+	  );
+    };
+
+    //
+    // IdentifiableDomainObject
+    //
+
+   /**
+    * Abstract defintion of the state members representing an IdentifiableDomainObject.
+    * This abstract defintion is inherited by AbstractResourceStorage and ConsumerStorage.
+    * @see org.omg.Session.IdentifiableDomainObject
+    */
+    abstract storagetype IdentifiableDomainObjectStorage
+    {
+
+	 /**
+        * Domain entry.
+        */
+	  readonly state ID domain_short_pid;
+
+        /**
+        * Random int identifier unique within the scope of the issuing domain.
+        */
+        readonly state long random;
+
+    };
+
+    //
+    // AbstractResource
+    //
+
+   /**
+    * An AbstractResourceStorage defines the interface to a storage 
+    * type for the OMG Task and Session AbstractResource.  As an 
+    * IdentifiableObject, the abstract resource is declared within a 
+    * specific domain.  The implementation assumes that the domain
+    * is a static value, qualified in the server configuration file
+    * and as such is not included in the instance state.  However,     
+    * a identifiable object has a random integer which is maintained 
+    * under the <code>random</code> state member.  An abstract resource
+    * is a type of BaseBusienssObject and as such exposed a creation
+    * date (readonly as this is never modified), a modication date, and 
+    * a last access date.  A base business object also supports the 
+    * registration of event subscriptions by clients (acting in the 
+    * role of event consumers).  The subscriptions state field maintains
+    * a list of entries referencing subscription  pid values, each 
+    * referrring to an instance of the persistent storage object which 
+    * refers to the consumer registering interest in events from this 
+    * resource. The final state member <code>name</name> contains the 
+    * current name of the abstract resource.
+    * @see org.omg.Session.AbstractResource
+    */
+    abstract storagetype AbstractResourceStorage : IdentifiableDomainObjectStorage
+    {
+
+       /**
+        * Owning principal.
+        */
+        state realm::StandardPrincipal owner;
+
+       /**
+        * Creation date.
+        */
+        readonly state unsigned long long creation;
+
+       /**
+        * Last modification date.
+        */
+        state unsigned long long modification;
+
+       /**
+        * Last access date.
+        */
+        state unsigned long long access;
+
+       /**
+        * Name of this resource.
+        */
+        state string name;
+
+       /**
+        * LinkedList of subscriptions entries referencing associated
+        * IdentifiableDomainConsumers that have subscribed to events 
+	  * produced by this instance. 
+        */
+        state LinkedList subscriptions;
+
+       /**
+        * A reference to a 0..1 Task that is producing this AbstractResource,
+        * where the reference is maintained under a ProducedBy link.
+        */
+        state Session::ProducedBy produced_by;
+
+       /**
+        * LinkedList of references to Workspaces that this AbstractResource is 
+	  * contained by.
+        */
+        readonly state LinkedList collected_by;
+
+       /**
+        * LinkedList of references to Tasks that are using this AbstractResource,
+	  * where the references are maintained as ConsumedBy links.
+        */
+        readonly state LinkedList consumed_by;
+
+    };
+
+   /**
+    * AbstractResourceStorageHome is the persistent repository of all 
+    * AbstractResourceStorage instances.
+    */
+    abstract storagehome AbstractResourceStorageHome of AbstractResourceStorage 
+    {
+
+       /**
+        * Locates a resource given the domain persitent identifier, 
+	  * the random identifier and creation date. 
+        */
+	  key resource_key( domain_short_pid, random, creation );
+
+       /**
+        * Creation of a new AbstractResourceStorage instance based on a 
+        * supplied AbstractResourceKey, modification and last access date, an
+        * empty SubscriptionStorageList valuetype and the resource name.
+        */
+        factory create( 
+		owner, 
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by 
+	  );
+    };
+
+    //
+    // Workspace
+    //
+
+   /**
+    * WorkspaceStorage is the persistent storage object for instance of Workspace.
+    * It extends AbstractResourceStorage with the addition of a list of contained
+    * AbstractResources.
+    * @see org.omg.Session.Workspace
+    */
+    abstract storagetype WorkspaceStorage : AbstractResourceStorage
+    {
+       /**
+        * A reference to a 0..1 Workspace that this AbstractResource is 
+	  * physicaly contained by (strong aggregation through an IsPartOf 
+        * link).
+        */
+        //state Session::IsPartOf is_part_of;
+
+       /**
+        * LinkedList of references to AbstractResources that are collected by this Workspace.
+        */
+        readonly state LinkedList collects;
+
+       /**
+        * LinkedList of references to Users that have been granted access rights.
+        */
+        readonly state LinkedList accessed_by;
+    };
+
+   /**
+    * Storage home interface for the WorkspaceStorage storage type.
+    */
+    abstract storagehome WorkspaceStorageHome of WorkspaceStorage
+    {
+
+	  key resource_key( domain_short_pid, random, creation );
+
+       /**
+        * Creation of a new WorkspaceStorage instance based on a 
+        * supplied domain short pid, random identifier, creation timestamp,
+        * modification and last access date, and initial links defining 
+	  * parent workspace and producing task.
+        */
+
+        factory create( 
+            owner,
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by
+	  );
+
+    };
+
+    //
+    // Desktop 
+    //
+
+   /**
+    * Desktop storage type is an interface to the persistent stoage of a User's
+    * private deskptop.
+    * @see org.omg.Session.Desktop
+    */
+    abstract storagetype DesktopStorage : WorkspaceStorage
+    {
+
+       /**
+        * Persistent identifier of the User that owns the desktop.
+        */
+	  state ID owner_short_pid; 
+    };
+
+   /**
+    * The factory and home interface for storage types of the type DesktopStorage.
+    */
+    abstract storagehome DesktopStorageHome of DesktopStorage
+    {
+	  key resource_key( domain_short_pid, random, creation );
+        factory create( 
+		owner,
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by, 
+		owner_short_pid 
+	  );
+    };
+
+    //
+    // Message 
+    //
+
+   /**
+    * Message storage type contains the values exposed by a Message resource 
+    * including a MessageHeader valuetype and message body.
+    * @see org.omg.Session.Message
+    * @see org.omg.Session.MessageHeader
+    */
+    abstract storagetype MessageStorage
+    {
+       /**
+        * Storage object unique key.
+        */
+	  state unsigned long long identifier;
+
+       /**
+        * Message header containing subject, priority and message type.
+        */
+	  state Session::SystemMessage message;
+
+    };
+
+   /**
+    * The factory for MessageStorage.
+    */
+    abstract storagehome MessageStorageHome of MessageStorage
+    {
+	  key identifier;
+        factory create( identifier, message );
+    };
+
+    //
+    // Folder 
+    //
+
+   /**
+    * Folder storage is a storage type that holds a set of messages 
+    * and is owned by a single user.  The Folder contains a unique 
+    * internal identifier, a name, a reference to the user owning the
+    * folder, and a list of messages.
+    */
+    abstract storagetype FolderStorage
+    {
+
+       /**
+        * The folder internal identifier.
+        */
+	  state unsigned long long identifier;
+
+       
+       /**
+        * The name of this folder.
+        */
+        state string name;
+
+       /**
+        * A list of messages contained within the folder.
+        */
+        state LinkedList messages;
+    };
+
+   /**
+    * The factory for FolderStorage.
+    */
+    abstract storagehome FolderStorageHome of FolderStorage
+    {
+	  key identifier;
+        factory create( identifier, name );
+    };
+
+
+    //
+    // User 
+    //
+
+   /**
+    * The UserStorage storagetype extends AbstractResourceStorage to include an 
+    * embedded DesktopStorage object, a list of owned Tasks, a list of Workspaces 
+    * accessed by this user, a list of incomming messages, a message folder, a 
+    * of PropertySet storage object, and the conected state of the user.
+    * @see org.omg.Session.User
+    */
+    abstract storagetype UserStorage : AbstractResourceStorage
+    {
+
+       /**
+        * The identity of the principal.
+        */
+        state EncodedCertPath path;
+
+	 /**
+        * Reference to a DesktopStorage holding the persistent state of 
+        * the User's Desktop.
+        * @see org.omg.Session.Desktop
+        */
+	  state ref<DesktopStorage> desktop;
+
+       /**
+        * A list of links referencing the tasks owned by this user.
+        */
+	  state LinkedList owns;
+
+       /**
+        * A list of links referencing the Workspaces accessed by this user.
+        */
+	  state LinkedList accesses;
+
+       /**
+        * An embedded storage object containing a list of queued messages.
+        */
+	  state LinkedList messages;
+
+       /**
+        * An embedded storage object containing a list of message folders.
+        */
+	  state LinkedList folders;
+
+       /**
+        * An embedded storage object containing a set of Properties and 
+        * property constraints.
+        */
+        state PropertySetDefStorage property_set;
+
+       /**
+        * Connected state of the User.
+        */
+        state boolean connected;
+
+       /**
+        * An embedded storage object containing a list of Member associations.
+        */
+	  state LinkedList memberships;
+    };
+
+   /**
+    * The factory for UserStorage.
+    */
+    abstract storagehome UserStorageHome of UserStorage
+    {
+        key resource_key( domain_short_pid, random, creation );
+	  key path;
+        factory create( 
+            owner,
+		path,
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by, 
+		desktop, 
+		connected );
+    };
+
+
+    //
+    // Task 
+    //
+
+   /**
+    * Task storage type contains a textual description, task state value, 
+    * a link associating a Task to an owning User, a list containing 
+    * links to consumed resources, a list containing links to produced 
+    * resources and a link associating a Task to the Processor it is 
+    * coordinating.
+    * @see org.omg.Session.Task
+    */
+    abstract storagetype TaskStorage : AbstractResourceStorage
+    {
+       /**
+        * Description of the task.
+        */
+        state string description;
+
+       /**
+        * Current asynchronous state of the task.
+        */
+	  state Session::task_state task_state;
+
+       /**
+        * User that owns this task.
+        */
+        state Session::OwnedBy owned_by;
+
+       /**
+        * List of consumed resources.
+        */
+	  state LinkedList consumes;
+
+       /**
+        * List of preoduced resources.
+        */
+	  state LinkedList produces;
+
+       /**
+        * Reference to the processor that this task is coordinating.
+        */
+        state CollaborationFramework::Coordinates coordinates;
+    };
+
+   /**
+    * The factory for TaskStorage.
+    */
+    abstract storagehome TaskStorageHome of TaskStorage
+    {
+	   key resource_key( domain_short_pid, random, creation );
+         factory create( 
+		owner,
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by, 
+		owned_by, 
+		coordinates, 
+		task_state, 
+		description 
+	  );
+    };
+
+    //
+    // Processor 
+    //
+
+   /**
+    * A Processor storage type instance is bound to a coordinating Task, is a slave 
+    * to 0 or 1 parent processor, is a master of * subsidary processors, contains 
+    * a processor model of execution policy, and exposed a current processor state.
+    * @see org.omg.CollaborationFramework.Processor
+    */
+    abstract storagetype ProcessorStorage : AbstractResourceStorage
+    {
+
+	 /**
+        * Container of the current processor state and in the case of a completion, 
+	  * a final success or failure status.
+        */
+	  state CollaborationFramework::StateDescriptor processor_state;
+
+	 /**
+	  * A Task acting in the role of process coordinator.
+	  */
+	  state CollaborationFramework::CoordinatedBy coordinated_by;
+
+	 /**
+	  * Between 0 and 1 parent processor that is responsible for the lifecycle
+        * of this processor instance.
+	  */
+	  state CollaborationFramework::ControlledBy controlled_by;
+
+       /**
+        * Subsidiary processors that this processor is managing.
+	  */
+	  readonly state LinkedList controls;
+
+	 /**
+	  * The model describing the externally visible process execution policy.
+	  */
+	  state CollaborationFramework::ProcessorModel model;
+
+	 /**
+	  * The criteria label.
+	  */
+	  state string label;
+
+	 /**
+	  * Context arguments supplied as part of the factory criteria.
+	  */
+	  state CosLifeCycle::Criteria criteria;
+
+	 /**
+	  * Appliance configuration element name.
+	  */
+	  state string appliance;
+
+    };
+
+   /**
+    * The factory for Processor.
+    */
+    abstract storagehome ProcessorStorageHome of ProcessorStorage
+    {
+	  key resource_key( domain_short_pid, random, creation );
+
+        factory create( 
+		owner,
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by, 
+		processor_state, 
+		coordinated_by, 
+		controlled_by,
+		label,
+		model,
+		criteria,
+		appliance
+	  );
+    };
+
+    //
+    // Generic 
+    //
+
+   /**
+    * Generic storage type.
+    * @see org.omg.CommunityFramework.GenericResource
+    */
+    abstract storagetype GenericStorage : AbstractResourceStorage
+    {
+
+       /**
+        * The IDL identifier of valuetypes that can be assigned as the 
+        * as the value of the resource.
+        */
+        state string identifier;
+
+       /**
+        * The locked state of a GenericResource.
+        */
+        state boolean locked;
+
+       /**
+        * Qualifies the resource as a template source.
+        */
+        state boolean template;
+
+       /**
+        * The value contained by the GenericResource.
+        */
+	  state ValueBase value;
+    };
+
+   /**
+    * The factory for GenericStorage.
+    */
+
+    abstract storagehome GenericStorageHome of GenericStorage
+    {
+	  key resource_key( domain_short_pid, random, creation );
+        factory create( 
+            owner,
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by, 
+            identifier,
+		locked, 
+		template, 
+		value );
+    };
+
+    //
+    // Community 
+    //
+
+   /**
+    * Community storage type is an interface to the persistent storage of a 
+    * community supporting association to multiple members through a contained 
+    * MembershipStorage instance.
+    */
+
+    abstract storagetype CommunityStorage : WorkspaceStorage
+    {
+
+	 /**
+        * Policy control model containing rules related to membership 
+	  * administration.
+        */
+	  state CommunityFramework::MembershipModel model;
+
+       /**
+        * Recruitment status of the membership.
+        */
+        state CommunityFramework::RecruitmentStatus recruitment;
+
+       /**
+        * The set of Member associations (representing the set of Users
+        * associated to the Membership as Members).
+        */
+	  state LinkedList members;
+
+    };
+
+   /**
+    * The factory and home interface for CommunityStorage storage types.
+    */
+
+    abstract storagehome CommunityStorageHome of CommunityStorage
+    {
+	  key resource_key( domain_short_pid, random, creation );
+        factory create( 
+            owner,
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by, 
+		model,
+		recruitment
+	  );
+    };
+
+
+    //
+    // Consumer 
+    //
+
+   /**
+    * A ConsumerStorage abstract storage type contains the reference to the 
+    * IdentifiableDomainConsumer in the form of a CORBA object reference, a connected
+    * state, and an event queue.
+    */
+    abstract storagetype ConsumerStorage : IdentifiableDomainObjectStorage
+    {
+
+       /**
+        * Embedded LinkedList containing first event entry and the 
+        * the number of event entries in the list.
+        */
+        readonly state LinkedList queue;
+
+       /**
+        * CORBA object reference to the IdentifiableDomainConsumer that 
+        * has established this subscription.
+        */
+        state Session::IdentifiableDomainConsumer idc;
+
+       /**
+        * Current state of the identifiable domain consumers connection.
+        */
+        state boolean connected;
+
+       /**
+        * Change the current connected state to true.
+        */
+        void connect();
+
+       /**
+        * Change the current connected state to false.
+        */
+        void disconnect();
+
+       /**
+        * The shutdown operations requests that the consumer storage completes
+	  * propergate of all pending event following which a disconnection 
+	  * from the actual consumer should be performed.
+	  */
+	  void shutdown();
+    };
+
+   /**
+    * ConsumerStorageHome is the persistent repository of all ConsumerStorage 
+    * instances.
+    */
+    abstract storagehome ConsumerStorageHome of ConsumerStorage
+    {
+        key identifier( domain_short_pid, random );
+        factory create( domain_short_pid, random, idc, connected );
+    };
+
+   /**
+    * FinderStorage is a storage object representing a site profile.
+    */
+
+    abstract storagetype FinderStorage
+    {
+
+       /**
+        * Configuration profile name.
+        */
+        state string name;
+
+       /**
+        * The root community.
+        */
+	  //state ref<CommunityStorage> community;
+        state Session::AbstractResource resource;
+    };
+
+    abstract storagehome FinderStorageHome of FinderStorage
+    {
+        key name;
+        factory create( name, resource );
+    };
+
+    //
+    // DomainStorageBase 
+    //
+
+    storagetype DomainStorageBase
+    implements DomainStorage
+    { 
+    };
+
+    storagehome DomainStorageHomeBase of DomainStorageBase
+    implements DomainStorageHome
+    { 
+    };
+
+    //
+    // SubscriptionStorageBase 
+    //
+
+    storagetype SubscriptionStorageBase
+    implements SubscriptionStorage
+    { 
+    };
+
+    storagehome SubscriptionStorageHomeBase of SubscriptionStorageBase
+    implements SubscriptionStorageHome
+    { 
+    };
+
+    //
+    // LinkStorageBase
+    //
+
+    storagetype LinkStorageBase
+    implements LinkStorage
+    { 
+    };
+
+    storagehome LinkStorageHomeBase of LinkStorageBase
+    implements LinkStorageHome
+    { 
+    };
+
+    //
+    // AbstractResourceStorageBase
+    //
+
+    storagetype AbstractResourceStorageBase
+    implements AbstractResourceStorage
+    {
+        stores subscriptions as ref<LinkedListBase>;
+        stores collected_by as ref<LinkedListBase>;
+        stores consumed_by as ref<LinkedListBase>;
+    };
+
+    storagehome AbstractResourceStorageHomeBase of AbstractResourceStorageBase
+    implements AbstractResourceStorageHome
+    { 
+    };
+
+    //
+    // WorkspaceStorageBase
+    //
+
+    storagetype WorkspaceStorageBase : AbstractResourceStorageBase
+    implements WorkspaceStorage 
+    {
+        stores collects as ref<LinkedListBase>;
+        //stores composes as ref<LinkedListBase>;
+        stores accessed_by as ref<LinkedListBase>;
+    };
+
+    storagehome WorkspaceStorageHomeBase of WorkspaceStorageBase
+    implements WorkspaceStorageHome 
+    { 
+    };
+
+    //
+    // DesktopStorageBase
+    //
+
+    storagetype DesktopStorageBase : WorkspaceStorageBase
+    implements DesktopStorage 
+    {
+    };
+
+    storagehome DesktopStorageHomeBase of DesktopStorageBase
+    implements DesktopStorageHome 
+    { 
+    };
+
+    //
+    // MessageStorageBase
+    //
+
+    storagetype MessageStorageBase
+    implements MessageStorage 
+    {
+    };
+
+    storagehome MessageStorageHomeBase of MessageStorageBase
+    implements MessageStorageHome 
+    { 
+    };
+
+    //
+    // FolderStorageBase
+    //
+
+    storagetype FolderStorageBase
+    implements FolderStorage 
+    {
+        stores messages as ref<LinkedListBase>;
+    };
+
+    storagehome FolderStorageHomeBase of FolderStorageBase
+    implements FolderStorageHome 
+    { 
+    };
+
+    //
+    // UserStorageBase
+    //
+
+    storagetype UserStorageBase : AbstractResourceStorageBase
+    implements UserStorage 
+    {
+        stores owns as ref<LinkedListBase>;
+        stores accesses as ref<LinkedListBase>;
+        stores messages as ref<LinkedListBase>;
+        stores folders as ref<LinkedListBase>;
+        stores property_set as ref<PropertySetDefStorageBase>;
+        stores desktop as ref<DesktopStorageBase> scope DesktopStorageHomeBase;
+        stores memberships as ref<LinkedListBase>;
+   };
+
+    storagehome UserStorageHomeBase of UserStorageBase
+    implements UserStorageHome 
+    { 
+    };
+
+    //
+    // TaskStorageBase
+    //
+
+    storagetype TaskStorageBase : AbstractResourceStorageBase
+    implements TaskStorage 
+    {
+        stores consumes as ref<LinkedListBase>;
+        stores produces as ref<LinkedListBase>;
+    };
+
+    storagehome TaskStorageHomeBase of TaskStorageBase
+    implements TaskStorageHome 
+    { 
+    };
+
+    //
+    // ProcessorStorageBase
+    //
+
+    storagetype ProcessorStorageBase : AbstractResourceStorageBase
+    implements ProcessorStorage 
+    {
+        stores controls as ref<LinkedListBase>;
+    };
+
+    storagehome ProcessorStorageHomeBase of ProcessorStorageBase
+    implements ProcessorStorageHome 
+    { 
+    };
+
+    //
+    // GenericStorageBase
+    //
+
+    storagetype GenericStorageBase : AbstractResourceStorageBase
+    implements GenericStorage 
+    {
+    };
+
+    storagehome GenericStorageHomeBase of GenericStorageBase
+    implements GenericStorageHome 
+    { 
+    };
+
+    //
+    // CommunityStorageBase
+    //
+
+    storagetype CommunityStorageBase : WorkspaceStorageBase
+    implements CommunityStorage 
+    {
+        stores members as ref<list::LinkedListBase>;
+    };
+
+    storagehome CommunityStorageHomeBase of CommunityStorageBase
+    implements CommunityStorageHome 
+    { 
+    };
+
+    //
+    // ConsumerStorageBase
+    //
+
+    storagetype ConsumerStorageBase
+    implements ConsumerStorage
+    { 
+        stores queue as ref<list::LinkedListBase>;
+    };
+
+    storagehome ConsumerStorageHomeBase of ConsumerStorageBase
+    implements ConsumerStorageHome
+    { 
+    };
+
+    //
+    // FinderStorageBase
+    //
+
+    storagetype FinderStorageBase
+    implements FinderStorage
+    { 
+        stores community as ref<CommunityStorageBase> scope CommunityStorageHomeBase;
+    };
+
+    storagehome FinderStorageHomeBase of FinderStorageBase
+    implements FinderStorageHome
+    { 
+    };
+
+
+}; 
+};
+
+#endif // _HUB_PSS_PSDL_

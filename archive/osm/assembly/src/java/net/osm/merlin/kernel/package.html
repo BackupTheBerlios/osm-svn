@@ -1,0 +1,30 @@
+
+<body>
+<p>
+The kernel package defines a top level {@link net.osm.merlin.kernel.Kernel} that serves as a host to a root {@link net.osm.merlin.kernel.Container} that provides support for container hierachy creation. The default kernel implementation handles the setup of the logging infrastructure, extension manager, and the root container.
+
+</p>
+<h3>Funtional Summary</h3>
+<ul>
+<li>Geneneric container architecture.
+<li>Hierachical container composition.
+</ul>
+<h3>Key Features</h3>
+<p>A primary objective of this container is to provide simple composition of applications and the management of service provission from parent to child containers with minimal administration overhead.</p>
+<ul>
+<li>Component-based architecture.
+<li>Deployment as a stand-alone application or as an embedeed component.
+<li>Fully configurable classpaths at the kernel and container levels.
+<li>Support for cascading startup and shutdown.
+<li>Protected classloader hierachy.
+<li>Graceful management of interupts.
+<li>Integral logging.
+</ul>
+
+<h3>Object Model</h3>
+<p>An container is primarily a component type manager. Actual type management is handled by an embedded {@link net.osm.merlin.registry.Registry} and the associated default implementation {@link net.osm.merlin.registry.DefaultRegistry}.  In addition to component type support, the container provides a framework from the creation of container hierachies.  Services established in a parent container are available as potential candidate suppliers to component providers in sibling containers.
+
+<h3>Package Structure (UML)</h3>
+<p><img src=doc-files/DefaultContainer.gif border=0></p>
+</body>
+

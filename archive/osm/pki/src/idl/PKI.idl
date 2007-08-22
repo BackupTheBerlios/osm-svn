@@ -1,0 +1,779 @@
+#ifndef __PKI_IDL
+#define __PKI_IDL
+
+#pragma prefix "omg.org"
+
+
+module PKI 
+{
+
+   /**
+    * The Opaque type is used to represent encoded structures as a sequence of bytes.
+    */      
+    typedef sequence <octet> Opaque;
+
+   /**
+    * Certificate Type
+    */
+    typedef unsigned long CertificateType;
+
+   /**
+    * Unknown certificate type.
+    */
+    const CertificateType UnknownCertificate = 0;
+
+   /**
+    * X509 v1 certificate type.
+    */
+    const CertificateType X509v1Certificate = 1;
+
+   /**
+    * X509 v2 certificate type.
+    */
+    const CertificateType X509v2Certificate = 2;
+
+   /**
+    * X509 v3 certificate type.
+    */
+    const CertificateType X509v3Certificate = 3;
+
+   /**
+    * PGP certificate type.
+    */
+    const CertificateType PGPCertificate = 4;
+
+   /**
+    * SPKI certificate type.
+    */
+    const CertificateType SPKICertificate = 5;
+
+   /**
+    * X509v1 certificate type.
+    */
+    const CertificateType X509v1AttributeCertificate = 6;
+
+   /**
+    * Custom certificate type.
+    */
+    const CertificateType CustomCertificate = 0x8000;
+
+   /**
+    * Certificate type sequence.
+    */
+    typedef sequence <CertificateType> CertificateTypeList;
+
+   /**
+    * The EncodingType is a type used to describe the method of encoding used to encode
+    * the original PKI structure to an Opaque type. The general case will be ASN.1 DER
+    * (Distinguished Encoding Rules).
+    */     
+    typedef unsigned long EncodingType;
+
+   /**
+    * Unknown encoding.
+    */
+    const EncodingType UnknownEncoding = 0;
+
+   /**
+    * DER encoding.
+    */
+    const EncodingType DEREncoding = 1;
+
+   /**
+    * BER encoding.
+    */
+    const EncodingType BEREncoding = 2;
+
+   /**
+    * Base64 encoding.
+    */
+    const EncodingType Base64Encoding = 3;
+
+   /**
+    * SExpr encoding.
+    */
+    const EncodingType SExprEncoding = 4;
+
+   /**
+    * Custom encoding.
+    */
+    const EncodingType CustomEncoding = 0x8000;
+
+    // SJM: Changed name from RepresentationType to EncodedData
+   /**
+    * This construct is defined to be able to represent encoded structures in a type safe
+    * manner. This is recommended for implementations that are currently defined and
+    * represent structures using ASN.1 encoding rules.
+    */
+    struct EncodedData 
+    {
+        EncodingType encoding_type;
+        Opaque data;
+    };
+
+   /**
+    * Describes the type of message issued by an Authority.
+    */
+    typedef unsigned long AuthorityInfoType;
+
+   /**
+    * An unknown message type.
+    */
+    const AuthorityInfoType UnknownMessage = 0;
+
+   /**
+    * A PKIXCMP general message type.
+    */
+    const AuthorityInfoType PKIXCMPGeneralMessage = 1;
+
+   /**
+    * A custom message type.
+    */
+    const AuthorityInfoType CustomMessage = 0x8000;
+
+    // SJM: changed from struct to valuetype
+
+   /**
+    * A message to/from an authority.
+    */
+    valuetype AuthorityInfo 
+    { 
+        public AuthorityInfoType authority_info_type;
+        public EncodedData representation_type;
+    };
+
+    //
+    // Certificate information - used in both the Certificate definition
+    // and the PKIAuthority::RegistrationAuthorityProviderInfo definition.
+    // SJM: changed to valuetype
+
+   /**
+    * Description of a certificate type.
+    */
+    valuetype CertificateInfo {
+        public CertificateType certificate_type;
+        public EncodingType encoding_type;
+    };
+
+   /**
+    * Sequence of certificate type deescriptions.
+    */
+    typedef sequence<CertificateInfo> CertificateInfoList;
+
+    //Certificate
+    // SJM: changed from struct to valuetype
+    // SJM: changed representation_type any to EncodedData data
+
+   /**
+    * Structurure containing a description of the certificate 
+    * type together with its encoded data.
+    */
+    valuetype Certificate 
+    {
+        private CertificateType certificate_type;
+        private EncodedData data;
+    };
+
+   /**
+    * A sequence of certificates.
+    */
+    typedef sequence <Certificate> CertificateList;
+
+    //CRL Types
+   /**
+    * Defintion of a CRL type.
+    */
+    typedef unsigned long CRLType;
+
+   /**
+    * Unknown CRL type constant.
+    */
+    const CRLType UnknownCRL = 0;
+
+   /**
+    * X509v1 CRL type constant.
+    */
+    const CRLType X509v1CRL = 1;
+
+   /**
+    * X509v2 CRL type constant.
+    */
+    const CRLType X509v2CRL = 2;
+
+   /**
+    * X509V1 ARL type constant.
+    */
+    const CRLType X509V1ARL = 3;
+
+   /**
+    * Custom CRL type constant.
+    */
+    const CRLType CustomCRL = 0x8000;
+
+   /**
+    * Sequence of CRL type descriptions.
+    */
+    typedef sequence <CRLType> CRLTypeList;
+
+    // SJM: changed to a valuetype
+   /**
+    * CRL description.
+    */
+    valuetype CRLInfo
+    {
+        public CRLType crl_type;
+        public EncodingType encoding_type;
+    };
+
+   /**
+    * A sequcne of CRL descriptions.
+    */
+    typedef sequence<CRLInfo> CRLInfoList;
+
+    // CRL
+    // SJM: changed from struct to valuetype
+    // SJM: changed representation_type any to EncodedData data
+   /**
+    * A Certificate Revocation List.
+    */
+    valuetype CRL 
+    {
+       /**
+        * The type of CRL such as X509V1CRL, X509V2CRL, X509V1ARL.
+        */
+        private CRLType crl_type;
+
+       /**
+        * The encoded CRL data.
+        */
+        private EncodedData data;
+    };
+
+    //Certificate Request Type
+   /**
+    * Declaration of a type of certificate request message.
+    */
+    typedef unsigned long CertificateRequestType;
+
+   /**
+    * Constant defining a unknown certificate request type.
+    */
+    const CertificateRequestType UnknownCertificateRequest = 0;
+
+   /**
+    * Constant defining a PKCS#10 certificate request type.
+    * A PKCS10 certification request consists of a distinguished name, a public key, and 
+    * optionally a set of attributes, collectively signed by the entity requesting certification. 
+    * PKCS10 Certification requests are sent to a certification authority, who transforms the 
+    * request to an X.509 public-key certificate, or a PKCS #6 extended certificate. The intention 
+    * of including a set of attributes is twofold: to provide other information about a given 
+    * entity, such as the postal address to which the signed certificate should be returned if 
+    * electronic mail is not available, or a "challenge password" by which the entity may later 
+    * request certificate revocation; and to provide attributes for a PKCS #6 extended 
+    * certificate. A non-exhaustive list of attributes is given in PKCS #9. Certification 
+    * authorities may also require non-electronic forms of request and may return non-electronic 
+    * replies. It is expected that descriptions of such forms will be available from the certification 
+    * authority.
+    * <p>
+    * A certification request shall have ASN.1 type CertificationRequest: </p>
+    * <p>
+    * <pre>
+    * CertificationRequest ::= SEQUENCE 
+    * { 
+    *     certificationRequestInfo CertificationRequestInfo, 
+    *     signatureAlgorithm SignatureAlgorithmIdentifier, 
+    *     signature Signature 
+    * } 
+    *
+    * SignatureAlgorithmIdentifier ::= AlgorithmIdentifier 
+    *
+    * Signature ::= BIT STRING 
+    *
+    * CertificationRequestInfo: 
+    *
+    * CertificationRequestInfo ::= SEQUENCE 
+    * { 
+    *    version Version, 
+    *    subject Name, 
+    *    subjectPublicKeyInfo SubjectPublicKeyInfo, 
+    *    attributes [0] IMPLICIT Attributes
+    * }
+    * 
+    * Version ::= INTEGER 
+    *
+    * Attributes ::= SET OF Attribute 
+    *
+    * </pre>
+    * <p/>
+    * <p>The fields of type CertificationRequest have the following meanings:</p> 
+    * <ul>
+    *   <li>certificateRequestInfo is the "certification request information." It is the value being signed. </li>
+    *   <li>signatureAlgorithm identifies the signature algorithm (and any associated parameters) under 
+    *       which the certification-request information is signed.</li>
+    * </ul>
+    * 
+    * The fields of type CertificationRequestInfo have the following meanings:</p>
+    * <ul>
+    *  <li> version is the version number, 0 for compatibility with future revisions 
+    *       of PKCS#10. </li>
+    *  <li> subject is the distinguished name of the certificate subject (the 
+    *       entity whose public key is to be certified). </li>
+    *  <li> subjectPublicKeyInfo contains information about the public key being 
+    *       certified. The information identifies the entity's public-key algorithm 
+    *       (and any associated parameters); examples of public-key algorithms 
+    *       include X.509's rsa and PKCS #1's rsaEncryption. The information also 
+    *       includes a bit-string representation of the entity's public key. For both 
+    *       public-key algorithms just mentioned, the bit string contains the BER 
+    *       encoding of a value of X.509/PKCS #1 type RSAPublicKey. </li>
+    *  <li> attributes is a set of attributes providing additional information about 
+    *       the subject of the certificate. Some attribute types that might be useful 
+    *       here are defined in PKCS #9. An example is the challenge- password 
+    *       attribute, which specifies a password by which the entity may request that 
+    *       the certificate revocation. Another example is the 
+    *       extended-certificate-attributes attribute, which specifies attributes for 
+    *       a PKCS #6 extended certificate. </li>
+    * </ul>
+    * <p>Refer to <a href="ftp://ftp.isi.edu/in-notes/rfc2314.txt">
+    * PKCS #10: Certification Request Syntax V1.5</a>
+    */
+    const CertificateRequestType PKCS10CertificateRequest = 1;
+
+   /**
+    * Constant defining a PKIX CRMF certificate request type.
+    */
+    const CertificateRequestType PKIXCRMFCertificateRequest = 2;
+
+   /**
+    * Constant defining a PKIX CMC certificate request type.
+    */
+    const CertificateRequestType PKIXCMCCertificateRequest = 3;
+
+
+   /**
+    * Constant defining a custom certificate request type.
+    */
+    const CertificateRequestType CustomCertificateRequest = 0x8000;
+
+   /**
+    * Sequence of certificate request types.
+    */
+    typedef sequence <CertificateRequestType> CertificateRequestTypeList;
+
+    // Information about a certificate request
+    // SJM: changed to a valuetype
+   /**
+    * Structure defining a certificate request including the 
+    * certificate request type and encoded data.
+    */
+    valuetype CertificateRequestInfo 
+    {
+        public CertificateRequestType cert_request_type;
+        public EncodingType encoding_type;
+    };
+
+   /**
+    * A sequence of certificate reguest info statements.
+    */
+    typedef sequence<CertificateRequestInfo> CertificateRequestInfoList;
+
+    //Certificate Request
+    // SJM: changed from struct to valuetype
+    // SJM: changed representation_type any to EncodedData data
+
+   /**
+    * A Certificate request.
+    */
+    valuetype CertificateRequest 
+    {
+        public CertificateRequestType cert_request_type;
+        public EncodedData data;
+    };
+
+    // CertificatePair used for cross certification lists
+
+   /**
+    * A certificate public and private pair.
+    */
+    struct CertificatePair 
+    {
+        Certificate forward;
+        Certificate reverse;
+    };
+
+   /**
+    * Sequence of certificate pairs.
+    */
+    typedef sequence<CertificatePair> CertificatePairList;
+
+   /**
+    * Continuation message type.
+    */
+    typedef unsigned long ContinueType;
+
+   /**
+    * Unknown continuation message type constant.
+    */
+    const ContinueType UnknownContinue = 0;
+
+   /**
+    * PKIX CMP continuation message type constant.
+    */
+    const ContinueType PKIXCMPContinue = 1;
+
+   /**
+    * PKIX CMC continuation message type constant.
+    */
+    const ContinueType PKIXCMCContinue = 2;
+
+   /**
+    * PKIX CMP confirmation message type constant.
+    */
+    const ContinueType PKIXCMPConfirm = 3;
+
+   /**
+    * PKIX CMC confirmation message type constant.
+    */
+    const ContinueType PKIXCMCConfirm = 4;
+
+   /**
+    * Custom continuation message type constant.
+    */
+    const ContinueType CustomContinue = 0x8000;
+
+    //
+    // SJM:
+    // changed from struct to valuetype
+    // changed representation_type any to EncodedData data
+
+   /**
+    * Structure defining a continue message.
+    */
+    valuetype Continue 
+    {
+        private ContinueType continue_type;
+        private EncodedData data;
+
+        ContinueType getContinueType();
+        EncodingType getEncodingType();
+	  Opaque getEncoded();
+    };
+
+   /**
+    * Request message issued by a client as part of a message exchange.
+    */
+    typedef Continue RequestData;
+
+   /**
+    * Request message issued by a provider as part of a message exchange.
+    */
+    typedef Continue ResponseData;
+
+   /**
+    * Request message issued in confirmation during a message exchange.
+    */
+    typedef Continue ConfirmData;
+
+   /**
+    * Certificate Revocation Type declaration.
+    */
+    typedef unsigned long CertRevocationType;
+
+   /**
+    * Unknown certificate recovation type constant.
+    */
+    const CertRevocationType UnknownCertRevocation = 0;
+
+   /**
+    * PKIX CMP certificate recovation type constant.
+    */
+    const CertRevocationType PKIXCMPCertRevocation = 1;
+
+   /**
+    * PKIX CMC certificate recovation type constant.
+    */
+    const CertRevocationType PKIXCMCCertRevocation = 2;
+
+   /**
+    * Custom certificate recovation type constant.
+    */
+    const CertRevocationType CustomCertRevocation = 0x8000;
+
+    // SJM: changed from struct to valuetype
+    // SJM: changed representation_type any to EncodedData data
+
+   /**
+    * Structure defining a certificate recovation.
+    */
+    valuetype CertificateRevocationInfo 
+    {
+       /**
+        * The certificate revocation type.
+        */
+        private CertRevocationType cert_rev_type;
+
+       /**
+        * The encoded certificate revocation data.
+        */
+        private EncodedData data;
+    };
+
+   /**
+    * A sequence of certificate revocation information structures.
+    */
+    typedef sequence <CertificateRevocationInfo> CertificateRevocationInfoList;
+
+    // SJM: changed from struct to valuetype
+    // SJM: changed representation_type any to EncodedData data
+   /**
+    * Certificate revocation statement.
+    */
+    valuetype CertRevocation 
+    {
+        private CertRevocationType cert_rev_type;
+        private EncodedData data;
+    };
+
+   /**
+    * Certificate revocation response statement.
+    */
+    typedef CertRevocation CertRevResponse;
+
+   /**
+    * Certificate revocation request statement.
+    */
+    typedef CertRevocation CertRevRequest;
+
+   /**
+    * Key recovery type.
+    */
+    typedef unsigned long KeyRecoveryType;
+
+   /**
+    * Unknown key recovery type constant.
+    */
+    const KeyRecoveryType UnknownKeyRecovery = 0;
+
+   /**
+    * PKIX CMP key recovery type constant.
+    */
+    const KeyRecoveryType PKIXCMPKeyRecovery = 1;
+
+   /**
+    * PKIX CMC key recovery type constant.
+    */
+    const KeyRecoveryType PKIXCMCKeyRecovery = 2;
+
+   /**
+    * Custom key recovery type constant.
+    */
+    const KeyRecoveryType CustomKeyRecovery = 0x8000;
+
+   /**
+    * Structure describing a key recovery statement.
+    */
+    struct KeyRecoveryInfo 
+    {
+       /**
+        * The key recovery type.
+        */
+        KeyRecoveryType key_rec_type;
+
+       /**
+        * Key recovery encoding.
+        */
+        EncodingType encoding_type;
+    };
+
+   /**
+    * Sequence of key recovery infomation descriptions.
+    */
+    typedef sequence <KeyRecoveryInfo> KeyRecoveryInfoList;
+
+    //Key Recovery Response
+    // SJM: changed from struct to valuetype
+    // SJM: changed representation_type any to EncodedData data
+    // SJM: changed name from KeyRecResponse to KeyRecoveryResponse
+   
+   /**
+    * A key recover response message.
+    */
+    valuetype KeyRecoveryResponse 
+    {
+        private KeyRecoveryType key_recovery;
+        private EncodedData data;
+    };
+
+   /**
+    * Certificate status request type.
+    */
+    typedef unsigned long CertificateStatusRequestType;
+
+   /**
+    * Unknown certificate status request type constant.
+    */
+    const CertificateStatusRequestType
+        UnknownCertificateStatusRequestType = 0;
+
+   /**
+    * OCSP certificate status request type constant.
+    */
+    const CertificateStatusRequestType
+        OCSPCertificateStatusRequest = 1;
+
+   /**
+    * Custom certificate status request type constant.
+    */
+    const CertificateStatusRequestType
+        CustomCertificateStatusRequest = 0x8000;
+
+    //Type for certificate status requests
+    // SJM: changed from struct to valuetype
+    // SJM: changed representation_type any to EncodedData data
+
+   /**
+    * Certificate status request.
+    */
+    valuetype CertificateStatusRequest 
+    {
+       /**
+        * Request tuype descriptor.
+        */
+        private CertificateStatusRequestType type;
+
+       /**
+        * Encoded certificate request data.
+        */
+        private EncodedData data;
+    };
+
+   /**
+    * Certificate status response type.
+    */
+    typedef unsigned long CertificateStatusResponseType;
+
+   /**
+    * Unknown certificate status response type.
+    */
+    const CertificateStatusResponseType
+        UnknownCertificateStatusResponseType = 0;
+
+   /**
+    * OCSP certificate status response type.
+    */
+    const CertificateStatusResponseType
+        OCSPCertificateStatusResponse = 1;
+
+   /**
+    * Custom certificate status response type.
+    */
+    const CertificateStatusResponseType
+        CustomCertificateStatusResponse = 0x8000;
+
+    // SJM: changed from struct to valuetype
+    // SJM: changed representation_type any to EncodedData data
+
+   /**
+    * The construct used to represent an encoded certificate request message.
+    */
+    valuetype CertificateStatusResponse 
+    {
+        private CertificateStatusResponseType type;
+        private EncodedData data;
+    };
+
+   /**
+    * Constant indicating the status of a request.
+    */
+    typedef unsigned long PKIStatus;
+
+    /** 
+     *  PKISuccess indicates that the current transaction is now
+     *  complete without any more invocations required.
+     */
+    const PKIStatus PKISuccess = 0;
+
+    /** 
+     *  PKISuccessWithWarning indicates that the client has received
+     *  something similar to what was asked for. It is up to the client to
+     *  ascertain the differences. This may for example be a certificate
+     *  that varies in some way from the request such as the validity
+     *  period may be different to that requested.
+     */
+    const PKIStatus PKISuccessWithWarning = 1;
+
+    /** 
+     *  PKIContinueNeeded indicates that the current part of the transaction
+     *  is complete but the actual end result has not yet been
+     *  reached. This means that another invocation is required
+     *  most likely requiring some additional information.
+     */
+    const PKIStatus PKIContinueNeeded = 2;
+
+    /** 
+     *  PKIFailed indicates that a failure has occurred and the transaction
+     *  should be terminated.
+     *
+     * <pre>
+     * PKIFailureInfo ::= BIT STRING { 
+     *   -- since we can fail in more than one way! 
+     *   -- More codes may be added in the future if/when required. 
+     *   badAlg (0), -- unrecognized or unsupported Algorithm Identifier 
+     *   badMessageCheck (1), -- integrity check failed (e.g., signature did not verify) 
+     *   badRequest (2), -- transaction not permitted or supported 
+     *   badTime (3), -- messageTime was not sufficiently close to the system time, 
+     *                -- as defined by local policy 
+     *   badCertId (4), -- no certificate could be found matching the provided criteria 
+     *   badDataFormat (5), -- the data submitted has the wrong format 
+     *   wrongAuthority (6), -- the authority indicated in the request is different from the 
+     *                       -- one creating the response token 
+     *   incorrectData (7), -- the requester's data is incorrect (used for notary services) 
+     *   missingTimeStamp (8), -- when the timestamp is missing but should be there (by policy) 
+     *   badPOP (9), -- the proof-of-possession failed 
+     *   certRevoked (10), -- the certificate has already been revoked 
+     *   certConfirmed (11), -- the certificate has already been confirmed 
+     *   wrongIntegrity (12), -- invalid integrity, password based instead of signature or 
+     *                        -- vice versa 
+     *   badRecipientNonce (13), -- invalid recipient nonce, either missing or wrong value 
+     *   timeNotAvailable (14), -- the TSA's time source is not available  
+     *   unacceptedPolicy (15), -- the requested TSA policy is not supported by the TSA.  
+     *   unacceptedExtension (16), -- the requested extension is not supported by the TSA.  
+     *   addInfoNotAvailable (17), -- the additional information requested could not be understood  
+     *                             -- or is not available  
+     *   badSenderNonce (18), -- invalid sender nonce, either missing or wrong size  
+     *   badCertTemplate (19), -- invalid certificate template or missing mandatory information  
+     *   signerNotTrusted (20), -- signer of the message unknown or not trusted  
+     *   transactionIdInUse (21), -- the transaction identifier is already in use  
+     *   unsupportedVersion (22), -- the version of the message is not supported  
+     *   notAuthorized (23), -- the sender was not authorized to make the preceding request  
+     *                       -- or perform the preceding action  
+     *   systemUnavail (24), -- the request cannot be handled due to system unavailability  
+     *   systemFailure (25), -- the request cannot be handled due to system failure  
+     *   duplicateCertReq (26) -- certificate cannot be issued because a duplicate certificate  
+     *                         -- already exists }
+     *</pre>
+     */
+    const PKIStatus PKIFailed = 3;
+
+    /** 
+     *  PKIPending indicates that the transaction is in a transitional
+     *  period pending some result.
+     *  This state occurs during the period before either
+     *  a transaction is complete or a continue is required.
+     */
+    const PKIStatus PKIPending = 4;
+
+    /** 
+     *  PKISuccessAfterConfirm indicates that the transaction is complete
+     *  but the <code>PKIAuthority</code> requires that a confirmation
+     *  message is sent using <code>RequestManager.confirm_content</code>
+     *  operation.
+     *  For example this might occur in the case where the
+     *  CA may revoke the issued certificate if a confirm is not made
+     *  as the CA may presume that the client could not decrypt the
+     *  message as a way of providing proof of possession (POP)
+     *  of the private key.
+     */
+    const PKIStatus PKISuccessAfterConfirm = 5;
+
+};
+#endif

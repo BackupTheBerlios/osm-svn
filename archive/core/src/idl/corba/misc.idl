@@ -1,0 +1,12 @@
+
+// This file includes other files containing omg defined local interfaces
+
+#include "PortableServer.idl"
+
+#include "DynamicAny.idl"
+
+// Added by the portable interceptors submission
+
+#include "Codec.idl"
+#include "Dynamic.idl"
+#include "PortableInterceptor.idl"

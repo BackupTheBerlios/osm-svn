@@ -1,0 +1,96 @@
+/*
+ * Copyright 2000-2002 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.3 18 MAR 2001
+ * @version 2.0 31 MAR 2002
+ */
+
+#ifndef _OSM_CHOOSER_IDL_
+#define _OSM_CHOOSER_IDL_
+#pragma prefix "osm.net"
+#include <adapter.idl>
+
+module chooser
+{
+
+    //
+    // Chooser
+    //
+
+    native Iterator;
+    typedef sequence<string> KeySequence;
+
+   /**
+    * Exception thrown by the chooser if the supplied name is unknown.
+    */
+    exception UnknownName
+    {
+        string name;
+    };
+
+   /**
+    * Chooser is an interface that provides publication of a set of 
+    * services that are accessible via names.
+    */
+    interface Chooser : adapter::Adaptive
+    {
+
+       /**
+        * Get the sequence of keys supported by lookup.
+        */
+        KeySequence get_keys();
+
+       /**
+        * Locates an object reference to a service by name.
+        */
+        adapter::Adaptive lookup
+        (
+            in string name 
+        )
+        raises
+        ( 
+            UnknownName
+        );
+
+    };
+
+    abstract valuetype ChooserAdapter : adapter::ServiceAdapter
+    {
+       /**
+        * Returns the set of names supported by the chooser.
+        * @return  String[] the set of names
+        */
+        KeySequence getNames();
+
+       /**
+        * Locates an <code>ServiceAdapter</code> to a object reference by name.
+        * @param name the service to lookup
+        * @exception UnknownName if the supplied name is not known by the chooser
+        */
+        adapter::ServiceAdapter lookup( in string name )raises( UnknownName );
+
+       /**
+        * Returns an iterator of the available services.
+        * @return Iterator service iterator
+        */
+        Iterator getServices();
+    };
+
+
+   /**
+    * Valuetype containing a set of names supported by a chooser.
+    */
+    valuetype ChooserValue : adapter::ServiceValue, ChooserAdapter
+    {
+       /**
+        * A key that identifies the factory within the scope of its managing
+        * finder.
+        */
+        private KeySequence m_keys;
+    };
+};
+
+#endif // _OSM_CHOOSER_IDL_

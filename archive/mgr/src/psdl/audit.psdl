@@ -1,0 +1,123 @@
+/**
+ * Storage type defintions for adapters supporting the logging of events
+ * from remotely located AbstractResource instances.  An adapter contains
+ * a reference to a structured push provider, a reference to the abstract 
+ * resource that events are produced by, and a linked list of produced
+ * events.
+ */
+
+#ifndef _AUDIT_PSDL_
+#define _AUDIT_PSDL_
+#include <Session.idl>
+#include <list.psdl>
+#include <event.psdl>
+
+#pragma prefix "osm.net"
+
+module audit {
+module pss {
+
+    typedef list::LinkedList LinkedList;
+
+   /**
+    * An Adapter is an storagetype defintion that contains 
+    * an object reference of a structured push supplier, the subject resource,
+    * and a linked list of events received from the source.
+    */
+    abstract storagetype AdapterStorage
+    {
+
+	 /**
+        * Domain address authority (IDL, DCE, DNS, OTHER, etc.).
+        */
+	  readonly state long authority;
+
+	 /**
+        * Domain address type (e.g. mybiz.com).
+        */
+	  readonly state string address;
+
+        /**
+        * Random int identifier of the remote object.
+        */
+        readonly state long random;
+
+       /**
+        * The object reference of the AbstractResource that this 
+        * adapter adapts.
+        */
+	  state Session::AbstractResource reference;
+
+       /**
+        * Object reference to the event producer.
+        */
+	  state CosNotifyComm::StructuredPushSupplier supplier;
+
+       /**
+        * Linked list of events received from the source resource.
+        */
+        state list::LinkedList events;
+
+       /**
+        * Connected state of the adapter.
+        */
+        state boolean connected;
+
+	 /**
+        * Sequence of event types that the adapter has subscribed to.
+        */
+	  state CosNotification::EventTypeSeq subscription;
+
+    };
+
+   /**
+    * AdapterStorageHome is the factory for AdapterStorage storageobjects.
+    */
+    abstract storagehome AdapterStorageHome of AdapterStorage
+    {
+	  key identifier ( authority, address, random );
+	  factory create( authority, address, random, reference, supplier, subscription );
+    };
+
+    //
+    // catalog
+    //
+
+   /**
+    * AdapterCatalog exposes convinience operations enabling access to
+    * the AdapterStorageHome and EventStorageHome.
+    */
+    //catalog AdapterCatalog : list::UtilityCatalog
+    //{
+    //    provides AdapterStorageHome adapter_home;
+    //    provides event::EventStorageHome event_home;
+    //};
+
+    //
+    // AdapterStorageBase
+    //
+
+   /**
+    * AdapterStorageBase is a generated PSS implementation supporting the
+    * AdapterStorage storage object.
+    */
+    storagetype AdapterStorageBase
+    implements AdapterStorage
+    {
+        stores events as ref<list::LinkedListBase>;
+    };
+
+   /**
+    * AdapterStorageHomeBase is a generated PSS implementation supporting the
+    * AdapterStorageHome storage object home interface for instances of the 
+    * storage type AdapterStorageBase.
+    */
+    storagehome AdapterStorageHomeBase of AdapterStorageBase
+    implements AdapterStorageHome
+    { 
+    };
+
+}; 
+};
+
+#endif // _ADAPTER_PIDL_

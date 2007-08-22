@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Created-By: OSM SARL
+Extension-Name: Assembler
+Specification-Vendor: Apache Software Foundation
+Specification-Version: 1.0
+Implementation-Vendor: Apache Software Foundation
+Implementation-Version: 0.1
+Class-Path: avalon-framework.jar logkit.jar excalibur-i18n-1.0.jar excalibur-configuration-1.0.jar excalibur-extension-1.0a.jar excalibur-containerkit-1.0.jar
+Main-Class: net.osm.merlin.kernel.Main
+
+Name: net/osm/merlin/kernel/DefaultContainer.class
+Avalon-Block: true
+
+Name: net/osm/merlin/kernel/DefaultKernel.class
+Avalon-Block: true
+
+Name: net/osm/merlin/registry/DefaultRegistry.class
+Avalon-Block: true
+

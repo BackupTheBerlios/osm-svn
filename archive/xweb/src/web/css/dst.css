@@ -1,0 +1,59 @@
+.form{font-family: Verdana, sans-serif; font-size: 10px; color: #333333; text-decoration: none;}
+
+.leftnavoff { font-family: Verdana, sans-serif; font-size: 10px; font-weight: bold; color: #333333; text-decoration: none; }
+.leftnavoff:hover { font-family: Verdana, sans-serif; font-size: 10px; font-weight: bold; color: #333333; text-decoration: underline; }
+.leftnavon { font-family: Verdana, sans-serif; font-size: 10px; font-weight: bold; color: #E85100; text-decoration: none; }
+.leftnavon:hover { font-family: Verdana, sans-serif; font-size: 10px; font-weight: bold; color: #E85100; text-decoration: underline; }
+.leftnavsub { font-family: Verdana, sans-serif; font-size: 10px; color: #333333; text-decoration: none; }
+.leftnavsub:hover { font-family: Verdana, sans-serif; font-size: 10px; color: #E85100; text-decoration: underline; }
+
+.leftnavsubon { font-family: Verdana, sans-serif; font-size: 10px; color: #E85100; text-decoration: none; }
+
+
+.textHdr { font-family: Verdana, sans-serif; font-size: 12px; font-weight: bold; color: #333333; text-transform: uppercase; }
+
+H3
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 12px;
+    TEXT-TRANSFORM: uppercase;
+    COLOR: #333333;
+    FONT-FAMILY: Verdana, sans-serif, sans-serif
+}
+.h3
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 12px;
+    TEXT-TRANSFORM: uppercase;
+    COLOR: #333333;
+    FONT-FAMILY: Verdana, sans-serif, sans-serif
+}
+.p
+{
+    font-family: Verdana, sans-serif; 
+    font-size: 12px; color: #666666; 
+}
+.bb
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 12px;
+    TEXT-TRANSFORM: none;
+    COLOR: #333333;
+    FONT-FAMILY: Verdana, sans-serif, sans-serif
+}
+
+
+.text { font-family: Verdana, sans-serif; font-size: 12px; color: #666666; }
+.textLink { font-family: Verdana, sans-serif; font-size: 12px; color: #2D838D; text-decoration: underline; }
+
+.homeNews { font-family: Verdana, sans-serif; font-size: 10px; color: #FFFFFF; }
+
+.ticker { font-family: Arial; font-size: 16px; font-weight: bold; color: #333333; }
+.tickerLink { font-family: Arial; font-size: 16px; font-weight: bold; color: #FFFFFF; text-decoration: none;}
+.tickerLink:hover { font-family: Arial; font-size: 16px; font-weight: bold; color: #FFFFFF; text-decoration: underline;}
+
+.low { text-transform: lowercase; }
+a { font-family: Verdana, sans-serif; font-size: 12px; color: #2D838D; text-decoration: underline; }
+
+.textIndent { font-family: Verdana, sans-serif; font-size: 12px; color: #666666; text-indent: -13px; margin-left: 13px; }
+.tm { font-family: Verdana, sans-serif; font-size: 10px; font-weight: bold; color: #333333; }

@@ -1,0 +1,102 @@
+/**
+ */
+
+#ifndef _REALM_PSDL_
+#define _REALM_PSDL_
+#include <list.psdl>
+#pragma prefix "osm.net"
+
+module service
+{
+module realm
+{
+module pss
+{
+
+    typedef CORBA::OctetSeq ID;
+    typedef sequence<ID> IDs;
+    typedef sequence<string> names;
+    typedef list::LinkedList LinkedList;
+
+    //
+    // role
+    //
+
+    abstract storagetype RoleStorage
+    {
+        state string name;
+        state string description;
+
+       /**
+        * Linked list of principals that have been granted this role.
+        */
+
+        state list::LinkedList principals;
+
+    };
+
+    storagetype RoleStorageBase implements RoleStorage
+    { 
+        stores principals as ref<list::LinkedListBase>;
+    };
+
+    abstract storagehome RoleStorageHome of RoleStorage
+    {
+        key name;
+        factory create( name, description );
+    };
+
+    storagehome RoleStorageHomeBase of RoleStorageBase implements RoleStorageHome
+    { 
+    };
+
+    //
+    // principal
+    //
+
+    abstract storagetype PrincipalStorage
+    {
+        state string username;
+        state string email;
+        state string passphrase;
+	  state any reference;
+
+       /**
+        * Linked list of principals that have been granted this role.
+        */
+
+        state list::LinkedList roles;
+
+    };
+
+    storagetype PrincipalStorageBase implements PrincipalStorage
+    {
+        stores roles as ref<list::LinkedListBase>;
+    };
+
+    abstract storagehome PrincipalStorageHome of PrincipalStorage
+    {
+        key username;
+        key email;
+        factory create( username, email, passphrase, reference );
+    };
+
+    storagehome PrincipalStorageHomeBase of PrincipalStorageBase implements PrincipalStorageHome
+    {
+    };
+
+    //
+    // catalog
+    //
+    
+    catalog RealmCatalog : list::UtilityCatalog
+    {
+        provides RoleStorageHome role_home;
+        provides PrincipalStorageHome principal_home;
+    };
+
+};
+};
+};
+
+#endif // _REALM_PSDL_

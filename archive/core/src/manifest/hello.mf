@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Main-Class: net.osm.sample.hello.HelloWorldProcess
+title: Hello World
+description: Example of an internal business process wrapper.
+resource: http://home.osm.net/examples/hello.jar
+provider: http://www.osm.net
+terms: http://www.osm.net/gateway/terms.html
+key: net/osm/enterprise/process/core/hello
+type: process
+version: 1.0
+
+Name: vendor
+value: OSM
+url: http://www.osm.net
+
+Name: specification/authority
+url: http://www.osm.net
+value: OSM
+

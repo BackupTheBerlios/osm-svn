@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+
+<!--
+Demonstration.xinfo
+Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+This software is the proprietary information of OSM SARL.  
+Use is subject to license terms.
+  
+@author  Stephen McConnell
+@version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <name>demo</name>
+    <version>1.0</version>
+  </block>
+
+  <!-- 
+  Service dependecies.
+  -->
+
+  <dependencies>
+      <dependency>
+          <role>vault</role>
+          <service name="net.osm.vault.Vault" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>orb</role>
+          <service name="org.apache.orb.ORB" version="2.4"/>
+          <configuration>
+
+            <initializer class="net.osm.realm.ClientInitializer" name="realm"/>
+
+            <value catagory="adapter" idl="IDL:osm.net/adapter/Adapter:1.0" 
+              factory="net.osm.adapter.AdapterValue" />
+            <value catagory="service" idl="IDL:osm.net/adapter/ServiceAdapter:1.0" 
+              factory="net.osm.adapter.ServiceValue" />
+            <value catagory="finder" idl="IDL:osm.net/finder/FinderAdapter:1.0" 
+              factory="net.osm.finder.FinderValue" />
+            <value catagory="chooser" idl="IDL:osm.net/chooser/ChooserAdapter:1.0" 
+              factory="net.osm.chooser.ChooserValue" />
+            <value catagory="factory" idl="IDL:osm.net/factory/FactoryAdapter:1.0" 
+              factory="net.osm.factory.FactoryValue" />
+
+            <value catagory="gateway" idl="IDL:osm.net/session/HomeAdapter:1.0" 
+              factory="net.osm.session.HomeValue" />
+            <value catagory="desktop" idl="IDL:osm.net/session/desktop/DesktopAdapter:1.0" 
+              factory="net.osm.session.desktop.DesktopValue" />
+            <value catagory="workspace" idl="IDL:osm.net/session/workspace/WorkspaceAdapter:1.0" 
+              factory="net.osm.session.workspace.WorkspaceValue" />
+            <value catagory="task" idl="IDL:osm.net/session/task/TaskAdapter:1.0" 
+              factory="net.osm.session.task.TaskValue" />
+            <value catagory="processor" idl="IDL:osm.net/session/processor/ProcessorAdapter:1.0" 
+              factory="net.osm.session.processor.ProcessorValue" />
+            <value catagory="user" idl="IDL:osm.net/session/user/UserAdapter:1.0" 
+              factory="net.osm.session.user.UserValue" />
+            <value catagory="principal" idl="IDL:osm.net/session/user/PrincipalAdapter:1.0" 
+              factory="net.osm.session.user.PrincipalValue" />
+
+          </configuration>
+      </dependency>
+  </dependencies>
+
+  <configuration>
+    <ior value="session.ior"/>
+  </configuration>
+
+</blockinfo>

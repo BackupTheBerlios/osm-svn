@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<!--
+Copyright 2000-2001 OSM SARL All Rights Reserved.
+This configuration is the proprietary information of OSM SARL.
+Use is subject to license terms.  Entitys of this document 
+are derived from prior work of the Apache Software
+Foundation open source projects.
+
+@author  Stephen McConnell <mailto:mcconnell@osm.net>
+@version 1.0 20-JUN-2001
+-->
+
+<!--
+server.xml
+Basic config file that sets up context for server application.
+-->
+
+<environment>
+
+    <logs>
+
+      <category name="" target="mgr" priority="WARN" />
+      <category name="desktop" target="mgr" priority="DEBUG" />
+      <category name="shell" target="mgr" priority="DEBUG" />
+      <category name="agent" target="mgr" priority="DEBUG" />
+      <category name="audit" target="mgr" priority="DEBUG" />
+      <category name="vault" target="mgr" priority="DEBUG" />
+
+      <log-target name="mgr" location="log/mgr.log" />
+
+    </logs>
+
+    <policy>
+      <grant code-base="file:${app.home}${/}SAR-INF${/}lib${/}*">
+        <permission class="java.security.AllPermission" />
+      </grant>
+    </policy>
+
+</environment>

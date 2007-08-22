@@ -1,0 +1,235 @@
+// -----------------------------------------------------------------------------
+// OpenORB Cos Persistent State
+//
+// (c) Intalio Inc , 2000
+// -----------------------------------------------------------------------------
+
+
+#ifndef _COS_PERSISTENT_STATE_PSDL_
+#define _COS_PERSISTENT_STATE_PSDL_
+
+#include <orb.idl>
+#include <CosTransactions.idl>
+
+#pragma prefix "omg.org"
+
+module CosPersistentState 
+{	
+	local interface CatalogBase;
+	local interface Connector;
+	local interface EndOfAssociationCallback;
+	local interface Session;
+	local interface SessionPool;
+	local interface StorageHomeBase;
+	local interface TransactionalSession;
+
+	native StorageObjectBase;
+	native StorageObjectFactory;
+	native StorageHomeFactory;
+	native SessionFactory;
+	native SessionPoolFactory;
+
+	exception NotFound {};
+
+	typedef string TypeId;
+	typedef CORBA::OctetSeq Pid;
+	typedef CORBA::OctetSeq ShortPid;	
+
+      #ifdef _PSDL_
+	abstract storagetype StorageObject 
+	{
+		void destroy_object();
+		
+		boolean object_exists();
+
+		Pid get_pid();
+
+		ShortPid get_short_pid();
+
+		StorageHomeBase get_storage_home();
+	};	
+	#endif	
+
+			
+	local interface ConnectorRegistry
+	{
+		Connector find_connector( in string implementation_id ) 
+			raises( NotFound );
+
+		void register_connector( in Connector c );
+
+		void unregister_connector( in string implementation_id )
+			raises( NotFound );
+	};
+
+	enum YieldRef { YIELD_REF };
+
+	enum ForUpdate { FOR_UPDATE };
+
+	typedef short IsolationLevel;
+
+	const IsolationLevel READ_UNCOMMITTED = 0;
+	const IsolationLevel READ_COMMITTED = 1;
+	const IsolationLevel REPEATABLE_READ = 2;
+	const IsolationLevel SERIALIZABLE = 3;
+
+	typedef short TransactionPolicy;
+	
+	const TransactionPolicy NON_TRANSACTIONAL = 0;
+	const TransactionPolicy TRANSACTIONAL = 1;
+	
+	typedef short AccessMode;
+	
+	const AccessMode READ_ONLY = 0;
+	const AccessMode READ_WRITE = 1;
+
+	struct Parameter 
+	{
+		string name;
+		any val;
+	};
+
+	typedef sequence<Parameter> ParameterList;
+	typedef sequence<TransactionalSession> TransactionalSessionList;
+
+	//-------------------------------------------------------------
+	// Connector
+	//-------------------------------------------------------------
+
+	local interface Connector 
+	{
+		readonly attribute string implementation_id;
+		
+		Pid get_pid(in StorageObjectBase obj);
+
+		ShortPid get_short_pid(in StorageObjectBase obj);
+
+		Session create_basic_session(in AccessMode access_mode,
+					     in TypeId catalog_type_name,
+					     in ParameterList additional_parameters );
+		
+		TransactionalSession create_transactional_session(
+					     in AccessMode access_mode,
+					     in IsolationLevel default_isolation_level,
+					     in EndOfAssociationCallback callback,
+	 				     in TypeId catalog_type_name,
+					     in ParameterList additional_parameters );
+
+		SessionPool create_session_pool(
+					     in AccessMode access_mode,
+					     in TransactionPolicy tx_policy,
+					     in TypeId catalog_type_name,
+					     in ParameterList additional_parameters );
+
+		TransactionalSession current_session();
+
+		TransactionalSessionList sessions(in CosTransactions::Coordinator transaction);
+
+		StorageObjectFactory register_storage_object_factory(
+						  in TypeId storage_type_name,
+						  in StorageObjectFactory _factory );
+
+		StorageHomeFactory register_storage_home_factory(
+						  in TypeId storage_home_type_name,
+						  in StorageHomeFactory _factory );
+
+		SessionFactory register_session_factory(
+						  in TypeId catalog_type_name,
+						  in SessionFactory _factory );
+
+		SessionPoolFactory register_session_pool_factory(
+						  in TypeId catalog_type_name,
+						  in SessionPoolFactory _factory );
+	};
+		
+	//-------------------------------------------------------------
+	// CatalogBase
+	//-------------------------------------------------------------
+
+	local interface CatalogBase 
+	{
+		readonly attribute AccessMode access_mode;
+
+		StorageHomeBase find_storage_home(in string storage_home_id)
+			raises (NotFound);
+
+		StorageObjectBase find_by_pid(in Pid the_pid) 
+			raises (NotFound);
+
+		void flush();
+
+		void refresh();
+
+		void free_all();
+
+		void close();
+	};
+	
+	//-------------------------------------------------------------
+	// StorageHomeBase
+	//-------------------------------------------------------------
+
+	local interface StorageHomeBase 
+	{
+		StorageObjectBase find_by_short_pid(in ShortPid short_pid)
+			raises (NotFound);
+
+		CatalogBase get_catalog();
+	};
+	
+	//-------------------------------------------------------------
+	// Session
+	//-------------------------------------------------------------
+
+	local interface Session : CatalogBase 
+	{};
+
+	//-------------------------------------------------------------
+	// TransactionalSession
+	//-------------------------------------------------------------
+
+	local interface TransactionalSession : Session 
+	{
+		readonly attribute IsolationLevel default_isolation_level;
+
+		typedef short AssociationStatus;
+
+		const AssociationStatus NO_ASSOCIATION = 0;
+		const AssociationStatus ACTIVE = 1;
+		const AssociationStatus SUSPENDED = 2;
+		const AssociationStatus ENDING = 3;
+
+		void start(in CosTransactions::Coordinator transaction);
+
+		void suspend(in CosTransactions::Coordinator transaction);
+
+		void end( in CosTransactions::Coordinator transaction,
+			  in boolean success );
+
+		AssociationStatus get_association_status();
+
+		CosTransactions::Coordinator transaction();
+	};
+	
+	local interface EndOfAssociationCallback 
+	{
+		void released(in TransactionalSession session);
+	};
+
+	//-------------------------------------------------------------
+	// SessionPool
+	//-------------------------------------------------------------
+
+	typedef sequence<Pid> PidList;
+
+	local interface SessionPool : CatalogBase 
+	{
+		void flush_by_pids(in PidList pids);
+
+		void refresh_by_pids(in PidList pids);
+
+		readonly attribute TransactionPolicy transaction_policy;
+	};
+};
+
+#endif // _COS_PERSISTENT_STATE_PSDL_

@@ -1,0 +1,209 @@
+
+<!-- 
+Copyright 2001-2002 OSM SARL, All Rights Reserved.
+-->
+
+<project name="assembly" default="help" basedir=".">
+
+  <property file="local.properties"/>
+  <property file="build.properties"/>
+
+  <target name="help" >
+    <echo>
+
+      Description
+      -----------
+
+      ${project.title}
+
+      General Targets:
+      ----------------
+
+      all              - clean, build and dist
+      build            - invokes the general build target
+      javadoc          - javadoc API generation
+      dist             - executes build, javadoc and support file creation
+      clean            - destroy the build directory
+      test             - run the component
+      
+    </echo>
+  </target>
+
+  <property name="apps.path" value="../../jakarta-avalon-apps" />
+  <property name="excalibur.path" value="../../jakarta-avalon-excalibur" />
+  <property name="containerkit.path" value="${excalibur.path}/containerkit" />
+
+  <property name="lib" value="lib" />
+  <property name="src" value="src" />
+  <property name="etc" value="${src}/etc" />
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+  <property name="deploy"  value="deploy" />
+
+  <property name="javadoc.root.path"  value="${dist}/javadoc" />
+  <property name="avalon.href"  value="http://jakarta.apache.org/avalon/api/" />
+  <property name="jdk.href"  value="http://java.sun.com/j2se/1.4/docs/api/" />
+  <property name="containerkit.href"  value="../../../${containerkit.path}/dist/docs/api" />
+  <property name="overview.html" value="${etc}/overview.html" />
+  <property name="project.manifest" value="project.mf" />
+
+  <!-- classpath -->
+
+  <path id="project.classpath">
+      <fileset dir="${lib}">
+        <include name="*.jar" />
+      </fileset>
+  </path>
+
+  <!-- MAIN TARGETS -->
+
+  <target name="all" depends="clean,dist,javadoc,deploy"/>
+  <target name="dist" depends="build"/>
+
+  <target name="clean">
+     <delete dir="${build}"/>
+     <delete dir="${dist}"/>
+     <delete dir="${deploy}"/>
+  </target>
+
+  <!-- PREPARE -->
+
+  <target name="prepare"  >
+    <mkdir dir="${build}" />
+    <mkdir dir="${build}" />
+    <mkdir dir="${dist}" />
+  </target>
+
+  <!-- BLOCK -->
+
+  <target name="context" depends="prepare">
+    <mkdir dir="dist"/>
+    <uptodate property="uptodate" targetfile="${dist}/${ant.project.name}.jar">
+      <srcfiles dir="${src}/java">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${etc}">
+         <include name="${project.manifest}"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="build" depends="context,demo.build" unless="uptodate" >
+      <echo message="Building Block"/>
+      <mkdir dir="${build}/main"/>
+      <javac debug="off" destdir="${build}/main" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+        <src path="${src}/java" />
+      </javac>
+      <copy todir="${build}/main">
+        <fileset dir="${src}/java">
+          <include name="**/*.xinfo"/>
+          <include name="**/*.xml"/>
+          <include name="**/*.properties"/>
+        </fileset>
+      </copy>
+      <jar jarfile="${dist}/${ant.project.name}.jar" basedir="${build}/main" manifest="${etc}/${project.manifest}"/>
+  </target>
+
+  <target name="demo.context" depends="prepare">
+    <mkdir dir="dist"/>
+    <uptodate property="demo.uptodate" targetfile="${dist}/demo.jar">
+      <srcfiles dir="demo/src/java">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="demo/src/etc">
+         <include name="demo.mf"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="demo.build" depends="demo.context" unless="demo.uptodate" >
+      <echo message="Building Demo"/>
+      <mkdir dir="${build}/demo"/>
+      <javac debug="off" destdir="${build}/demo" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+        <src path="demo/src/java" />
+      </javac>
+      <copy todir="${build}/demo">
+        <fileset dir="demo/src/java">
+          <include name="**/*.xinfo"/>
+          <include name="**/*.xml"/>
+          <include name="**/*.properties"/>
+        </fileset>
+      </copy>
+      <jar jarfile="${dist}/demo.jar" basedir="${build}/demo" manifest="demo/src/etc/demo.mf"/>
+  </target>
+
+  <!-- UTILITY TARGETS -->
+
+  <target name="support">
+    <copy todir="${dist}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.TXT"/>
+         <include name="README.TXT"/>
+       </fileset>
+    </copy>
+  </target>
+
+  <target name="javadoc" depends="build" >
+    <echo message="path: ${javadoc.root.path}/${ant.project.name}"/>
+    <mkdir dir="${javadoc.root.path}/${ant.project.name}" />
+    <javadoc destdir="${javadoc.root.path}/${ant.project.name}" 
+	doctitle="&lt;h1&gt;${project.title}&lt;/h1&gt;" 
+      noindex="false" author="false" 
+      use="true"
+	windowtitle="Assembly" 
+      additionalparam="-breakiterator -J-Xmx128m"
+      packagenames="org.*,net.*" 
+      >
+        <sourcepath path="${src}/java"/>
+        <classpath>
+	    <path refid="project.classpath" />
+          <pathelement path="${dist}/${ant.project.name}.jar}" />
+	  </classpath>
+	  <link href="${jdk.href}" />
+	  <link href="${avalon.href}" />
+	  <link href="${containerkit.href}" />
+    </javadoc>
+  </target>
+
+  <target name="deploy" depends="build">
+     <mkdir dir="${deploy}"/>
+     <copy todir="${deploy}">
+       <fileset dir="${dist}">
+         <include name="assembly.jar"/>
+       </fileset>
+       <fileset dir="${lib}">
+         <include name="avalon-framework.jar"/>
+         <include name="logkit.jar"/>
+         <include name="excalibur-i18n-1.0.jar" />
+         <include name="excalibur-containerkit-1.0.jar" />
+         <include name="excalibur-extension-1.0a.jar" />
+         <include name="excalibur-configuration-1.0.jar" />
+         <include name="excalibur-io-1.1.jar" />
+         <include name="excalibur-util-1.0.jar" />
+       </fileset>
+     </copy>
+  </target>
+
+  <target name="kernel" depends="deploy">
+     <java jar="deploy/assembly.jar" fork="true">
+       <arg value="${src}/etc/kernel.xml"/>
+     </java>
+  </target>
+
+  <target name="patch">
+    <replace token="org.apache.excalibur.playground" value="net.osm.playground" dir="demo">
+        <include name="**/*.*"/>
+    </replace>
+    <replace token="org/apache/excalibur/playground" value="net/osm/playground" dir="demo">
+        <include name="**/*.*"/>
+    </replace>
+
+  </target>
+
+</project>

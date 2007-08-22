@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<!--
+ RegistrationAuthorityServer.xinfo
+ Copyright 2001 OSM SARL. All Rights Reserved.
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+ @author  Stephen McConnell
+ @version 1.0 28/12/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <version>1.0</version>
+  </block>
+
+  <!-- 
+  services that are offered by this block 
+  -->
+
+  <services>
+      <service name="net.osm.pki.authority.RegistrationAuthorityService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>ORB</role>
+          <service name="net.osm.orb.ORBService" version="2.3"/>
+      </dependency>
+	<dependency>
+          <role>PKI-CERTIFICATION</role>
+          <service name="net.osm.pki.authority.RequestCertificateService" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+</blockinfo>
+

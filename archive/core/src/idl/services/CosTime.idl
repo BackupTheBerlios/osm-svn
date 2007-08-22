@@ -1,0 +1,220 @@
+//File: CosTime.idl
+//Part of the Time Service
+
+#ifndef _COS_TIME_IDL_
+#define _COS_TIME_IDL_
+
+#include <TimeBase.idl>
+
+#pragma prefix "omg.org"
+
+module CosTime {
+
+	enum TimeComparison {	
+		TCEqualTo,
+		TCLessThan,
+		TCGreaterThan,
+		TCIndeterminate
+	};
+
+	enum ComparisonType{
+		IntervalC,		
+		MidC		
+	};
+
+	enum OverlapType {
+		OTContainer,
+		OTContained,
+		OTOverlap,
+		OTNoOverlap
+	};
+
+/**
+ * This exception is raised when the underlying trusted time service fails, or is 
+ * unable to provide time that meets the required security assurance.
+ */
+	exception TimeUnavailable {};
+	interface TIO;		// forward declaration
+ 
+/**
+* The UTO interface corresponds to an object that contains utc time, and is the means for
+* manipulating the time contained in the object. This interface has operations for getting
+* a UtcT type data structure containing the current value of time in the object, as well as
+* operations for getting the values of individual fields of utc time, getting absolute time
+* from relative time, and comparing and doing bounds operations on UTOs. The UTO
+* interface does not provide any operation for modifying the time in the object. It is
+* intended that UTOs are immutable.
+*/
+
+	interface UTO {
+
+/** 
+ * This is the time attribute of a UTO represented as a value of type TimeT. 
+ */
+		readonly attribute TimeBase::TimeT			time;
+
+/** 
+ * This is the inaccuracy attribute of a UTO represented as a value of type InaccuracyT. 
+ */
+		readonly attribute TimeBase::InaccuracyT	inaccuracy;
+
+/** 
+ * This is the time displacement factor attribute tdf of a UTO represented as a value 
+ * of type TdfT. 
+ */
+
+		readonly attribute TimeBase::TdfT 			tdf;
+
+/** 
+ * This attribute returns a properly populated UtcT structure with data corresponding to 
+ * the contents of the UTO.
+*/
+
+		readonly attribute TimeBase::UtcT 			utc_time;
+
+/**
+* This attribute returns a UTO containing the absolute time 
+* corresponding to the relative time in object. Absolute 
+* time = current time + time in the object. Raises
+* <CODE>CORBA::DATA_CONVERSION</CODE> exception if the 
+* attempt to obtain absolute time causes an overflow.
+*/
+		UTO absolute_time();
+
+/**
+ * Compares the time contained in the object with the time given in the input parameter
+ * uto using the comparison type specified in the in parameter comparison_type, and
+ * returns the result. See the description of TimeComparison in Section 14.2.2, Data
+ * Types, for an explanation of the result. See the explanation of ComparisonType in
+ * Section 14.2.2 for an explanation of comparison types. Note that the time in the object
+ * is always used as the first parameter in the comparison. The time in the utc parameter
+ * is used as the second parameter in the comparison.
+ */
+		TimeComparison compare_time(
+			in	ComparisonType	comparison_type,
+			in	UTO		a_uto
+		);
+
+/**
+ * Returns a TIO representing the time interval between the time in the object and the
+ * time in the UTO passed in the parameter uto. The interval returned is the interval
+ * between the midpoints of the two UTOs and the inaccuracies in the UTOs are not
+ * taken into consideration. The result is meaningless if the time base used by the two
+ * UTOs are different.
+ */
+		TIO time_to_interval(
+			in		UTO		a_uto);
+		TIO interval();
+	};
+
+/**
+ * The TIO represents a time interval and contains operations relevant to time intervals.
+ */
+	
+	interface TIO {
+
+/** 
+ * This attribute returns an IntervalT structure with the values of its fields filled 
+ * in with the corresponding values from the TIO. 
+ */
+
+		readonly attribute TimeBase::IntervalT 	time_interval;
+
+/** 
+ * This operation returns a value of type OverlapType depending on how the interval in
+ * the object and the time range represented by the parameter UTO overlap. See the
+ * definition of OverlapType in Section 14.2.2, Data Types. The interval in the object is
+ * interval A and the interval in the parameter UTO is interval B. If OverlapType is not
+ * OTNoOverlap, then the out parameter overlap contains the overlap interval, otherwise
+ * the out parameter contains the gap between the two intervals. The exception
+ * CORBA::BAD_PARAM is raised if the UTO passed in is invalid. 
+ */
+
+		boolean spans (
+			in	UTO			time,
+			out TIO			overlap);
+
+/**
+ * This operation returns a value of type OverlapType depending on how the interval in
+ * the object and interval in the parameter TIO overlap. See the definition of
+ * OverlapType in Section 14.2.2, Data Types. The interval in the object is interval A and
+ * the interval in the parameter TIO is interval B. If OverlapType is not OTNoOverlap,
+ * then the out parameter overlap contains the overlap interval, otherwise the out
+ * parameter contains the gap between the two intervals. The exception
+ * CORBA::BAD_PARAM is raised if the TIO passed in is invalid.
+ */
+
+		boolean overlaps (
+			in 	TIO			interval,
+			out TIO			overlap);
+
+/**
+ * Returns a UTO in which the inaccuracy interval is equal to the time interval in the ITO
+ * and time value is the midpoint of the interval.
+ */
+		UTO time ();
+	};
+
+/**
+ * The TimeService interface provides operations for obtaining the current time,
+ * constructing a UTO with specified values for each attribute, and constructing a TIO
+ * with specified upper and lower bounds.
+ */
+	interface TimeService {
+
+/**
+ * The universal_time operation returns the current time and an estimate of inaccuracy in
+ * a UTO. It raises TimeUnavailable exceptions to indicate failure of an underlying time
+ * provider. The time returned in the UTO by this operation is not guaranteed to be secure
+ * or trusted. If any time is available at all, that time is returned by this operation.
+ */
+		UTO universal_time()
+			raises(TimeUnavailable);
+
+/**
+ * The secure_universal_time operation returns the current time in a UTO only if the
+ * time can be guaranteed to have been obtained securely. In order to make such a
+ * guarantee, the underlying Time Service must meet the criteria to be followed for
+ * secure time, presented in Appendix A, Implementation Guidelines. If there is any
+ * uncertainty at all about meeting any aspect of these criteria, then this operation must
+ * return the TimeUnavailable exception. Thus, time obtained through this operation can
+ * always be trusted.
+ */
+		UTO secure_universal_time()
+			raises(TimeUnavailable);
+
+/**
+ * The new_universal_time operation is used for constructing a new UTO. The
+ * parameters passed in are the time of type TimeT and inaccuracy of type InaccuracyT.
+ * This is the only way to create a UTO with an arbitrary time from its components. This
+ * is expected to be used for building UTOs that can be passed as the various time
+ * arguments to the Timer Event Service, for example. CORBA::BAD_PARAM is
+ * raised in the case of an out-of-range parameter value for inaccuracy.
+ */
+		UTO new_universal_time(
+			in TimeBase::TimeT			time,
+			in TimeBase::InaccuracyT	inaccuracy,
+			in TimeBase::TdfT			tdf);
+/**
+ * The uto_from_utc operation is used to create a UTO given a time in the UtcT form.
+ * This has a single in parameter UTC, which contains a time together with inaccuracy
+ * and tdf. The UTO returned is initialized with the values from the UTC parameter. This
+ * operation is used to convert a UTC received over the wire into a UTO.
+ */
+
+		UTO uto_from_utc(
+			in TimeBase::UtcT			utc);
+
+/**
+ * The new_interval operation is used to construct a new TIO. The parameters are lower
+ * and upper, both of type TimeT, holding the lower and upper bounds of the interval. If
+ * the value of the lower parameter is greater than the value of the upper parameter, then
+ * a CORBA::BAD_PARAM exception is raised.
+ */
+		TIO new_interval(
+			in TimeBase::TimeT			lower,
+			in TimeBase::TimeT			upper);
+	};
+};
+
+#endif /* ifndef _COS_TIME_IDL_ */

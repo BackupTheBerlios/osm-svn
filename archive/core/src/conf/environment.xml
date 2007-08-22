@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+
+<!--
+Copyright 2000-2001 OSM SARL All Rights Reserved.
+This configuration is the proprietary information of OSM SARL.
+Use is subject to license terms.  Components of this document 
+are derived from prior work of the Apache Software
+Foundation open source projects.
+
+@author  Stephen McConnell <mailto:mcconnell@osm.net>
+@version 1.0 24 DEC 2000
+-->
+
+<!--
+environment.xml
+Basic config file that sets up environment context for the application.
+-->
+
+<environment>
+
+    <logs>
+
+      <category name="" target="default" priority="INFO" />
+
+      <category name="vault" target="default" priority="DEBUG" />
+      <category name="orb" target="default" priority="DEBUG" />
+      <category name="pss" target="default" priority="DEBUG" />
+      <category name="ins" target="default" priority="INFO" />
+      <category name="time" target="default" priority="INFO" />
+      <category name="portal" target="default" priority="INFO" />
+
+      <category name="gateway" target="gateway" priority="DEBUG" />
+      <category name="supplier" target="gateway" priority="DEBUG" />
+      <category name="workspace" target="gateway" priority="DEBUG" />
+      <category name="desktop" target="gateway" priority="DEBUG" />
+      <category name="user" target="gateway" priority="DEBUG" />
+      <category name="task" target="gateway" priority="DEBUG" />
+      <category name="generic" target="gateway" priority="DEBUG" />
+      <category name="processor" target="gateway" priority="DEBUG" />
+      <category name="community" target="gateway" priority="DEBUG" />
+      <category name="finder" target="gateway" priority="DEBUG" />
+      <category name="repository" target="pki" priority="DEBUG" />
+      <category name="authority" target="pki" priority="DEBUG" />
+      <category name="certification" target="pki" priority="DEBUG" />
+      <category name="certification-processor" target="gateway" priority="DEBUG" />
+      <category name="pki" target="gateway" priority="DEBUG" />
+
+      <log-target name="default" location="/logs/default.log" />
+      <log-target name="gateway" location="/logs/gateway.log" />
+      <log-target name="pki" location="/logs/pki.log" />
+
+    </logs>
+
+    <policy>
+      <grant code-base="file:${app.home}${/}SAR-INF${/}lib${/}*">
+        <permission class="java.security.AllPermission" />
+      </grant>
+    </policy>
+
+</environment>

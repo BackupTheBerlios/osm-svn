@@ -1,0 +1,170 @@
+/**
+ */
+
+#ifndef _SESSION_RESOURCE_PSDL_
+#define _SESSION_RESOURCE_PSDL_
+#include <Session.idl>
+#include <list.psdl>
+#include <realm.idl>
+#include <sps.psdl>
+
+#pragma prefix "osm.net"
+
+module session 
+{
+
+module resource
+{
+
+    //
+    // IdentifiableDomainObject
+    //
+
+   /**
+    * Abstract defintion of the state members representing an IdentifiableDomainObject.
+    * This abstract defintion is inherited by AbstractResourceStorage and ConsumerStorage.
+    * @see org.omg.Session.IdentifiableDomainObject
+    */
+    abstract storagetype IdentifiableDomainObjectStorage
+    {
+
+	 /**
+        * Short PID of a <code>DomainStorage</code> within which
+        * the object identity is scoped.
+        */
+	  readonly state CORBA::OctetSeq domain_short_pid;
+
+        /**
+        * Random int identifier unique within the scope of the issuing domain.
+        */
+        readonly state long random;
+
+    };
+
+    //
+    // AbstractResource
+    //
+
+   /**
+    * An AbstractResourceStorage defines the interface to a storage 
+    * type for the OMG Task and Session AbstractResource.  As an 
+    * IdentifiableObject, the abstract resource is declared within a 
+    * specific domain.  The implementation assumes that the domain
+    * is a static value, qualified in the server configuration file
+    * and as such is not included in the instance state.  However,     
+    * a identifiable object has a random integer which is maintained 
+    * under the <code>random</code> state member.  An abstract resource
+    * is a type of BaseBusienssObject and as such exposed a creation
+    * date (readonly as this is never modified), a modication date, and 
+    * a last access date.  A base business object also supports the 
+    * registration of event subscriptions by clients (acting in the 
+    * role of event consumers).  The subscriptions state field maintains
+    * a list of entries referencing subscription  pid values, each 
+    * referrring to an instance of the persistent storage object which 
+    * refers to the consumer registering interest in events from this 
+    * resource. The final state member <code>name</name> contains the 
+    * current name of the abstract resource.
+    * @see org.omg.Session.AbstractResource
+    */
+    abstract storagetype AbstractResourceStorage : IdentifiableDomainObjectStorage
+    {
+
+       /**
+        * Owning principal.
+        */
+        state realm::StandardPrincipal owner;
+
+       /**
+        * Creation date.
+        */
+        readonly state unsigned long long creation;
+
+       /**
+        * Last modification date.
+        */
+        state unsigned long long modification;
+
+       /**
+        * Last access date.
+        */
+        state unsigned long long access;
+
+       /**
+        * Name of this resource.
+        */
+        state string name;
+
+       /**
+        * A reference to a 0..1 Task that is producing this AbstractResource,
+        * where the reference is maintained under a ProducedBy link.
+        */
+        state Session::ProducedBy produced_by;
+
+       /**
+        * LinkedList of references to Workspaces that this AbstractResource is 
+	  * contained by.
+        */
+        readonly state list::LinkedList collected_by;
+
+       /**
+        * LinkedList of references to Tasks that are using this AbstractResource,
+	  * where the references are maintained as ConsumedBy links.
+        */
+        readonly state list::LinkedList consumed_by;
+
+       /**
+        * LinkedList of subscribers.
+        */
+        readonly state sps::PublisherStorage publisher;
+
+    };
+
+   /**
+    * AbstractResourceStorageHome is the persistent repository of all 
+    * AbstractResourceStorage instances.
+    */
+    abstract storagehome AbstractResourceStorageHome of AbstractResourceStorage 
+    {
+       /**
+        * Locates a resource given the domain persitent identifier, 
+	  * the random identifier and creation date. 
+        */
+	  key identifier( random );
+
+       /**
+        * Creation of a new AbstractResourceStorage instance based on a 
+        * supplied AbstractResourceKey, modification and last access date, an
+        * empty SubscriptionStorageList valuetype and the resource name.
+        */
+        factory create( 
+		owner, 
+		domain_short_pid, 
+		random, 
+		creation, 
+		modification, 
+		access, 
+		name, 
+		produced_by 
+	  );
+    };
+
+    //
+    // AbstractResourceStorageBase
+    //
+
+    storagetype AbstractResourceStorageBase
+    implements AbstractResourceStorage
+    {
+        stores collected_by as ref<list::LinkedListBase>;
+        stores consumed_by as ref<list::LinkedListBase>;
+        stores publisher as ref<sps::PublisherStorageBase>;
+    };
+
+    storagehome AbstractResourceStorageHomeBase of AbstractResourceStorageBase
+    implements AbstractResourceStorageHome
+    { 
+    };
+};
+};
+
+#endif // _SESSION_RESOURCE_PSDL_

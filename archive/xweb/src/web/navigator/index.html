@@ -1,0 +1,41 @@
+<HTML>
+<HEAD><title>OSM Navigator</title>
+<script type="text/javascript">
+
+ /*
+  Set the url of the content panel to the supplied value.
+  */
+
+  function reloadHeader( ) 
+  {
+     this.frames['header'].window.location.reload;
+  };
+
+ /*
+  Set the url of the content panel to the supplied value.
+  */
+
+  function setLocation( url ) 
+  {
+     this.frames['main'].window.location=url;
+  };
+
+ /*
+  Set the url of the content panel to the supplied value.
+  */
+
+  function setContentLocation( url ) 
+  {
+     this.frames['main'].window.location=url;
+  };
+
+</script>
+
+</HEAD>
+
+<frameset rows="49,*" BORDER=1 FRAMEBORDER=1 FRAMESPACING=0 >
+		<frame name="header" src="nothing.html" SCROLLING="no" NORESIZE/>
+		<frame name="main" src="body.jsp?root=true&view=contents"/>
+</frameset>
+
+</HTML>

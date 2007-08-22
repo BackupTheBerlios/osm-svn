@@ -1,0 +1,432 @@
+<!-- 
+TITLE:
+
+	Digital Product Modeling Language (DPML) DTD specification 2.0.
+	Copyright OSM SARL, 1999-2000
+
+PURPOSE: 
+
+	This DTD defines the structural semantics of the data types used in 
+	the construction of digital products supporting distributed 
+	collaborative business process descriptions. Additional information 
+      concerning DPML and related mapping, standardisation and deployment 
+      activities are available under http://home.osm.net.
+
+VERSION:
+
+      Last Update: 19 November 2000, Stephen McConnell, OSM
+      Version: 2.0.3
+      Status: DRAFT
+
+TYPICAL INVOCATION: 
+
+	# <!DOCTYPE my_digital_product PUBLIC 
+	# "-//OSM//DTD Specification::DPML//EN" 
+	# "http://home.osm.net/formal/DPML.dtd">
+
+-->
+
+<!--
+The criteria ENTITY is defined as the set of concrete criteria types that can be contained as the root element within a DPML document.  The DPML root ELEMENT declaration defines the set of elements types that can be declared as a root element.  The elements generic (GenericCriteria), community (CommunityCriteria), agency (AgencyCriteria), encounter (EncounterCriteria), external (ExternalCriteria) and processor (ProcessorCriteria) all map directly to criteria valuetypes.  In the case of vote, engage and collaboration the elements map to an instance of ProcessorCriteria where the contained model is an instance of VoteModel, EngagementModel, and CollaborationModel respectively.
+-->
+
+	<!ENTITY % criteria "(user|generic|community|agency|encounter|processor|external|vote|engagement|collaboration)">
+	<!ELEMENT DPML (%criteria;)>
+
+<!--
+The control ENTITY is a declaration that defines an identifying name and description attribute.  These attribute declarations correspond to the state fields of the base type Control from the CommunityFramework.  The actional ENTITY is defined for the special case of the action element where the existance of a label is optional.
+-->
+
+	<!ENTITY % label "label ID #REQUIRED">
+	<!ENTITY % note "note CDATA #IMPLIED">
+	<!ENTITY % control "%label; %note;">
+
+<!--
+The input and output elements define consumption and production statements that can be associated to process centric criteria. Both input and output are derived from the abstract UsageDescriptor exposed by a ProcessorModel usage state field. The value contained by the type field shall be consistent with the XMI Production Rules, specifically, types shall be declared in accordance with their IDL interface repository identifier.  For example, a GenericResource would be identified by the string IDL:omg.org/CommunityFramework:2.0.  The value of the tag field corresponds to the tag attributed to a usage link (refer Production and Consumption - Task and Session Specification).  The implied attribute states that a usage link of the tag is required as distinct from optional.  The implied attribute, if true, states that if the tagged link already exists on the controlling Task, that link is implied - whereas a false value states that the link must be explicitly set (possible resulting in the replacement of an existing link with the same tag value).
+
+IDL:omg.org/CommunityFramework::InputDescriptor:2.0.
+IDL:omg.org/CommunityFramework::OutputDescriptor:2.0.
+-->
+
+	<!ENTITY % tag "tag CDATA #REQUIRED">
+	<!ENTITY % required "required (TRUE|FALSE) 'TRUE'">
+	<!ENTITY % implied "implied (TRUE|FALSE) 'TRUE'">
+	<!ENTITY % type "type CDATA #REQUIRED">
+
+	<!ELEMENT input EMPTY >
+	<!ATTLIST input  
+            %tag; %required; %implied; %type;
+	>
+
+	<!ELEMENT output EMPTY >
+	<!ATTLIST output  
+		%tag; %type;
+	>
+
+<!--
+The copy, move, create and remove directives are instructions that can be declared within the scope of a referral, a trigger, or an on post-condition statement. These directives declare actions to be taken by an implementation of CollaborationProcessor that effect tagged usage relationships on the coordinating Task or Encounter.   Usage directives enable the declaration of operators that result in the manipulation of usage associations such as renaming or duplication of an association, inversion of an association from consumption to production, or retraction of an association.
+
+IDL:omg.org/CollaborationFramework::Remove:2.0 // remove
+IDL:omg.org/CollaborationFramework::Duplicate:2.0 // copy
+IDL:omg.org/CollaborationFramework::Move:2.0 // move
+IDL:omg.org/CollaborationFramework::Constructor:2.0 // create
+-->
+
+	<!ENTITY % source "source CDATA #REQUIRED">
+	<!ENTITY % target "target CDATA #REQUIRED">
+	<!ENTITY % switch "switch (TRUE|FALSE) 'FALSE'">
+	<!ENTITY % directive.attributes "%source; %target; %switch;">
+
+	<!ELEMENT copy EMPTY>
+	<!ATTLIST copy
+		%directive.attributes;
+	>
+
+	<!ELEMENT move EMPTY>
+	<!ATTLIST move
+		%directive.attributes;
+	>
+
+	<!ELEMENT create (target,%criteria;) >
+	<!ATTLIST create
+		%target;
+	>
+
+	<!ELEMENT remove EMPTY >
+	<!ATTLIST remove
+		%source;
+	>
+	<!ENTITY % directive.content "((create|copy|move|remove)*)" >
+
+<!--
+An initialization ELEMENT is a type of transitional action.  It qualifies the containing state as a candidate for establishment of the active-state when starting a processor. A processor may be initialized through the apply operation on the abstract Collaboration interface, or implicitly through starting a CollaborationProcessor. 
+
+IDL:omg.org/CollaborationFramework::Initialization:2.0.
+-->
+
+	<!ELEMENT initialization (input*) >
+
+<!--
+A transition ELEMENT declares a target state facilitating modification of a CollaborationProcessor active state path.  Modification of the active state path establishes a new collaborative context, enabling a new set of triggers guard conditions and timeouts based on declared clocks.  A transition element may also contain any number of input statements enabling declaration of required or optional arguments to be supplied under the Collaboration apply_arguments operation.
+
+IDL:omg.org/CollaborationFramework::SimpleTransition:2.0
+-->
+
+	<!ELEMENT transition (input*) >
+	<!ATTLIST transition 
+		target IDREF #IMPLIED
+	>
+	
+<!--
+The local ELEMENT defines a transition to the current active-state and exposes a clock timeout reset policy.  If the reset policy is true, all timeout conditions established under the active state path shall be re-initialized. A local transition element may also contain any number of input statements enabling declaration of required or optional arguments to be supplied under the Collaboration apply_arguments operation.
+
+IDL:omg.org/CollaborationFramework::LocalTransition:2.0.
+-->
+
+	<!ELEMENT local (input*) >
+	<!ATTLIST local 
+		reset (TRUE|FALSE) "FALSE"
+	>
+	
+<!--
+A termination declares a processors termination within completion status. The ENTITY completion declares a completion class and code.  It is used within a termination element to declare a SUCCESS or FAILURE result status and implementation specific result code.  The termination element can contain any number of output declarations.
+
+IDL:omg.org/CollaborationFramework::Completion:2.0
+IDL:omg.org/CollaborationFramework::TerminalTransition:2.0
+-->
+
+	<!ENTITY % class "class (SUCCESS|FAILURE) 'SUCCESS'">
+	<!ENTITY % code "code CDATA #IMPLIED">
+	<!ENTITY % completion "%class; %code;">
+
+	<!ELEMENT termination (output*)  >
+	<!ATTLIST termination
+		%completion;
+	>
+
+<!--
+The generic ELEMENT is used to define the valuetype GenericCriteria, used as an argument to a ResourceFactory to construct resources containing arbitrary content contained within a CORBA any. Instances of GenericResource provide a convenience container for arbitrary resource association (such as the subject of a negotiation or XML document defining contractual terms). 
+
+IDL:omg.org/CommunityFramework::GenericCriteria:2.0.  
+-->
+
+	<!ELEMENT generic (context*) >
+	<!ATTLIST generic 
+		%control;
+	>
+
+<!--
+The community ELEMENT describes an instance of CommunityCriteria.  CommunityCriteria may be used as an argument to a ResourceFactory to construct a new instance of Community.  Community is a type of Workspace (refer Task and Session) that supports the abstract Membership interface.
+
+IDL:omg.org/CommunityFramework::CommunityCriteria:2.0. 
+-->
+
+	<!ELEMENT community (membership, (context*)) >
+	<!ATTLIST community  
+		%control;
+	>
+
+<!--
+The agency ELEMENT represents the AgencyCriteria valuetype that may be passed as an argument to a ResourceFactory resulting in creation of a new Agency instance.  Agency is a type of Community with inheritance from LegalEntity.  Agency represents a community against which supplementary implementation specific policy can be associated (such as applicable legal domain).
+
+IDL:omg.org/CommunityFramework::AgencyCriteria:2.0
+-->
+
+	<!ELEMENT agency (membership, (context*)) >
+	<!ATTLIST agency
+		%control;
+	>
+
+<!--
+The encounter ELEMENT defines an EncounterCriteria against which new instances of Encounter can be created using a ResourceFactory.  Encounter is a type of Task that serves as a controller of Processor instances.  Encounter, as a Membership, may be associated to may users. Through inheritance of Task exactly one User is associated as owner of an Encounter.
+
+IDL:omg.org/CollaborationFramework::EncounterCriteria:2.0
+-->
+
+	<!ELEMENT encounter (membership,context*) >
+	<!ATTLIST encounter 
+		%control;
+	>
+
+<!--
+External describes the ExternalCriteria valuetype.  ExternalCriteria contains a public and system identifier of a remote resource.  The public and system identifiers contained within an external declaration are factory dependent. For example, a factory implementation with knowledge of DPML can use external criteria as a means through which criteria can be inferred.  Other examples of external criteria application include embedding of interoperable naming URLs.  An external element may include any number of input and output statements.  
+
+IDL:omg.org/CommunityFramework::ExternalCriteria:2.0.
+-->
+
+	<!ELEMENT external ((input|output)*,context*)>
+	<!ATTLIST external 
+		%control;
+		public CDATA #IMPLIED
+		system CDATA #REQUIRED
+	>
+
+<!--
+The processor element contains input and output declarations and a named value pair sequence defining factory criteria. Input and output declarations define the resources that a processor implementation requires as input, and the resources that will be produced by the processor. Supplimentatory processor criteria is contained under the context (named value pair) sequence.  An implementation is responsible for mapping of context values to a named value pair sequence as defined by the CosLifeCycle Criteria type specification.
+
+IDL:omg.org/CollaborationFramework::ProcessorCriteria:2.0.
+-->
+
+	<!ELEMENT processor ((input|output)*, context*)>
+	<!ATTLIST processor 
+		%control;
+	>
+
+<!--
+The vote element defines ProcessorCriteria containing a VoteModel (referred to as vote criteria).   Vote criteria, when passed to a ResourceFactory, results in the establishment of a new instance of VoteProcessor. Using a VoteProcessor, members of a coordinating Encounter can register votes in support of, in opposition to, or abstain relative to a subject.  VoteProcessor raises a result status indicating the successful or failure status of a voting process.
+
+IDL:omg.org/CollaborationFramework::ProcessorCriteria:2.0 
+IDL:omg.org/CollaborationFramework::VoteModel:2.0  // model 
+-->
+
+	<!ENTITY % numerator "numerator CDATA #REQUIRED" >
+	<!ENTITY % denominator "denominator CDATA #REQUIRED" >
+	<!ENTITY % quorum "%numerator; %denominator;" >
+
+	<!ELEMENT vote ((input|output)*, context*)>
+	<!ATTLIST vote 
+		%control; 
+		%quorum;
+		policy (AFFERMATIVE|NON_ABSTAINING) "AFFERMATIVE"
+		single (TRUE|FALSE) "TRUE" 
+		lifetime CDATA #IMPLIED
+	>
+
+<!--
+Engagement defines a ProcessorCriteria that contains an EngagementModel.  When passed as an argument to a ResourceFactory, such a criteria will result in the creation of a new instance of EngagementProcessor. EngagementProcessor declares policy enabling the attribution of proofs and evidence in the establishment of binding agreements.
+
+IDL:omg.org/CollaborationFramework::ProcessorCriteria:2.0 
+-->
+
+	<!ELEMENT engagement ((input|output)*,context*)>
+	<!ATTLIST engagement 
+		%control; 
+		policy CDATA #IMPLIED
+	>
+
+<!--
+The collaboration element defines ProcessorCriteria criteria containing a CollaborationModel (referred to as Collaboration Criteria).  Collaboration criteria, when passed as an argument to a ResourceFactory results in the creation of a new instance of CollaborationProcessor.  CollaborationProcessor is a type of Processor that contains a CollaborationModel as the definition of the rules of engagement between a set of members associated under a controlling Encounter.
+
+IDL:omg.org/CollaborationFramework::ProcessorCriteria:2.0 
+IDL:omg.org/CollaborationFramework::CollaborationModel:2.0  // model 
+-->
+
+	<!ELEMENT collaboration ((input|output)*, role?, state, context*) >
+	<!ATTLIST collaboration
+		%control; 
+	>
+
+<!--
+The launch element defines a Launch valuetype, itself a type of Guard that is contained by a Trigger.  Guards establish preconditions to the activation of actions contained within triggers.  In the case of Launch, the preconditions concern the implicit role of a user and optionally explicit association of a user under a particular role. Implicit preconditions declare three enumeration values INITIATOR, the principal that invoked that last collaborative action, or in the case of no prior action, a member of the controlling Encounter; RESPONDENT, any principal other than the initiator; and PARTICIPANT, any principal associated to the controlling Encounter.  These implicit role are dynamically maintained by an implementation of CollaborationProcessor.  Implicit roles can be further qualified by declaration of a role name that a principal must be associated to under the coordinating Encounter (such as "customer", "supplier", etc.).
+
+IDL:omg.org/CollaborationFramework::Launch:2.0.  
+IDL:omg.org/CollaborationFramework::TriggerMode:2.0 
+-->
+
+	<!ENTITY % mode "mode (INITIATOR|RESPONDENT|PARTICIPANT) 'PARTICIPANT'">
+
+	<!ELEMENT launch EMPTY >
+	<!ATTLIST launch 
+		%mode; 
+		role IDREF #IMPLIED
+	>
+
+<!--
+A clock defines a Clock valuetype.  Clock contains a timeout declaration.  When the containing state enters the Active-state path the clock countdown is enabled.  Clock resetting is possible through invocation of a local transition.  Clock disabling is possible by changing the active state path such that the containing state is no longer active.  On timeout of a clock, an implementation of CollaborationProcessor is responsible for invoking the action contained by the Trigger containing the clock declaration.  A typical application of the clock operator is to automatically trip a state transition after a predetermined period of in-activity.
+
+IDL:omg.org/CollaborationFramework::Clock:2.0.
+-->
+
+	<!ELEMENT clock EMPTY >
+	<!ATTLIST clock 
+		timeout CDATA #IMPLIED
+	>
+
+<!-- 
+A referral references the ID of an action to apply. An implementation of Collaboration is responsible for management of the branching of the collaboration state to the identified action and in the case of compound transition, to execute on statements arising from sub-process conclusion.
+
+IDL:omg.org/CollaborationFramework::Referral:2.0.
+-->
+
+	<!ELEMENT referral %directive.content; >
+	<!ATTLIST referral
+		action IDREF #REQUIRED
+	>
+
+<!--
+A compound transition is not directly represented in the DPML schema as an element.  Instead, it is represented in terms of an ENTITY content rule associating a processor criteria (or element expandable to a processor criteria) and result mapping.  While simplifying DPML structure, the flattening of criteria and action results in the requirement for a compound action label to be equivalent to the model contained by a compound action.
+
+IDL:omg.org/CollaborationFramework::CompoundTransition:2.0.
+-->
+
+	<!ENTITY % compound "((external|process|collaboration|vote|engagement), (on+))">
+
+<!-- 
+A trigger contains a guard, directive operators, an action, and a priority attribute.  Triggers are referenced by their label under the Collaboration interface apply operation.  An implementation of Collaboration takes trigger labels as execution instructions that enable client to manipulate collaborative context.  An implementation of apply is responsible for assessing guard preconditions, following which apply requests and associated usage directives are queued relative to Trigger priorities.  On execution and implementation is responsible for executing usage directives before executing the action contained within the trigger.
+
+IDL:omg.org/CollaborationFramework::Guard:2.0.
+IDL:omg.org/CollaborationFramework::Trigger:2.0.
+-->
+
+	<!ENTITY % guard "(launch|clock)">
+	<!ENTITY % priority "priority CDATA #IMPLIED">
+	<!ENTITY % transitional "(initialization|transition|local|termination)">
+	<!ENTITY % action "(%transitional;|referral|%compound;)">
+
+	<!ELEMENT trigger (%guard;,%directive.content;,%action;)>
+	<!ATTLIST trigger 
+		%control;
+		%priority;
+	>
+
+<!--
+A compound transition content declaration associates processor criteria that may be executed as a sub-process with a set of on statements.  Each on statement declares an action to apply given a particular result of the process executed as a result of criteria expansion.  On statements are defined by class and result code.  An implementation of collaboration is responsible for matching sub-process result class and sub-codes and subsequent firing of the declared action.
+
+IDL:omg.org/CollaborationFramework::Map:2.0.
+-->
+
+	<!ELEMENT on (%directive.content;,%action;) >
+	<!ATTLIST on
+		%class;
+		%code;
+	>
+
+<!-- 
+A "state" is an element containing a set of sub-states and associated triggers. State elements a the basic building blocks for collaborative context.  Each state element can contain sub-states and each state element can contain any number of Trigger declarations.  A Collaboration implementation maintains the notion of active-state following initialization of the collaboration and tracks active-state relative to the last transition that has been invoked.  The active state path is the set of states between the active state and the root-state of the CollaborationModel.  All triggers declared within the active-state path are considered candidates relative to the apply operation.  By modifying the active state (and by consequence the active-state path) the collaborative content and available trigger options available to the associated membership are modified relative to the constraints and directives declared under exposed triggers.
+
+IDL:omg.org/CollaborationFramework::State:2.0.
+-->
+
+	<!ELEMENT state ((trigger|state)*)>
+	<!ATTLIST state
+		%control;
+	>
+
+<!--
+Membership is a model of the policy and roles that establish the notion of a group of users sharing the same set of rules.  This element is used within the structural definition of criteria such as community, agency and encounter.
+
+IDL:omg.org/CommunityFramework::MembershipModel:2.0.
+-->
+
+	<!ELEMENT membership (membership.policy?, role) >
+
+<!--
+The membership.policy ELEMENT declares privacy and exclusivity constraints on the membership.  The membership.policy element is contained within the membership element.  MembershipPolicy declares an exclusivity attribute that if true, ensures that all members of a membership are uniquely represented in terms of identifiable principals (i.e. no principal may be represented more than once).  The privacy attribute qualifies the level of information that may be disclosed about the business roles attributed to a given member via operation of the Membership abstract interface.
+
+IDL:omg.org/CommunityFramework::MembershipPolicy:2.0.
+-->
+
+	<!ELEMENT membership.policy EMPTY>
+	<!ATTLIST membership.policy
+		privacy (PUBLIC|RESTRICTED|PRIVATE) "PUBLIC"
+		exclusivity (TRUE|FALSE) "TRUE"
+	>
+
+<!--
+Role is a specification of the state of a business role that may be abstract or concrete depending on the value of the abstract attribute.  A role element exposes a quorum and ceiling through the contained role.policy element.  Business roles such as "supplier" or "customer" can be packaged under higher-level roles such as "signatory".  Association of the status of "signatory" to both supplier and customer can be achieved by locating supplier and customer as sub-roles of a parent role named "signatory".  Roles can then be used as conditional guards concerning access to triggers within the body of collaboration models.
+
+IDL:omg.org/CommunityFramework::Role:2.0.
+-->
+
+	<!ELEMENT role (role.policy?,role*) >
+	<!ATTLIST role
+		%control;
+		abstract (TRUE|FALSE) "FALSE"
+	>
+
+<!--
+Role policy is an element that defies the state of a RolePolicy valuetype. RolePolicy is used as a container of the policy attributed to a specific name business role that includes ceiling and quorum values, policy concerning quorum assessment and policy concerning the connection status of a user relative to quorum calculations.
+
+IDL:omg.org/CommunityFramework::RolePolicy:2.0.
+-->
+
+	<!ELEMENT role.policy EMPTY >
+	<!ATTLIST role.policy
+		ceiling CDATA #IMPLIED
+		quorum CDATA #IMPLIED
+		assessment (STRICT|LAZY) "LAZY"
+		policy (SIMPLE|CONNECTED) "SIMPLE"
+	>
+
+
+<!--
+Named value pairs are used as descriptive arguments to generic resource criteria.  A sequence of context elements can be mapped to a CosLifeCycle::Criteria type as exposed by the Criteria type.
+ 
+IDL:omg.org/CosLifeCycle::NameValuePair:1.0.
+
+While interpretation of context values is implementation dependant, the following rules shall apply to values expressing IDL types:
+
+1. Basic IDL types are represented by a string containing the name of the type. The type is
+   derived from the CORBA TypeCode TCKind by deleting the leading "tk_". This rule follows
+   the convention used in section 5.3.10.2 (CorbaTypeName) of the XMI 1.0 specification
+   (formal/00-06-01). Example: the string representation of the type long is "long" that of 
+   unsigned long long is "ulonglong".
+2. Sequences of basic IDL types are represented by a string containing the type-specifier in 
+   IDL syntax without any spaces. That is, a sequence of XXXs is coded as "sequence<XXX>"
+   where XXX is the name of the string found using rule 1.
+   Example: A sequence of longs is represented by "sequence<long>".
+3. For other data types, the repository ID is used.
+   Example: the CollaborationProcessor is represented by
+   "IDL:omg.org/CollaborationFramework/CollaborationProcessor:2.0".
+-->
+	
+	<!ELEMENT context (context*) >
+	<!ATTLIST context 
+		name CDATA #REQUIRED
+		value CDATA #REQUIRED
+	>
+
+<!--
+The user element contains a named value pair sequence defining the inital properties to attrbute to the User instance created under a ResourceFactory.
+
+IDL:osm.net/hub/home::UserCriteria:2.0
+-->
+
+	<!ELEMENT user (context*)>
+	<!ATTLIST user 
+		%control;
+	>
+
+<!--
+EOF
+-->

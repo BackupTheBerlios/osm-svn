@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<!--
+DefaultVault.xinfo
+Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+This software is the proprietary information of OSM SARL.  
+Use is subject to license terms.
+  
+@author  Stephen McConnell
+@version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <name>vault</name>
+    <version>1.0</version>
+  </block>
+
+  <!-- 
+  The DefaultVault block provides local public-key and certificate 
+  management.
+  -->
+
+  <services>
+    <service name="net.osm.vault.Vault" version="1.0" />
+  </services>
+
+  <implementation policy="SINGLETON"/>
+
+</blockinfo>

@@ -1,0 +1,49 @@
+//File: CosObjectIdentity.idl
+//Part of the Relationship Service
+
+#ifndef _COS_OBJECT_IDENTITY_IDL_
+#define _COS_OBJECT_IDENTITY_IDL_
+#pragma prefix "omg.org"
+
+/**
+ * Provides supporting services for the attribution of identity to an object.
+ */
+
+module CosObjectIdentity {
+
+     /**
+	* Type used as an object identifier.
+      */
+
+	typedef unsigned long ObjectIdentifier;
+
+     /**
+	* Objects supporting the IdentifiableObject interface define an attribute of type
+	* ObjectIdentifier. The value of the attribute must not change during the lifetime of the
+	* object.
+	* A typical client use of this attribute is as a key in a hash table. As such, the more
+	* randomly distributed the values are, the better.
+	* The value of this attribute is not guaranteed to be unique; that is, another identifiable
+	* object can return the same value. However, if objects return different identifiers,
+	* clients can determine that two identifiable objects are not identical.
+      */
+
+	interface IdentifiableObject {
+
+	     /**
+		* Object identifier.
+      	*/
+
+		readonly attribute ObjectIdentifier constant_random_id;
+
+	     /**
+		* Determination if two identifiable objects have the same identifier.
+      	*/
+
+		boolean is_identical (
+			in IdentifiableObject other_object);
+	};
+
+};
+        
+#endif /* ifndef _COS_OBJECT_IDENTITY_IDL_ */

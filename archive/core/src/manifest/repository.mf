@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: OSM SARL
+
+Name: net/osm/pki/repository/RepositoryServer.class
+Avalon-Block: true

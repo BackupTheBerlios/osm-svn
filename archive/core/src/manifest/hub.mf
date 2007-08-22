@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Created-By: OSM SARL
+
+Name: net/osm/hub/gateway/Gateway.class
+Avalon-Block: true
+
+Name: net/osm/hub/sps/StructuredPushSupplierServer.class
+Avalon-Block: true
+
+Name: net/osm/hub/workspace/WorkspaceServer.class
+Avalon-Block: true
+
+Name: net/osm/hub/desktop/DesktopServer.class
+Avalon-Block: true
+
+Name: net/osm/hub/user/UserServer.class
+Avalon-Block: true
+
+Name: net/osm/hub/task/TaskServer.class
+Avalon-Block: true
+
+Name: net/osm/hub/generic/GenericResourceServer.class
+Avalon-Block: true
+
+Name: net/osm/hub/processor/ProcessorServer.class
+Avalon-Block: true
+
+Name: net/osm/hub/community/CommunityServer.class
+Avalon-Block: true
+
+Name: net/osm/hub/gateway/FinderServer.class
+Avalon-Block: true

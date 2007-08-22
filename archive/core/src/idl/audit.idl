@@ -1,0 +1,176 @@
+/*
+ * audit.idl
+ *
+ * Copyright 2000-2001 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.1 2 APR 2001
+ */
+
+#ifndef _AUDIT_IDL_
+#define _AUDIT_IDL_
+#include <Session.idl>
+#include <CosNotification.idl>
+#pragma prefix "osm.net"
+
+module audit
+{
+   module home
+   {
+
+      native RemoteEventListener;
+
+     /**
+      * Exception raised by a Manager indicating a problem while
+      * attempting to subscribe to a resource.
+      */
+     
+	exception ManagerException
+	{
+		string message;
+	};
+
+	typedef sequence<CosNotification::StructuredEvent> StructuredEventSequence;
+
+	/**
+	* An iterator of Workspace instances.
+	*/
+
+	interface EventIterator : CosCollection :: Iterator { };
+
+     /**
+      * Adapter is an extension of an IdentifiableDomainConsumer that provides support
+      * for the persistent storage of incomming events from a principal resource.
+	*/
+
+	interface Adapter : Session::IdentifiableDomainConsumer
+	{
+
+           /**
+            * Issue a request to the associated supplied to establish
+	      * a connected state whereup event delivery will be initiated.
+	      */
+		void connect();
+
+           /**
+            * Issue a request to the associated supplied to establish
+	      * a disconnected state whereup event delivery will be suspended.
+	      */
+		void disconnect();
+
+           /**
+            * Returns the connected state of the adapter.
+            */
+            boolean connected();
+
+           /**
+            * Returns the list of event types that the adapter has subscribed to.
+            */
+            CosNotification::EventTypeSeq subscription();
+
+           /**
+            * Returns the primary object reference that the adapter 
+	      * is listening to.
+	      */
+		Session::AbstractResource principal();
+
+           /**
+            * Returns an object reference to this adapter under the 
+            * IdentifiableDomainConsumer interface.
+            */
+            Session::IdentifiableDomainConsumer idc();
+
+           /**
+            * Test if the adapter is currently subscribed to an event 
+	      * of the supplied type.	
+            */
+            boolean subscribed
+            (
+                in CosNotification::EventType type
+            );
+
+           /**
+            * Updates the subscription according to the supplied set of 
+            * event types to be removed and events types to be added.
+            * @param added - event types to be added to the subscription
+            * @param removed - event types to be removed from the subscription
+            */
+            void update
+            (
+                in CosNotification::EventTypeSeq added,
+                in CosNotification::EventTypeSeq removed
+            );
+
+           /**
+            * Local operation to add an event listener to the adapter.
+            */
+            void addRemoteEventListener( in RemoteEventListener listener );
+
+           /**
+            * Local operation to remove an event listener from the adapter.
+            */
+            void removeRemoteEventListener( in RemoteEventListener listener );
+
+           /**
+            * Local operation to dispose of the adapter.
+            */
+            void dispose();
+	};
+
+	exception NotFound{};
+
+     /**
+      * Manager defines a set of operations supporting the establishment 
+	* of subscriptions to structured events on AbstractResource business
+	* objects.
+	*/
+
+	interface Manager
+	{
+
+           /**
+            * Request to to the manager to establish a subscription 
+		* on the supplied AbstractResource and maintain the event 
+		* history.
+		*
+		* @param resource AbstractResource to subscribe to
+		* @exception ManagerException indicating a problem during subscription
+		*/
+ 
+		Adapter create
+		(
+			in Session::AbstractResource resource 
+		)
+		raises
+		(
+			ManagerException
+		);
+
+           /**
+            * Locate an existing adapter based on the supplied parameters.
+		*
+		* @param long authority type
+		* @param string domain address
+		* @param long random identifier
+		* @exception NotFound
+		*/
+ 
+		Adapter locate
+		(
+			in long authority, 
+			in string address, 
+			in long random
+		)
+		raises
+		(
+			NotFound
+		);
+	};
+
+
+   };
+};
+
+#endif // _AUDIT_IDL_

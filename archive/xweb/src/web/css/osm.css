@@ -1,0 +1,75 @@
+
+A:link {color:DarkSeaGreen; }
+A:visited {color:DarkSeaGreen; }
+A:active {color:DarkSeaGreen; }
+A:hover {color:CadetBlue; }
+
+.home{
+	FONT: bold 48pt verdana; color: LightSlateGray;
+	MARGIN-BOTTOM: 24; MARGIN-TOP: 48; MARGIN-LEFT: 25pt; MARGIN-RIGHT: 25pt; 
+	LETTER-SPACING: -3px; 
+}
+
+.button-label{ 
+	FONT: 8pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM:2pt; MARGIN-TOP:1; MARGIN-LEFT:3pt; MARGIN-RIGHT:3pt; padding:0;
+}
+
+.lead{
+	FONT: bold 12pt verdana; color: DarkSlateGray; 
+	MARGIN-BOTTOM: 6pt; MARGIN-TOP: 72; LEFT: 15pt; 
+	POSITION: relative
+}
+
+.label{ 
+	FONT: 9pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 6pt; MARGIN-TOP: 6; LEFT: 15pt; 
+	POSITION: relative
+}
+
+.label-required{
+	FONT: 9pt verdana, sans-serif; color: maroon; 
+	MARGIN-BOTTOM: 6pt; MARGIN-TOP: 6; LEFT: 15pt; 
+	POSITION: relative
+}
+
+p{ 
+	FONT: 12pt verdana, sans-serif; color: DarkSeaGreen; 
+	MARGIN-BOTTOM: 3pt; MARGIN-TOP: 3pt; MARGIN-LEFT: 3pt; MARGIN-RIGHT: 3pt;
+	POSITION: relative
+}
+
+.entry{ 
+	FONT: 9pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 3pt; MARGIN-TOP: 3; LEFT: 3pt; MARGIN-RIGHT: 3pt;
+	POSITION: relative
+}
+
+.property{ 
+	FONT: 9pt verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 3pt; MARGIN-TOP: 3; MARGIN-LEFT: 3pt; MARGIN-RIGHT: 3pt;
+	POSITION: relative;
+      PADDING-LEFT:17;
+}
+
+BODY{ 
+	FONT: verdana, sans-serif, color: black; background:white;
+}
+
+H1{ 
+	FONT: 24pt verdana; color: DarkSlateGray; LETTER-SPACING: -2px; 
+	MARGIN-BOTTOM: 24pt; MARGIN-TOP: 72; LEFT: 15pt; MARGIN-RIGHT: 25pt;
+	POSITION: relative
+}
+
+H2{ 
+	FONT: 18pt verdana; color: black; LETTER-SPACING: -2px; 
+	MARGIN-BOTTOM: 18pt; MARGIN-TOP: 72; LEFT: 15pt; MARGIN-RIGHT: 25pt;
+	POSITION: relative
+}
+
+p{ 
+	FONT: verdana, sans-serif; color: black; 
+	MARGIN-BOTTOM: 3pt; MARGIN-TOP: 3pt; MARGIN-LEFT: 3pt; MARGIN-RIGHT: 3pt;
+	POSITION: relative
+}

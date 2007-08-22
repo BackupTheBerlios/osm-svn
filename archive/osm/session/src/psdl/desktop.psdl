@@ -1,0 +1,52 @@
+/**
+ */
+
+#ifndef _SESSION_DESKTOP_PSDL_
+#define _SESSION_DESKTOP_PSDL_
+#include <workspace.psdl>
+
+#pragma prefix "osm.net"
+
+module session 
+{
+  module desktop
+  {
+
+   /**
+    * Desktop storage type is an interface to the persistent stoage of a User's
+    * private deskptop.
+    * @see org.omg.Session.Desktop
+    */
+    abstract storagetype DesktopStorage : workspace::WorkspaceStorage
+    {
+
+       /**
+        * Persistent identifier of the User that owns the desktop.
+        */
+	  state CORBA::OctetSeq owner_short_pid; 
+    };
+
+   /**
+    * The factory and home interface for storage types of the type DesktopStorage.
+    */
+    abstract storagehome DesktopStorageHome of DesktopStorage : workspace::WorkspaceStorageHome 
+    {
+    };
+
+    //
+    // DesktopStorageBase
+    //
+
+    storagetype DesktopStorageBase : workspace::WorkspaceStorageBase
+    implements DesktopStorage 
+    {
+    };
+
+    storagehome DesktopStorageHomeBase of DesktopStorageBase
+    implements DesktopStorageHome 
+    { 
+    };
+  };
+};
+
+#endif // _SESSION_DESKTOP_PSDL_

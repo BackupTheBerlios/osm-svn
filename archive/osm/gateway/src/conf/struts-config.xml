@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE struts-config PUBLIC
+       "-//Apache Software Foundation//DTD Struts Configuration 1.0//EN"
+       "http://jakarta.apache.org/struts/dtds/struts-config_1_0.dtd">
+
+<struts-config>
+
+  <form-beans>
+    <form-bean name="nameForm" type="net.osm.gateway.resource.NameForm"/>
+    <form-bean name="resourceForm" type="net.osm.gateway.resource.AbstractResourceForm"/>
+    <form-bean name="createTaskForm" type="net.osm.gateway.user.CreateTaskForm"/>
+    <form-bean name="stateChangeForm" type="net.osm.gateway.task.StateChangeForm"/>
+  </form-beans>
+
+  <global-forwards>
+    <forward name="success" path="/welcome.jsp"/>
+  </global-forwards>
+
+  <action-mappings>
+
+    <!--
+    Rename the resource.
+    -->
+    <action path="/rename"
+      type="net.osm.gateway.resource.RenameAction"
+      scope="request"
+      name="nameForm"
+      input="/resolver.jsp">
+    </action>
+
+    <!--
+    Create a task.
+    -->
+    <action path="/createTask"
+      type="net.osm.gateway.user.CreateTaskAction"
+      scope="request"
+      name="nameForm"
+      input="/resolver.jsp" >
+    </action>
+
+    <!--
+    Change task state
+    -->
+    <action path="/stateChange"
+      type="net.osm.gateway.task.StateChangeAction"
+      scope="request"
+      name="stateChangeForm"
+      input="/task" >
+    </action>
+
+    <!--
+    Create a subworkspace.
+    -->
+    <!--
+    <action path="/subworkspace"
+      type="net.osm.gateway.workspace.CreateSubWorkspaceAction"
+      scope="request"
+      name="resourceForm"
+      input="/workspace.jsp" >
+    </action>
+    -->
+
+    <!--
+    Create a subworkspace.
+    -->
+    <action path="/sub-workspace"
+      type="net.osm.gateway.workspace.CreateSubWorkspaceAction"
+      scope="request"
+      name="nameForm"
+      input="/workspace.jsp" >
+    </action>
+
+  </action-mappings>
+
+</struts-config>

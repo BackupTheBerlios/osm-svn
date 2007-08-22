@@ -1,0 +1,64 @@
+/**
+ */
+
+#ifndef _COLLABORATION_PSDL_
+#define _COLLABORATION_PSDL_
+#include <CollaborationFramework.idl>
+#include <processor.psdl>
+
+#pragma prefix "osm.net"
+
+module collaboration
+{
+
+    //
+    // Collaboration 
+    //
+
+   /**
+    * Community storage type is an interface to the persistent storage of a 
+    * community supporting association to multiple members through a contained 
+    * MembershipStorage instance.
+    */
+    abstract storagetype EncounterStorage : session::processor::ProcessorStorage
+    {
+
+	 /**
+        * Policy control model containing rules related to membership 
+	  * administration.
+        */
+	  state CommunityFramework::MembershipModel model;
+
+       /**
+        * Recruitment status of the membership.
+        */
+        state CommunityFramework::RecruitmentStatus recruitment;
+
+       /**
+        * The set of Member associations (representing the set of Users
+        * associated to the Membership as Members).
+        */
+	  state list::LinkedList members;
+
+    };
+
+   /**
+    * The factory and home interface for CommunityStorage storage types.
+    */
+    abstract storagehome EncounterStorageHome of EncounterStorage : session::processor::ProcessorStorageHome 
+    {
+    };
+
+    storagetype EncounterStorageBase : session::processor::ProcessorStorageBase
+    implements EncounterStorage 
+    {
+        stores members as ref<list::LinkedListBase>;
+    };
+
+    storagehome EncounterStorageHomeBase of EncounterStorageBase
+    implements EncounterStorageHome 
+    { 
+    };
+};
+
+#endif // _COLLABORATION_PSDL_

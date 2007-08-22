@@ -1,0 +1,522 @@
+
+/*
+ * discovery.idl
+ *
+ * Copyright 2000-2001 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.2 2 APR 2001
+ */
+
+#ifndef _DISCOVERY_IDL_
+#define _DISCOVERY_IDL_
+#include <orb.idl>
+#include <TimeBase.idl>
+#pragma prefix "osm.net"
+
+module discovery
+{
+
+    	valuetype Filter;
+    	valuetype Entry;
+
+    	valuetype Identifier;
+    	valuetype Key;
+    	valuetype Feature;
+    	valuetype UtcT;
+    	valuetype Receipt;
+    	valuetype Selection;
+    	valuetype SelectionSet;
+    	valuetype Score;
+
+	abstract interface Verifiable;
+
+    	interface Registry;
+    	interface Directory;
+
+/*
+Datatypes
+*/
+ 
+	valuetype StringSequence sequence<string> ;
+	valuetype ValueBaseSequence sequence<ValueBase> ;
+	valuetype SelectionSequence sequence<Selection> ;
+	valuetype EntrySequence sequence<Entry> ;
+	valuetype FilterSequence sequence<Filter> ;
+
+/**
+ * Content is an abstract valuetype that serves as a base 
+ * valuetype for all measurable values (refer BooleanFilter 
+ * and LinearFilter).  It serves as a placeholder for 
+ * potential introduction of inheritance from XML valuetype 
+ * defintions.
+ */
+
+      // abstract valuetype Content {};
+
+      valuetype Content {};
+
+/**
+ * A URI is a valuetype representing a Uniform Resource Locator.
+ */
+
+    	valuetype URI : Content {
+
+		/**
+		The value attribute contains the URL defining the URI.  A client application is responsible 
+		for ensuing valid URL fomating.
+		*/
+
+		public string value;
+
+	};
+
+/**
+ * The DisclosurePolicyValue is an enumeration that distinguishes 
+ * between REPLICATION of a value (simple copy), REFERRAL (packaging 
+ * a value in a container including proof of disclosure), or the 
+ * UNDEFINED value.
+ */
+
+	enum DisclosurePolicyValue {
+		UNDEFINED, 
+		REPLICATION, 
+		REFERRAL 
+	};
+
+/**
+ * DisclosurePolicy is a valuetype that contains a DisclosurePolicyValue. 
+*/
+
+    	valuetype DisclosurePolicy : Content {
+		public DisclosurePolicyValue value;
+	};
+
+/**
+ * An identifier is a valuetype that contains a domain URL and a string  
+ * that can be used to identify the instance within the scope of a domain.
+ */
+
+    	valuetype Identifier : Content {
+
+           /**
+		* The value of an identifier is a domain dependent string that can be used (possibly in 
+		* conjunction with other attributes) to uniquely identity an instance.
+		*/
+		public string value;
+
+	     /**
+		* DNS name or URL of the domain under which an identifier value is recognised.
+		*/
+		public string dns;
+	};
+
+/**
+ * UtcT is a valuetype containing a UtcT time value.
+ */
+	valuetype UtcT : Content {
+
+	   /**
+	    * Time value in UtcT.  Refer OMG TimeService (TimeBase module).
+	    */
+	    public TimeBase::UtcT value;
+	};
+
+/**
+ * Entry is an abstract value type for Key and Feature.
+ */
+	valuetype Entry : Content {
+
+	     /**
+		* State member containing the key name.
+		*/
+ 		public string name;
+
+	};
+
+/**
+ * Chain is valuetype the serves as a common container of named value instances.
+ */
+
+	valuetype Chain : Content {
+	 	public EntrySequence contents;
+	};
+
+/**
+ * A Key is a valuetype that contains a keyword and a container of 
+ * named values maintained by this instance.  An instance of key 
+ * represents a hierachical graph that can be used to to efficiently 
+ * index an given description relative to mutliple orthoginal naming 
+ * schemes.
+ */
+
+	valuetype Key : Entry {
+
+	     /**
+		* State member containing the key value.
+		*/
+ 		public Chain value;
+
+      };
+
+/**
+ * A Feature is a value type containing a name which is unique within 
+ * the scope of its container and a value.
+ */
+
+      valuetype Feature : Entry {
+
+	     /**
+		* The value of the Feature.
+		*/
+ 
+		public string value;
+
+	};
+
+/**
+ * VerificationFailure is an exception raised by the verify operation 
+ * when an implementation cannot complete a verification of a concrete 
+ * instance.
+ */
+
+      exception VerificationFailure {
+		string reason;
+		Verifiable artifiact;
+      };
+
+/**
+ * Verifiable is an abstract interface exposing the operation verify, 
+ * used to validate the integrity of a derived valuetype.
+ */
+
+	abstract interface Verifiable {
+
+	     /**
+		* Returns true is the valuetype state is valid (non-repudiation).
+		*/
+		boolean verify( 
+		) raises (
+			VerificationFailure
+		);
+	};
+
+/**
+ * An Artifact is an abstract interface inherited by Description and 
+ * Disclosure and exposed by the Directory interface.
+ */
+	valuetype Artifact : Content supports Verifiable {
+		public Identifier id;
+		public UtcT timestamp;
+		public DisclosurePolicy policy;
+		private Chain manifest;
+		public Chain value;
+	};
+
+
+/**
+ * A Description is a valuetype used to describe of an information 
+ * artifact (internet tresource).  It contains a domain relative 
+ * identifier, a timestamp indicating the date and time of creation, 
+ * a policy of diclosure indicating if the object may be directly 
+ * replicated or must be distributed by refferral.  It also includes 
+ * a Chain which enables atteribut of keys and featues to the instance, 
+ * a reference to the internet artificat under the resource member, a 
+ * title, description, and supplimentary information under a manifest.
+ */
+
+	valuetype Description : Artifact
+		{
+		public URI resource;
+		public string title;
+		public string description;
+	};
+
+/**
+ * A Disclosure is a valuetype that contains an artifact (either a 
+ * resource description or disclosure) together with information 
+ * concerning the proof of registration.  An instance of disclosure 
+ * is typically created by an implementation of a Registry prior to 
+ * publication under a directory. 
+ */
+
+	valuetype Disclosure : Artifact 
+		{
+		public discovery::Artifact artifact;
+	};
+
+/**
+ * Receipt returned from an act of registration, replacement or 
+ * retraction of a single artifact.  A Receipt is qualified by the
+ * ReceiptClass enumeration which details one of the three possible 
+ * receipt type - registration, replacement and retraction.
+ */
+	enum ReceiptClass {
+		REGISTRATION,
+		REPLACEMENT,
+		RETRACTION
+	};
+
+/**
+ * Receipt returned from an act of registration, replacement or retraction of a single artifact. 
+ */
+
+	valuetype Receipt supports Verifiable
+		{
+
+		public Identifier id;
+		public ReceiptClass classification;	
+		public Identifier artifact;	
+		public UtcT timestamp;
+
+		private Chain manifest;
+	};
+
+/**
+ * A Score is a valuetype containing a scored interger value against a base 
+ * integer reference.  The score operation enables applications to add or 
+ * subtract from the values of score and base.  The increment operation 
+ * enables an equivilent function based on a Score argument.  The ground 
+ * operation returns an equivilent value expressed as an integer beween 0 
+ * and 1.
+ */
+
+	valuetype Score {
+
+	    	public long value;
+	    	public long base;
+
+		Score score( in long score, in long base );
+		Score increment( in discovery::Score score );
+		long ground();
+	};
+
+/**
+ * Selection is a type combining an an artifact and the ranking of the 
+ * artifact relative to a query.
+ */
+
+	valuetype Selection
+		{
+		public discovery::Artifact artifact;	
+		public Score ranking;
+	};
+
+/**
+ * The NoMatch exception is raised when a locate of find operation is 
+ * invoked, and the implememntation is unable to provide a response.
+ */
+
+	exception NoMatch{ };
+
+/**
+ * The InvalidFilter exceptionmay be thrown when an attempt is made to 
+ * invoke the locate or find operations on Directory within an badly 
+ * formed in invalid Filter.
+ */
+
+	exception InvalidFilter{
+		Filter filter;
+		string problem;
+	};
+
+/**
+ * Directory provides suppport for the invocation of queries based on 
+ * a supplied Filter enabling the discovery of capability descriptions.  
+ * This interface is used as a server interface and as interface supported 
+ * by the valuetype SelectionSet.
+ */
+	interface Directory {
+
+	     /**
+		* The locate operation provides support for the location of a specific 
+		* artifact based on a filter argument. 
+		*/
+
+		Artifact locate( 
+			in discovery::Filter filter
+		) raises (
+			NoMatch,
+			InvalidFilter
+		);
+
+	     /**
+		* The find operation returns a SelectionSet containing a ranked sequence of
+		* Selection instances based on a filter argumement.
+		*/
+
+		SelectionSet find(
+			in discovery::Filter filter
+		) raises (
+			NoMatch,
+			InvalidFilter
+		);
+
+	};
+
+/**
+ * SelectionSet is an identifiable valuetype containing a sequence of Selection instances.
+ */
+
+	valuetype SelectionSet supports Directory
+		{
+		public Identifier id;
+		public SelectionSequence selections;
+	};
+
+
+/**
+ * Filter is the abstract base class for all filters.  
+ * A Filter is a vauuetype that describes arguments that collactively 
+ * defines a query.  A Filter may be a logical (true or false) or linear 
+ * in nature.  Logical filters provide state information necessary for 
+ * resolution of a true or false match.  If not logical, a filter can 
+ * return a scalar reanking of resources.
+ */
+
+	valuetype Filter { 
+		public string name; 
+		public boolean logical;  // default true
+		public boolean binary;  // default true
+	};
+
+/**
+ * CompositeFilter is a filter that contains a set of filters.  
+ * This filter defintion needds to be updated to include AND or OR operators.
+ */
+
+	valuetype CompositeFilter : Filter {
+		public FilterSequence filters;
+	};
+
+/**
+ * Content filter is a filter that can be applied against a string.
+ */
+
+	valuetype ContentFilter : Filter{ 
+		public boolean sensitive; // default false (not-case-sensitive)
+		public boolean exact; // default false (partial matching)
+		public string value; 
+	};
+
+/**
+ * Scalar filter is a filter that can be applied against a object than 
+ * can be coerrsed to a numeric value such as a string representing an 
+ * integer, real, or a UtcT value.
+ */
+
+	enum LogicalOperator{
+		LESS_THAN,
+		LESS_THAN_OR_EQUAL,
+		EQUAL_TO,
+		GREATER_THAN_OR_EQUAL,
+		GREATER_THAN
+      };
+
+	valuetype ScalarFilter : Filter{ 
+		public LogicalOperator operator; // default EQUAL_TO
+		public float value; 
+	};
+
+/**
+ * The RangeFilter declares a range between a minimum and maximum value to 
+ * applied to the measurement of a source value that can be coersed to a real 
+ * value.  If the source value falls within the range (minimum <= range 
+ * <= maximum), the source value is considered as a candidate.
+ */
+
+	valuetype RangeFilter : Filter{ 
+		public float minimum;
+		public float maximum;
+	};
+
+	exception ExistingArtifact{};
+	exception RegistrationDenied{
+		CORBA::StringValue reason;
+	};
+	exception RetractionDenied{
+		CORBA::StringValue reason;
+	};
+	exception UnknownReceipt{
+		CORBA::StringValue reason;
+	};
+	exception MallformedReceipt{
+		CORBA::StringValue reason;
+	};
+	exception MallformedArtifact{
+		CORBA::StringValue reason;
+	};
+	exception ArtifactUnavailable{
+		CORBA::StringValue reason;
+	};
+
+/**
+ * A registry is an interface that provides an operation supporting 
+ * registration of ResourceDescriptions, retrival of existing resource 
+ * descriptions based on supplied receipts, and replacement of exiting 
+ * resouces descriptions with new descriptions based on a supplied 
+ * registration receipt.
+ */
+	interface Registry 
+		{
+
+	     /**
+		* Registration of a Description.  
+		*/
+		Receipt register(
+			in discovery::Artifact artifact
+		) raises ( 
+			ExistingArtifact,
+			RegistrationDenied,
+			MallformedArtifact
+		);
+
+	     /**
+		* Get the artifact based on a receipt.
+		*/
+		Artifact select(
+			in discovery::Receipt receipt
+		) raises (
+			UnknownReceipt,
+			MallformedReceipt,
+			ArtifactUnavailable
+		);
+
+	     /**
+		* Replace an existing artifact with another.
+		*/
+		Receipt update(
+			in discovery::Receipt receipt,
+			in discovery::Artifact artifact
+		) raises (
+			RegistrationDenied,
+			UnknownReceipt,
+			MallformedReceipt,
+			MallformedArtifact
+		);
+
+	     /**
+		* Retract an existing artifact.
+		*/
+		Receipt retract(
+			in discovery::Receipt receipt
+		) raises (
+			UnknownReceipt,
+			MallformedReceipt,
+			RetractionDenied
+		);
+	};
+  
+     /**
+	* A Portal is combination of a Registry and Directory.
+	*/
+	interface Portal : 
+		discovery::Registry, 
+		discovery::Directory
+		{
+	};
+
+};
+#endif // _DISCOVERY_IDL_

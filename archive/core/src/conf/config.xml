@@ -1,0 +1,638 @@
+<?xml version="1.0"?>
+
+<!--
+assembly.java
+
+Copyright 2000-2001 OSM SARL All Rights Reserved.
+This configuration is the proprietary information of OSM SARL.
+Use is subject to license terms.  
+
+@author  Stephen McConnell <mailto:mcconnell@osm.net>
+@version 1.0 24 DEC 2000
+-->
+
+<config>
+
+    <vault alias="mcconnell" challenge="paris.14"/>
+
+    <orb class="org.openorb.CORBA.ORB" singleton="org.openorb.CORBA.ORBSingleton">
+        <property name="openorb.debug" value="1" />
+        <property name="openorb.home" file="." />
+        <property name="openorb.config" file="conf/orb.xml" />
+        <property name="openorb.profile" value="gateway" />
+        <property name="openorb.debug.ShowStackTrace" value="true"/>
+        <property name="iiop.port" value="2509" />
+        <property name="iiop.alternateAddr" value="home.osm.net:2509"/>
+        <property name="PSS.debug" value="false" />
+        <property name="PSS.File.DataStore.Directory" file="pss" />
+        <property name="PSS.File.DataStore.Name" value="hub" />
+        <property name="PSS.File.FlushTime" value="30" />
+        <property name="PSS.File.Transaction.IsolationLevel" value="1" />
+    </orb>
+
+    <pss>
+
+        <!--
+        Declaration of the PSS connector to use as the underlying storage mechanism.
+        -->
+
+        <connector value="PSS:OSM:database" />
+
+        <!--
+        PSS systems typically require a set of implementation dependant  
+        parameters to be passed to a registry when reqesting the establishment 
+        of a PSS session.  The following parameter declarations will be collected     
+        and passed to the PSS Connector Registry during creation of a new PSS 
+        session.  The JDBC URL path values will be applied relative to the root  
+        application directory in the server activation framework.
+        -->
+
+        <parameter name="JDBC Driver" value="org.enhydra.instantdb.jdbc.idbDriver" />
+        <parameter name="JDBC URL" value="jdbc:idb:${osm.pss.jdbc.url}" />
+
+        <persistence>
+
+            <storage psdl="PSDL:osm.net/list/EntryStorageBase:1.0"
+            class="net.osm.list.Entry" />
+            <home psdl="PSDL:osm.net/list/EntryStorageHomeBase:1.0"
+            class="net.osm.list.EntryStorageHomeBase" />
+
+            <storage psdl="PSDL:osm.net/list/LinkedListBase:1.0"
+            class="net.osm.list.List" />
+
+        </persistence>
+
+    </pss>
+
+
+    <supplier>
+
+        <persistence>
+            <storage psdl="PSDL:osm.net/event/EventStorageBase:1.0"
+            class="net.osm.event.EventStorageBase" />
+            <home psdl="PSDL:osm.net/event/EventStorageHomeBase:1.0"
+            class="net.osm.event.EventStorageHomeBase" />
+
+           <storage psdl="PSDL:osm.net/hub/pss/SubscriberStorageBase:1.0"
+            class="net.osm.hub.pss.SubscriberStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/SubscriberStorageHomeBase:1.0"
+            class="net.osm.hub.pss.SubscriberStorageHomeBase" />
+        </persistence>
+
+    </supplier>
+
+    <!-- The Time block -->
+    <time port="2507" ior="time.ior">
+
+        <!-- 
+        The following properties are passed to the ORB initialization 
+        method and declare to the Java Virtual Machine the ORB implementation
+        to be used together with supplementary ORB properties.
+        -->
+
+        <orb class="org.openorb.CORBA.ORB" singleton="org.openorb.CORBA.ORBSingleton">
+            <property name="openorb.debug" value="0" />
+            <property name="openorb.home" file="." />
+            <property name="openorb.config" file="conf/orb.xml" />
+            <property name="openorb.profile" value="time" />
+            <property name="iiop.port" value="2507" />
+        </orb>
+
+        <!-- 
+        The profile element declares the inaccuracy values 
+        that will be used by the time server. 
+        -->
+
+        <profile inaccuracy="10000" />
+
+    </time>
+
+    <!-- Gateway -->
+
+    <gateway profile="osm.planet" policy="planet.xml">
+
+        <!-- 
+        Declaration of the server domain identifications structure used by identifiable
+        business objects in combination with a random integer identifier.  This value
+        must be updated to match the specific installation.
+        -->
+
+        <domain authority="DNS" address="home.osm.net" />
+
+        <!-- 
+        Declaration of the persistence configuration. The parameters declared under the 
+        persistence element are used to construct a PSS session.  Customization of the 
+        data source used by the platform is possible through replacement of the 
+        implementation class declarations under the "catalog" element "class" attributes.
+        -->
+
+        <!--
+        Declaration of the PSS subsystem and catalog implementation.
+        -->
+
+        <pss>
+
+          <connector value="PSS:OSM:database" />
+          <parameter name="JDBC Driver" value="org.enhydra.instantdb.jdbc.idbDriver" />
+          <parameter name="JDBC URL" value="jdbc:idb:${osm.gateway.jdbc.url}" />
+
+        </pss>
+
+        <persistence>
+
+            <!--
+            The following set of elements (storage and home elements) declare
+            the respective storage unit and storage home types and corresponding
+            classes that should be registered with a PSS connection.  Modification of 
+            the <code>class</code> attribute value enables the possibility for the 
+            customization of the implementation of the home or catalog
+            for a particular component.  The default values listed here will result in the 
+            access to native OSM storage for the business objects
+            supplied under the OMG Task and Session Business Object Domain Specifications
+            (User, Message, Task, Workspace, Desktop) and EC Domain Specifications 
+            (including Community and Collaboration services).
+            -->
+
+            <storage psdl="PSDL:osm.net/list/EntryStorageBase:1.0"
+            class="net.osm.list.Entry" />
+            <home psdl="PSDL:osm.net/list/EntryStorageHomeBase:1.0"
+            class="net.osm.list.EntryStorageHomeBase" />
+
+            <storage psdl="PSDL:osm.net/list/LinkedListBase:1.0"
+            class="net.osm.list.List" />
+
+            <storage psdl="PSDL:osm.net/hub/pss/LinkStorageBase:1.0"
+            class="net.osm.hub.persistence.Link" />
+            <home psdl="PSDL:osm.net/hub/pss/LinkStorageHomeBase:1.0"
+            class="net.osm.hub.pss.LinkStorageHomeBase" />
+
+            <storage psdl="PSDL:osm.net/hub/pss/DomainStorageBase:1.0"
+            class="net.osm.hub.pss.DomainStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/DomainStorageHomeBase:1.0"
+            class="net.osm.hub.pss.DomainStorageHomeBase" />
+
+            <storage psdl="PSDL:osm.net/properties/pss/PropertyStorageBase:1.0"
+            class="net.osm.properties.pss.PropertyStorageBase" />
+            <home psdl="PSDL:osm.net/properties/pss/PropertyStorageHomeBase:1.0"
+            class="net.osm.properties.pss.PropertyStorageHomeBase" />
+            <storage psdl="PSDL:osm.net/properties/pss/PropertySetDefStorageBase:1.0"
+            class="net.osm.hub.properties.PropertySetDef" />
+
+            <storage psdl="PSDL:osm.net/hub/pss/AbstractResourceStorageBase:1.0"
+            class="net.osm.hub.pss.AbstractResourceStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/AbstractResourceStorageHomeBase:1.0"
+            class="net.osm.hub.pss.AbstractResourceStorageHomeBase" />
+
+		<!--
+            <storage psdl="PSDL:osm.net/hub/pss/SubscriptionStorageBase:1.0"
+            class="net.osm.hub.persistence.Subscription" />
+            <home psdl="PSDL:osm.net/hub/pss/SubscriptionStorageHomeBase:1.0"
+            class="net.osm.hub.pss.SubscriptionStorageHomeBase" />
+
+            <storage psdl="PSDL:osm.net/hub/pss/ConsumerStorageBase:1.0"
+            class="net.osm.hub.persistence.Consumer" />
+            <home psdl="PSDL:osm.net/hub/pss/ConsumerStorageHomeBase:1.0"
+            class="net.osm.hub.pss.ConsumerStorageHomeBase" />
+		-->
+
+        </persistence>
+
+        <!--
+        Delcaration of the relative file path under which DPML documents are maintained.
+        These DPML documents will be coverted into factory Criteria and made availble
+        under the ResourceFactory interface.  Relative references are resolved relative to
+        the root "gateway" directory.
+        -->
+
+        <dpml directory="dpml" />
+
+        <!--
+        The following community element declares policy for the root community
+        membership.
+        -->
+
+        <community label="osm.planet" note="OSM business community">
+            <membership label="planet" note="root community membership model">
+                <mpolicy privacy="PUBLIC" exclusivity="true" />
+                <role label="participant" note="generic root role" abstract="true" >
+                    <rpolicy ceiling="0" quorum="0" assessment="STRICT" policy="CONNECTED" />
+                    <role label="guest" abstract="false" note="general guest access role"/>
+                    <role label="member" abstract="false" note="registered member access role">
+                      <role label="administrator" abstract="false" note="membership coordinator">
+                        <rpolicy ceiling="1" quorum="1" assessment="STRICT" policy="CONNECTED" />
+			    </role>
+                    </role>
+                </role>
+            </membership>
+        </community>
+
+    </gateway>
+
+    <workspace>
+
+	  <!--
+        Declaration of the PSDL storage types and homes.
+        -->
+
+        <persistence>
+           <storage psdl="PSDL:osm.net/hub/pss/WorkspaceStorageBase:1.0"
+            class="net.osm.hub.pss.WorkspaceStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/WorkspaceStorageHomeBase:1.0"
+            class="net.osm.hub.pss.WorkspaceStorageHomeBase" />
+        </persistence>
+    </workspace>
+
+    <desktop>
+
+	  <!--
+        Declaration of the PSDL storage types and homes.
+        -->
+
+        <persistence>
+            <storage psdl="PSDL:osm.net/hub/pss/DesktopStorageBase:1.0"
+            class="net.osm.hub.pss.DesktopStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/DesktopStorageHomeBase:1.0"
+            class="net.osm.hub.pss.DesktopStorageHomeBase" />
+        </persistence>
+    </desktop>
+
+    <user>
+
+	  <!--
+        The User factory on creation of a new user instance is configured with a default set 
+	  of properties.  These properties are contained under a property set (defined by the 
+	  OMG CosPropertyService::PropertySetDef interface.  A property set can contain any 
+	  number of properties and any each property can contain any kind of object (unless 
+	  a type or property constraint is declared on containing property set).  
+
+	  The Gateway provides supports for the persistent registration of any CORBA object 
+	  (all base types, structs, valuetypes and object references).  The default 
+	  configuration does not place any constraint on the types of object that can be 
+	  stored as properties nor limitations on property names.  Configuration of the 
+	  initial set of properties to be assigned to a user is achived through the 
+	  'propertset' element contained within the 'user' element. 
+
+	  The following example declares the the user root property set shall be restricted 
+	  to properties containing property sets.  It also declares two property set values
+	  to be established during creation of a new User instance, one property set 
+	  representing required properties, and the second supporting attribution of 
+	  supplimentary optional properties.  The argument values shown below such as 
+	  ${user} and ${email} correspond to named values passed to the factory under the
+	  factory criteria.
+
+        |
+        | Example:
+        |
+        |  <user>
+        |    <propertyset>
+        |      <types>
+        |        <idl type="IDL:omg.org/CosPropertyService/PropertySet:1.0"/>
+        |      </types>
+        |      <property name="common" mode="fixed_readonly">
+        |        <types>
+        |          <idl type="string"/>
+        |        </types>
+        |        <propertyset>
+        |          <property name="name" mode="fixed_readonly">
+        |	       <value type="string" argument="${user}" />
+        |          </property>
+        |          <property name="email" mode="fixed_readonly">
+        |	       <value type="string" argument="${email}" />
+        |          </property>
+        |        </propertyset>
+        |      </property>
+        |    </propertyset>
+        |  <user>
+        |
+
+	  The above XML fragment is not currently supported but is provided as an 
+	  indication of the intended approach.
+	  -->
+
+        <persistence>
+
+            <storage psdl="PSDL:osm.net/hub/pss/UserStorageBase:1.0"
+            class="net.osm.hub.pss.UserStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/UserStorageHomeBase:1.0"
+            class="net.osm.hub.pss.UserStorageHomeBase" />
+
+            <storage psdl="PSDL:osm.net/hub/pss/FolderStorageBase:1.0"
+            class="net.osm.hub.pss.FolderStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/FolderStorageHomeBase:1.0"
+            class="net.osm.hub.pss.FolderStorageHomeBase" />
+
+            <storage psdl="PSDL:osm.net/hub/pss/MessageStorageBase:1.0"
+            class="net.osm.hub.pss.MessageStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/MessageStorageHomeBase:1.0"
+            class="net.osm.hub.pss.MessageStorageHomeBase" />
+
+        </persistence>
+
+    </user>
+
+    <task>
+
+	  <!--
+        Declaration of the PSDL storage types and homes.
+        -->
+
+        <persistence>
+            <storage psdl="PSDL:osm.net/hub/pss/TaskStorageBase:1.0"
+            class="net.osm.hub.pss.TaskStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/TaskStorageHomeBase:1.0"
+            class="net.osm.hub.pss.TaskStorageHomeBase" />
+        </persistence>
+
+    </task>
+
+    <generic>
+
+	  <!--
+        Declaration of the PSDL storage types and homes.
+        -->
+
+        <persistence>
+            <storage psdl="PSDL:osm.net/hub/pss/GenericStorageBase:1.0"
+            class="net.osm.hub.pss.GenericStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/GenericStorageHomeBase:1.0"
+            class="net.osm.hub.pss.GenericStorageHomeBase" />
+        </persistence>
+
+    </generic>
+
+    
+    <processor>
+
+        <dpml>
+
+            <!--
+            Hello World demonstration processor.
+            -->
+
+    		<processor label="net.osm.hello" 
+                note="Hello World Process"
+                appliance="hello"
+		    catagory="TOOL">
+      	    <input tag="contract" required="TRUE" type="IDL:omg.org/Session/AbstractResource:2.0" />
+		    <context name="location" value="Paris" />
+    		</processor>
+
+        </dpml>
+
+        <!--
+        The following "extensions" element contains element declarations that map 
+        the criteria appliance atribute name to a jar file containing an appliance 
+        implementation from which a new appliance can be instantiated in a Processor.
+        -->
+
+        <extensions>
+
+            <!--
+            The following elements declares a demonstration appliance.  The
+            class implemeting the appliance must support the net.osm.hyub.processor.Appliance
+            interface. Following the loading of the class, an instance of that class will 
+		be instantiated by the processor and assigned as the execution mechanism.
+            -->
+
+            <appliance label="hello" class="net.osm.hub.processor.HelloWorldAppliance">
+                <policy startup="10000" suspension="10000" termination="10000" />
+                <configuration>
+                    <message value="Hello World"/>
+                    <count value="10"/>
+                    <pause value="600"/>
+                </configuration>
+            </appliance>
+
+        </extensions>
+
+	  <!--
+        Declaration of the PSDL storage types and homes.
+        -->
+
+        <persistence>
+            <storage psdl="PSDL:osm.net/hub/pss/ProcessorStorageBase:1.0"
+            class="net.osm.hub.pss.ProcessorStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/ProcessorStorageHomeBase:1.0"
+            class="net.osm.hub.pss.ProcessorStorageHomeBase" />
+        </persistence>
+
+    </processor>
+
+    <community>
+
+        <!-- 
+        The DPML element contains possibly multiple criteria statements which will
+        be registered with a central factory.  The factory will provide criteria
+        instances derived from the following declarations towards clients, and maps
+        the criteria label to the supporting factory.
+        -->
+
+        <dpml>
+          <community label="net.osm.community" note="Business Community">
+            <membership label="planet" note="root community membership model">
+                <mpolicy privacy="PUBLIC" exclusivity="true" />
+                <role label="participant" note="generic root role" abstract="true" >
+                    <rpolicy ceiling="0" quorum="0" assessment="STRICT" policy="CONNECTED" />
+                    <role label="guest" abstract="false" note="general guest access role"/>
+                    <role label="member" abstract="false" note="registered member access role"/>
+                </role>
+            </membership>
+          </community>
+        </dpml>
+
+ 
+	  <!--
+        Declaration of the PSDL storage types and homes.
+        -->
+
+       <persistence>
+            <storage psdl="PSDL:osm.net/hub/pss/CommunityStorageBase:1.0"
+            class="net.osm.hub.pss.CommunityStorageBase" />
+            <home psdl="PSDL:osm.net/hub/pss/CommunityStorageHomeBase:1.0"
+            class="net.osm.hub.pss.CommunityStorageHomeBase" />
+        </persistence>
+
+    </community>
+
+    <finder ior="F:/content/gateway/finder.ior" >
+
+        <!--
+        The bootstrap element contains the declaration of named objects that 
+        should exiust in the environment following startup.  These objects will
+        be created once during the first startup of the system and registered in 
+        the finders bootstrap object table.  Clients accessing the finder can 
+        lookup objects by name (where the name shall correspond to the profile's
+        name attribiute).
+        -->
+
+        <bootstrap>
+
+            <!--
+            The osm.planet profile describes a business community that will be 
+            created by the finder during its bootstrap initilization phase.  This 
+            community serves as the primary point-of-access to this domain.
+            -->
+
+            <profile name="osm.planet">
+
+		   <dpml>
+                  <community label="net.osm.community" note="Default Business Community">
+                    <membership label="planet" note="root community membership model">
+                      <mpolicy privacy="PUBLIC" exclusivity="true" />
+                      <role label="participant" note="generic root role" abstract="true" >
+                        <rpolicy ceiling="0" quorum="0" assessment="STRICT" policy="CONNECTED" />
+                        <role label="guest" abstract="false" note="general guest access role"/>
+                        <role label="member" abstract="false" note="registered member access role">
+				  <!--
+                          <role label="administrator" abstract="false" note="membership coordinator">
+                            <rpolicy ceiling="1" quorum="1" assessment="STRICT" policy="CONNECTED" />
+			        </role>
+				  -->
+                        </role>
+                      </role>
+                    </membership>
+                  </community>
+		   </dpml>
+
+            </profile>
+
+        </bootstrap>
+
+        <!--
+        Declaration of the storage home and storage object factory for the finder.
+        The home provides services for creation of a new entry in the finders 
+        bootstrap lookup list.
+        -->
+
+        <persistence>
+            <home psdl="PSDL:osm.net/hub/pss/FinderStorageHomeBase:1.0"
+            class="net.osm.hub.pss.FinderStorageHomeBase" />
+            <storage psdl="PSDL:osm.net/hub/pss/FinderStorageBase:1.0"
+            class="net.osm.hub.pss.FinderStorageBase" />
+        </persistence>
+
+    </finder>
+
+
+    <repository ior="repository.ior" >
+
+	  <!--
+        Declaration of the PSDL storage types and homes.
+        -->
+
+        <persistence>
+            <storage psdl="PSDL:osm.net/pki/repository/PrincipalStorageBase:1.0"
+            class="net.osm.pki.repository.PrincipalStorageBase" />
+            <home psdl="PSDL:osm.net/pki/repository/PrincipalStorageHomeBase:1.0"
+            class="net.osm.pki.repository.PrincipalStorageHomeBase" />
+        </persistence>
+
+    </repository>
+
+
+    <authority ior="F:/content/gateway/authority.ior">
+
+        <provider public-key-url="http://home.osm.net/planet/keys.html" 
+	     policy-url="http://home.osm.net/planet/pki-policy.html"/>
+	  <standard name="OMG PKI Authority" version="1.1"/>
+	  <product name="OSM PKI" version="1.0" vendor="OSM">
+The OSM Registration Authority (RA) accepts requests for certificates on behalf of a CA and verifies the binding between the public/private key pair and the attributes being certified. Typically one or more RAs exist to provide a means for scaling a PKI within a single management domain. The relationship between the RAs and the CA is similar to the relationship between bank branches and the bank. While the branches are the face of the organization, the bank has the ultimate authority for the granting of transactions. So a request for a certificate may be made on a particular RA, the RA may verify Proof Of Possession (POP) of the private key and then request the certificate from the CA. The certificate obtained is from the CA but the RA provides the point of contact and may perform functions such as POP and checking authentication based on policy.
+	  </product>
+        <certificate-info>
+	    <type value="X509v1Certificate" encoding="DEREncoding"/>
+	    <type value="X509v2Certificate" encoding="DEREncoding"/>
+	    <type value="X509v3Certificate" encoding="DEREncoding"/>
+        </certificate-info>
+        <crl-info>
+	    <type value="X509v1CRL" encoding="DEREncoding"/>
+	  </crl-info>
+    </authority>
+
+    <certification title="OSM PKI Certification Service">
+
+	  <!--
+        Declaration of the PSDL storage types and homes.
+        -->
+
+        <persistence>
+            <storage psdl="PSDL:osm.net/pki/authority/RequestCertificateStorageBase:1.0"
+            class="net.osm.pki.authority.RequestCertificateStorageBase" />
+            <home psdl="PSDL:osm.net/pki/authority/RequestCertificateStorageHomeBase:1.0"
+            class="net.osm.pki.authority.RequestCertificateStorageHomeBase" />
+        </persistence>
+
+        <!--
+	  RA policy
+        -->
+
+        <certificate-request value="PKCS10CertificateRequest" encoding="DEREncoding">
+		<policy>
+	          <user>
+			  <grant role="USER" validity="90" pop="REQUIRED"/>
+	          </user>
+            </policy>
+        </certificate-request>
+
+    </certification>
+
+    <pki title="OSM PKI Certification Processor">
+
+        <dpml>
+
+		<!--
+	      Criteria decribing the creation of a new generic resource constrained to 
+	      hold a PKCS10 digital certificate certification request object.
+            -->
+
+            <generic label="net.osm.pki.certification.request"
+	          note="Certification Request"
+		    identifier="IDL:osm.net/pki/pkcs/PKCS10:1.0"/>
+
+		<!--
+	      Criteria decribing the creation of a new generic resource constrained to 
+	      hold a PKCS7 digital certificate certification response object.
+            -->
+
+            <generic label="net.osm.pki.certification.response"
+	          note="Certification Response"
+		    identifier="IDL:osm.net/pki/pkcs/PKCS7:1.0"/>
+
+            <!--
+	      Certification processor that takes a PKCS10 value contained within a 
+	      generic resource as the input argument and produces a PKCS7 certification
+	      response.
+	      -->
+
+            <processor label="net.osm.pki.certification" note="Digital Identity Certification" 
+               appliance="net.osm.pki.certification">
+                <input tag="request" required="TRUE" type="IDL:osm.net/pki/pkcs/PKCS10:1.0"/>
+                <output tag="response" type="IDL:osm.net/pki/pkcs/PKCS7:1.0"/>
+            </processor>
+
+        </dpml>
+
+        <!--
+        The following "extensions" element contains appliance declarations that map 
+        the criteria appliance atribute name to a jar file containing an appliance 
+        implementation from which a new appliance can be instantiated in a Processor.
+        -->
+
+        <extensions>
+
+            <!--
+            The following elements declares a demonstration appliance.  The
+            class implemeting the appliance must support the net.osm.hyub.processor.Appliance
+            interface. Following the loading of the class, an instance of that class will 
+		be instantiated by the processor and assigned as the execution mechanism.
+            -->
+
+            <appliance label="net.osm.pki.certification" class="net.osm.pki.process.CertificationAppliance">
+                <policy startup="10000" suspension="10000" termination="10000" />
+            </appliance>
+
+        </extensions>
+
+
+    </pki>
+
+</config>

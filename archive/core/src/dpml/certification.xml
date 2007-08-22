@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<DPML>
+
+    <!-- 
+    Criteria defining a process supporting the execution 
+    of a Certificate Certification Request by a Public Key 
+    Infrastructure provider.
+    -->
+    
+    <processor 
+      label="certification" 
+      note="Certificate Certification Request">
+
+      <input tag="pkcs10" required="TRUE" type="IDL:omg.org/CommunityFramework/GenericResource:1.0" />
+      <output type="IDL:omg.org/CommunityFramework/GenericResource:1.0" />
+
+	<context name="catagory" value="TOOL" />
+	<context name="url" value="http://home.osm.net/planet/osm-pki.jar" />
+
+    </processor>
+
+</DPML>

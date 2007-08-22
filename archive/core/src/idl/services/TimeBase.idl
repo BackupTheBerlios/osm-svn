@@ -1,0 +1,90 @@
+//File: TimeBase.idl
+//Part of the Time Service
+
+#ifndef _TIME_BASE_IDL_
+#define _TIME_BASE_IDL_
+#pragma prefix "omg.org"
+
+/**
+* All data structures pertaining to the basic Time Service, Universal Time Object, and
+* Time Interval Object are defined in the TimeBase module so that other services can
+* make use of these data structures without requiring the interface definitions. The
+* interface definitions and associated enums and exceptions are encapsulated in the
+* CosTime module.<p>
+* The Time Service object manages Universal Time Objects (UTOs) and Time Interval 
+* Objects (TIOs). It does so by providing methods for creating UTOs and TIOs. 
+* Each UTO represents a time, and each TIO represents a time interval, and reference 
+* to each can be freely passed around, subject to certain caviats.<p>
+* A number of types and interfaces are defined and used by this service. All definitions
+* of data structures are placed in the TimeBase module. All interfaces, and associated
+* enum and exception declarations are placed in the CosTime module. This separation of
+* basic data type definitions from interface related definitions allows other services to
+* use the time data types without explicitly incorporating the interfaces, while allowing
+* clients of those services to use the interfaces provided by the Time Service to
+* manipulate the data used by those services.
+*/
+
+module TimeBase {
+
+	/**
+	* TimeT represents a single time value, which is 64 bits in size, and holds the number
+	* of 100 nanoseconds that have passed since the base time. For absolute time the base is
+	* 15 October 1582 00:00.of the Gregorian Calendar. All absolute time shall be computed 
+	* using dates from the Gregorian Calendar.
+	*/
+
+	typedef unsigned long long	TimeT;
+
+	/** 
+	* InaccuracyT represents the value of inaccuracy in time in units of 100
+	* nanoseconds. As per the definition of the inaccuracy field in the X/Open DCE Time
+	* Service [1], 48 bits is sufficient to hold this value.
+	*/ 
+
+	typedef TimeT 			InaccuracyT;
+
+	/**
+ 	* TdfT is of size 16 bits short type and holds the time displacement factor in the form
+	* of minutes of displacement from the Greenwich Meridian. Displacements East of the
+	* meridian are positive, while those to the West are negative.
+	*/
+
+	typedef short 			TdfT;
+
+	/** 
+	* UtcT defines the structure of the time value that is used universally in this service.
+	* The basic value of time is of type TimeT that is held in the time field. Whether a
+	* UtcT structure is holding a relative or absolute time is determined by its history.
+	* There is no explicit flag within the object holding that state information. The iacclo
+	* and inacchi fields together hold a 48-bit estimate of inaccuracy in the time field.
+	* These two fields together hold a value of type InaccuracyT packed into 48 bits.
+	* The tdf field holds time zone information. Implementation must place the time
+	* displacement factor for the local time zone in this field whenever they create a UTO.
+	* <p>
+	* The contents of this structure are intended to be opaque, but in order to be able to
+	* marshal it correctly, at least the types of fields need to be identified.
+	*/ 
+
+	struct UtcT {
+		TimeT			time;		// 8 octets
+		unsigned long	inacclo;	// 4 octets
+		unsigned short	inacchi;	// 2 octets
+		TdfT			tdf;		// 2 octets 
+							// total 16 octets.
+	};
+
+	/** 
+	* This type holds a time interval represented as two TimeT values corresponding to the
+	* lower and upper bound of the interval. An IntervalT structure containing a lower
+	* bound greater than the upper bound is invalid. For the interval to be meaningful, the
+	* time base used for the lower and upper bound must be the same, and the time base
+	* itself must not be spanned by the interval.
+	*/
+
+	struct IntervalT {
+		TimeT			lower_bound;
+		TimeT			upper_bound;
+	};
+};
+
+#endif /* _TIME_BASE_IDL_ */

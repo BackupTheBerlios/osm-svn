@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- 
+TITLE: Multilateral Negotiation Model.
+
+PURPOSE: 
+
+	This document defines a multilateral agreement process model.
+	The model defines states, related triggers and actions that 
+	can be applied by a membership, enabling the establishment of 
+	unilateral agreement to a subject.  The prosess enables the 
+	establishment of a motion during which a subject argument is 
+	supplied, the seconding of the motion, possible motion 
+	amendments, leading to a formal vote by the membership.  The
+	model also supports related actions including motion withdrawl,
+	calling the question, oposition semantics, call retraction, 
+	and vote-to-vote actions.
+
+	Copyright OSM SARL 1999,2000.
+ 
+TYPICAL REFERENCE: 
+
+	# "-OSM//XML Model::MULTILATERAL//EN"
+	# "http://www.osm.net/dpml/MULTILATERAL.xml"
+
+DEPENDENCIES: 
+
+	OSM Digial Product Modelling Language (DPML)
+	"-//OSM//DTD Specification::DPML//EN"
+	"http://www.osm.net/dpml/DPML.dtd"
+-->
+
+<DPML>
+
+    <collaboration label="multilateral" note="Multilateral agreement through motion, amendement and voting. This criteria defines a model of collaboration in which an initiating party can establish a motion, a reciprocating party can second the motion, supporting actions enable motion amendment (through amendment motions), leading to a vote on the motion and possible establishment of an agreed result.">
+
+      <input tag="subject" required="true" type="IDL:omg.org/Session/AbstractResource:2.1" />
+
+	<state label="motioned" >
+
+		<state label="pending" >
+
+			<trigger label="motion" >
+				<launch mode="INITIATOR" />
+				<initialization/>
+			</trigger>
+
+			<trigger label="second" >
+				<launch mode="RESPONDENT" />
+				<transition target="seconded" />
+			</trigger>
+
+			<trigger label="withdraw" >
+				<launch mode="INITIATOR" />
+				<termination class="FAILURE" code="0" />
+			</trigger>
+
+			<trigger label="timeout" >
+				<clock timeout="120000" />
+				<termination class="FAILURE" code="-1" />
+			</trigger>
+
+		</state>
+
+		<state label="seconded">
+
+			<trigger label="amend" >
+				<launch mode="PARTICIPANT"/>
+                        <move source="subject" target="subject.pending" />
+				<external label="amending" 
+                                    public="-OSM//XML Model::MULTILATERAL//EN"
+				        	system="http://home.osm.net/dpml/multilateral.xml">
+                        </external>
+				<on class="SUCCESS">
+                            <remove source="subject.pending"/>
+                            <move source="result" target="subject" switch="TRUE"/>
+				    <local reset="TRUE"/>
+				</on>
+				<on class="FAILURE">
+                            <remove source="subject" />
+                            <move source="subject.pending" target="subject"/>
+			          <local reset="TRUE"/>
+				</on>
+			</trigger>
+
+			<trigger label="call" >
+				<launch mode="PARTICIPANT" />
+				<transition target="called" />
+			</trigger>
+
+		</state>
+
+		<state label="called" >
+
+			<trigger label="vote" >
+				<clock timeout="120000"/>
+				<vote label="voting" policy="AFFERMATIVE" numerator="1" denominator="2">
+					<input tag="subject" required="TRUE" 
+						type="IDL:omg.org/Session/AbstractResource:2.1" />
+				</vote>
+   				<on class="SUCCESS">
+					<move source="subject" target="result" switch="TRUE" />
+				    	<termination class="SUCCESS" code="1">
+						<output tag="result" type="IDL:omg.org/Session/AbstractResource:2.1" />
+					</termination>
+				</on>
+				<on class="FAILURE">
+				    	<termination class="FAILURE" code="0" />
+				</on>
+			</trigger>
+
+			<trigger label="oppose" >
+				<launch mode="RESPONDENT" />
+				<transition target="opposed" />
+			</trigger>
+
+		</state>
+
+		<state label="opposed" >
+
+			<trigger label="retraction" >
+				<clock timeout="120000" />
+				<transition target="seconded" />
+			</trigger>
+
+			<trigger label="escalate" >
+				<launch mode="RESPONDENT" />
+				<vote label="vote-to-vote" policy="AFFERMATIVE" numerator="2" denominator="3"/>
+				<on class="SUCCESS">
+			            <referral action="voting" />
+				</on>
+				<on class="FAILURE">
+				    <transition target="seconded" />
+				</on>
+			</trigger>
+
+		</state>
+
+	</state>
+ 
+    </collaboration>
+
+</DPML>
+
+

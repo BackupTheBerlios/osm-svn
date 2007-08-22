@@ -1,0 +1,163 @@
+
+/**
+ * PSDL definition of persitent types and homes supporting the 
+ * OMG Interoperable Naming Service
+ */
+
+#include <CosNaming.idl>
+#pragma prefix "osm.net"
+
+module ins {
+module pss {
+
+    abstract storagetype NCStorage;
+    typedef ref<NCStorage> NCStorageRef;
+    typedef sequence<NCStorageRef> NCStorageRefSeq;
+    
+    abstract storagetype LOStorage;
+    typedef ref<LOStorage> LOStorageRef;
+    typedef sequence<LOStorageRef> LOStorageRefSeq;
+    
+    abstract storagetype POStorage;
+    typedef ref<POStorage> POStorageRef;
+    typedef sequence<POStorageRef> POStorageRefSeq;
+
+        
+   /**
+    * The BindingStorage abstract storage type represents any objects stored in the directory
+    */
+    abstract storagetype BindingStorage
+    {
+       /**
+        * The name of the object from the root
+        */
+        state string componentName;                      
+    };
+    
+    typedef sequence<ref<BindingStorage>> BindingStorageRefSeq;
+    
+   /**
+    * NCStorage abstract storage type reprensents the persistent data of a namingContext
+    */
+    abstract storagetype NCStorage : BindingStorage
+    {
+                
+       /**
+        * The list of NCStorage that are children of this naming context
+        */
+        state NCStorageRefSeq nc_children;
+        
+       /**
+        * The list of NamingObjectsStorage that are children of this naming context
+        */
+        state LOStorageRefSeq no_children;
+        
+       /**
+        * the list of Proxy Naming Contexts that are children of this naimg context
+        */
+        state POStorageRefSeq pnc_children;
+    };
+    
+   /**
+    * This abstract storage type represents a leaf in the directory
+    */
+    abstract storagetype LOStorage : BindingStorage
+    {
+        state Object namingObj;
+    };
+    
+   /** 
+    * This abstract storage type represents a Naming Context that is not local
+    */
+     abstract storagetype POStorage : BindingStorage
+     {
+         state CosNaming::NamingContext ctx;
+     };
+    
+   /**
+    * The factory for the NamingContexts
+    */
+    abstract storagehome NCStorageHome of NCStorage
+    {
+        key componentName;
+        
+        factory create( componentName, nc_children, no_children, pnc_children );
+    };
+    
+   /**
+    * The factory for the NamingObject
+    */
+    abstract storagehome LOStorageHome of LOStorage
+    {
+        key componentName;
+        
+        factory create(componentName, namingObj);
+    };
+    
+   /**
+    * The factory for the ProxyNamingContext
+    */
+    abstract storagehome POStorageHome of POStorage
+    {
+        key componentName;
+        factory create(componentName, ctx);
+    };
+    
+    storagetype BindingStorageBase implements BindingStorage
+    {
+    };
+    
+   /**
+    * This storage type provides an implementation for the abstract storage 
+    * type 'NamingObject'
+    */
+    storagetype LOStorageBase implements LOStorage
+    { 
+    };
+    
+   /**
+    * This storage type provides an implementation for the abstract storage type 
+    * 'ProxyNamingContext'
+    */
+    storagetype POStorageBase implements POStorage
+    { 
+    };
+    
+   /**
+    * This storage home implements the abstract storage home 'NamingObjectHome' 
+    * and manages a storage type 'NamingObjectBase'
+    */ 
+    storagehome LOStorageHomeBase of LOStorageBase implements LOStorageHome
+    { 
+    };
+    
+   /**
+    * This storage home implements the abstract storage home 'POStorageHome' 
+    * and manages a storage type 'POStorageBase'
+    */ 
+    storagehome POStorageHomeBase of POStorageBase implements 
+    POStorageHome
+    { 
+    };
+    
+   /**
+    * This storage type provides an implementation for the abstract storage type 
+    * 'NamingContext'
+    */
+    storagetype NCStorageBase implements NCStorage
+    {
+        stores nc_children as ref<NCStorageBase>;
+        stores no_children as ref<LOStorageBase> scope LOStorageHomeBase;
+        stores pnc_children as ref<POStorageBase> scope POStorageHomeBase;
+    };
+    
+   /**
+    * This storage home implements the abstract storage home 'NamingContextHome' and 
+    * manages a storage type 'NamingContextBase'
+    */ 
+    storagehome NCStorageHomeBase of NCStorageBase implements NCStorageHome
+    { 
+    };
+
+};
+};

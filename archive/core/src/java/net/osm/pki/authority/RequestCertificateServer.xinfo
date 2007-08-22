@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<!--
+ RequestCertificateServer.xinfo
+ Copyright 2001 OSM SARL. All Rights Reserved.
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+ @author  Stephen McConnell
+ @version 1.0 28/12/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <version>1.0</version>
+  </block>
+
+  <services>
+      <service name="net.osm.pki.authority.RequestCertificateService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>VAULT</role>
+          <service name="net.osm.vault.Vault" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>ORB</role>
+          <service name="net.osm.orb.ORBService" version="2.3"/>
+      </dependency>
+      <dependency>
+          <role>PSS-CONNECTOR</role>
+          <service name="net.osm.pss.PSSConnectorService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>PSS-SESSION</role>
+          <service name="net.osm.pss.PSSSessionService" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+</blockinfo>
+

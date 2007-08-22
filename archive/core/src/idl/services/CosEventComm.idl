@@ -1,0 +1,118 @@
+//File: CosEventComm.idl
+//Part of the Event Service
+
+#ifndef _COS_EVENT_COMM_IDL_
+#define _COS_EVENT_COMM_IDL_
+#pragma prefix "omg.org"
+
+/**
+* The CosEvent Push-style Communication Between a Supplier and a Consumer and 
+* Pull-style Communication Between a Supplier and a Consumer communication styles are both supported by
+* four simple interfaces: PushConsumer, PushSupplier, and PullSupplier and
+* PullConsumer. These interfaces are defined in the CosEventComm module.
+*/
+
+module CosEventComm {
+
+	exception Disconnected{};
+
+	/**
+	* A push-style consumer supports the PushConsumer interface to receive event data.
+	*/
+
+	interface PushConsumer {
+
+		/**
+		* A supplier communicates event data to the consumer by invoking the 
+		* push operation and passing the event data as a parameter. If the event 
+		* communication has already been disconnected, the Disconnected 
+		* exception is raised.
+		*/
+
+		void push (in any data) raises(Disconnected);
+
+		/**
+		* The disconnect_push_consumer operation terminates the event 
+		* communication; it releases resources used at the consumer to support the 
+		* event communication. The PushConsumer object reference is disposed.
+		*/
+
+		void disconnect_push_consumer(); 
+	};
+
+	/**
+	* A push-style supplier supports the PushSupplier interface.
+	*/
+
+      interface PushSupplier {
+
+		/**
+		* The disconnect_push_supplier operation terminates the event 
+		* communication; it releases resources used at the supplier to support the 
+		* event communication. The PushSupplier object reference is disposed.
+		*/
+
+		void disconnect_push_supplier();
+	};
+
+	/**
+	* A pull-style supplier supports the PullSupplier interface to transmit event data.
+	* A consumer requests event data from the supplier by invoking either the pull
+	* operation or the try_pull operation on the supplier.
+	*/
+
+	interface PullSupplier {
+
+		/**
+		* The pull operation blocks until the event data is available or an 
+		* exception is raised. It returns the event data to the consumer. If the 
+		* event communication has already been disconnected, the Disconnected 
+		* exception is raised.
+		*/
+
+		any pull () raises(Disconnected);
+
+		/**
+		* The try_pull operation does not block: if the event data is 
+		* available, it returns the event data and sets the has_event 
+		* parameter to true; if the event is not available, it sets the has_event 
+		* parameter to false and the event data is returned
+		* as long with an undefined value. If the event communication has 
+		* already been disconnected, the Disconnected exception is raised.
+		*/
+
+		any try_pull (
+			out boolean has_event
+		) raises ( 
+			Disconnected
+		);
+
+		/**
+		* The disconnect_pull_supplier operation terminates the 
+		* event communication; it releases resources used at the supplier to 
+		* support the event communication. The PullSupplier object reference is 
+		* disposed.
+		*/
+
+		void disconnect_pull_supplier(); 
+
+	};
+
+	/**
+	* A pull-style consumer supports the PullConsumer interface.
+	*/
+
+	interface PullConsumer {
+
+		/**
+		* The disconnect_pull_consumer operation terminates the 
+		* event communication; it releases resources used at the consumer to 
+		* support the event communication. The PullConsumer object reference 
+		* is disposed.
+		*/
+
+		void disconnect_pull_consumer();
+	};
+
+};
+#endif /* ifndef _COS_EVENT_COMM_IDL_ */

@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<!--
+ DomainManager.xinfo
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 17/03/2002
+-->
+
+<blockinfo>
+
+  <block>
+    <name>domain</name>
+    <version>1.0</version>
+  </block>
+
+  <services>
+      <service name="net.osm.domain.DomainService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>orb</role>
+          <service name="org.apache.pss.ORB" version="2.4"/>
+      </dependency>
+  </dependencies>
+
+  <configuration>
+
+    <!--
+    The PSS configuration.
+    -->
+
+    <pss>
+
+      <session>
+        <parameter name="PSS.File.DataStore.Directory" value="pss" />
+        <parameter name="PSS.File.DataStore.Name" value="domain" />
+      </session>
+
+      <persistence>
+        <storage psdl="PSDL:osm.net/domain/DomainStorageBase:1.0"
+          class="net.osm.domain.DomainStore" />
+        <home psdl="PSDL:osm.net/domain/DomainStorageHomeBase:1.0"
+          class="net.osm.domain.DomainStorageHomeBase" />
+      </persistence>
+
+    </pss>
+
+    <!--
+    Declaration of a default domain.
+    -->
+
+    <domain>
+      <authority>DNS</authority>
+      <address>localhost</address>
+    </domain>
+
+  </configuration>
+
+  <implementation policy="SINGLETON"/>
+
+</blockinfo>
+

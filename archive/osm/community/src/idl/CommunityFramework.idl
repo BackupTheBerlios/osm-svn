@@ -1,0 +1,1175 @@
+/*
+ * CommunityFramework.idl
+ *
+ * Copyright 2000-2001 OSM SARL.
+ * Rights to world-wide unlimited distribution of version 2.0 
+ * granted to the Object Management Group by OSM SARL. This 
+ * version (2.1 contains supplimentary specifications that are
+ * copyright OSM SARL.  OSM reserves all rights pending incorporation 
+ * all or part of these supplimentary specifications under future 
+ * revisions of the OMG Electronic Commerce Domain Specifications.
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.1 2 APR 2001
+ */
+
+// Changes:
+// SJM, 26 DEC 2000, changed the defintion of Note and Label valuetypes
+// due to runtime failure on JBroker and OpenORB platforms (see below).
+
+#ifndef _COMMUNITY_IDL_
+#define _COMMUNITY_IDL_
+#include <Session.idl>
+#pragma prefix "omg.org"
+
+module CommunityFramework {
+
+	#pragma version CommunityFramework 2.0
+
+	// forward declarations
+
+	interface Agency;
+	interface Community;
+	interface Generic;
+
+	abstract interface LegalEntity;
+	abstract interface Simulator;
+	abstract interface Membership;
+	abstract interface ResourceFactory;
+	abstract interface Model;
+
+      valuetype Criteria;
+      valuetype Control;
+	valuetype Role;
+	valuetype MembershipPolicy;
+	valuetype MembershipModel;
+	valuetype Problem;
+
+	// typedefs
+
+	valuetype Note string; // SJM: was valuetype Note CORBA::StringValue;
+	valuetype Label string; // SJM: was valuetype Label CORBA::StringValue;
+
+	valuetype Arguments CosLifeCycle::Criteria;
+	valuetype Roles sequence <Role>;
+	valuetype Models sequence <Model>;
+	valuetype CriteriaSequence sequence <Criteria>;
+	valuetype Problems sequence <Problem>;
+	valuetype Labels sequence <Label>;
+
+	// links
+
+/**
+* Member is a type of Privilege link (refer Task and Session) that defines 
+* relationship between a Membership and a User.  Recognizes is the 
+* inverse association of Member that associates a Membership with a Users.  
+* A Member instance when held by a Membership implementation 
+* references the participating User.  The inverse relationship, held by an 
+* implementation of User, contains a reference to the target Membership.  
+*/
+
+	valuetype Member : Session::Privilege 
+      {
+
+   /**
+    * The reference to a Membership that the User, holding this link is a member of.
+    */
+
+		public Membership resource_state;
+
+	};
+
+/**
+* Recognizes is a type of Privilege link (refer Task and Session) that defines 
+* relationship between a Membership and a User.  Member is the 
+* inverse association of Recognizes that associates a User with a Membership.  
+* A Recognizes instance, held by a Membership implementation 
+* references the participating User.  The inverse relationship, held by an 
+* implementation of User (called Member), contains a reference to the target 
+* Membership.  
+*/
+
+	valuetype Recognizes : Session::Privilege 
+      {
+
+    /**
+    * The User that this association refers to.
+    */
+
+		public Session::User resource_state;
+
+    /**
+    * A sequence of role names that the User is associated under 
+    * within the hosting Membership.
+    */
+
+		public Labels roles;
+	};
+	
+
+	// structures
+
+/**
+* QuorumAssessmentPolicy is an enumeration of assesment values covering 
+* STRICT and LAZY assessment policies. A STRICT QuorumAssessmentPolicy 
+* requires that quorum calculation is active in that execution may not proceed
+* until quorum is established, wheras LAZY assessment enables optimistic
+* execution of processes with quorum assessment on completion of the process
+* based on the participation of a number of members over a period of time.
+* LAZY assessment enables a logical collapse of time in the determination of 
+* applicable quorum and is appropriate for long duration activties where the 
+* explicit presence of the entire membership at a given point in time is not 
+* mandiated.  
+*/
+
+	enum QuorumAssessmentPolicy
+		{
+		STRICT, 
+		LAZY // default
+	};
+
+/**
+* MembershipPolicyValue enumerates privacy qualifiers.  Each qualifier defines a 
+* level of information access concerning members and the roles they have.  Privacy 
+* constraints refer to structural information (the association of members to a 
+* membership) and member role attribution.
+*
+*<P>
+* <table cellpadding=0 cellspacing=3 border=0>
+* <tr bgcolor="lightslategray" ><td width="30%">Value</td><td width="70%">Description</td></TR>
+* <tr><td>PUBLIC_DISCLOSUREn</td>
+* <td>Operations may return structural and member role associations to non-members.</td></TR>	
+* <tr><td>RESTRICTED_DISCLOSURE</td>
+* <td>Operations may return structural and member role associations to members that share a 
+* common root Membership (where a root membership is derived from navigation of collection 
+* relationships to higher-level membership instances).</td></TR>	
+* <tr><td>PRIVATE_DISCLOSURE</td>
+* <td>Operations may return structural and member role associations to members of the same 
+* Membership.</td></TR>	
+* </table>
+* <p>
+*/
+
+	enum PrivacyPolicyValue 
+		{ 
+		PUBLIC_DISCLOSURE, 
+		RESTRICTED_DISCLOSURE, 
+		PRIVATE_DISCLOSURE 
+	};
+
+/**
+* RecruitmentStatus is an enumeration of the status of a Membership, corresponding 
+* to one of the values of OPEN_MEMBERSHIP or CLOSED_MEMBERSHIP.
+*/
+
+	enum RecruitmentStatus{
+		OPEN_MEMBERSHIP, // default
+		CLOSED_MEMBERSHIP
+	};
+
+/**
+ * The MembershipCount valuetype  contains two values, the number of 
+ * Member instances associated to the Membership, and the number of 
+ * Member instances referencing connected Users at the time of 
+ * invocation.
+ * 
+ * @see org.omg.Session.User#connectstate
+ *
+ */
+
+	valuetype MembershipCount{
+
+   /**
+    * The number of users recognized by the Membership.
+    */
+
+		public long static;
+	
+   /**
+    * The number of recognized members that are associated uder a User instance 
+    * under a connected (as opposed to disconnected) state.
+    * 
+    * @see org.omg.Session.User#connectstate
+    *
+    */
+	
+		public long active;	
+	};
+
+/**
+* QuorumPolicy is an enumeration of the values SIMPLE and CONNECTED.  The SIMPLE 
+* quorum policy declares that quorum is determined by the number of recongnized 
+* users bound to the Membership whereas the CONNECTED policy requires that 
+* recognized users must also expose a connected state.
+* @see org.omg.Session.User#connectstate
+* @see org.omg.CommunityFramework.Recognizes
+*/
+
+	enum QuorumPolicy 
+		{
+		SIMPLE, // default
+		CONNECTED
+	};
+
+/**
+ * A valuetype that declares a possible quorum status condition.  Possible 
+ * QurumStatus values correspond to QUORUM_VALID, indicating that all roles 
+ * have reached quorum, QUORUM_PENDING, indicating that the a role has not 
+ * reached quorum, and the special case of QUORUM_UNREACHABLE, indicating 
+ * that the maximum number of members required for a particular role is less 
+ * than the minimum required.
+*/
+
+	enum QuorumStatus { 
+		QUORUM_VALID, 
+		QUORUM_PENDING, 
+		QUORUM_UNREACHABLE 
+	};
+
+/**
+ * RoleStatus is a valuetype returned from the Membership get_quorum_status
+ * operation that contains a role label as an identifier, the count of 
+ * members asscoaited under the identified role, and the quorum status for
+ * the role.
+ *
+ * @see org.omg.CommunityFramework.Membership#get_quorum_status
+ */
+
+ 	valuetype RoleStatus 
+		{
+
+   /**
+    * String identifier corresponding to the label of a busienss role.
+    * @see org.omg.CommunityFramework.Role
+    */
+
+		public Label identifier;
+
+   /**
+    * The number of Users recognized by the Membership under the role
+    * with a label corresponding to the identifier value.
+    * @see org.omg.CommunityFramework.Role#label
+    */
+
+		public MembershipCount count;
+
+   /**
+    * The quorum status of a role with a label corresponding to the 
+    * identifier value under a particular Membership supplying the 
+    * RoleStatus value.
+    * @see org.omg.CommunityFramework.Role#label
+    * @see org.omg.CommunityFramework.Membership#get_quorum_status
+    */
+
+		public QuorumStatus status;	
+	};
+
+	valuetype Problem 
+		{
+		public Session::Timestamp timestamp;
+		public Label identifier;
+		public CORBA::StringValue message;
+		public CORBA::StringValue description;
+		public Problems cause;
+	};
+
+	// exceptions
+
+	exception PrivacyConflict
+		{
+		PrivacyPolicyValue reason;
+	};
+
+	exception AttemptedCeilingViolation{ 
+		Membership source;
+	};
+
+	exception AttemptedExclusivityViolation{ 
+		Membership source;
+	};
+	
+	exception UnknownRole{  
+		Membership source;
+	};
+
+	exception UnknownMember{  
+		Membership source;
+		Member link;
+	};
+	
+	exception UnknownIdentifier{ 
+		Membership source;
+		Label identifier; 
+	};
+
+	exception MembershipRejected{ 
+		Membership source;
+		string reason;
+	};
+
+	exception RoleAssociationConflict{ 
+		Membership source;
+		string reason;
+		Label role;
+	};
+
+	exception CannotRemoveRole{ 
+		Membership source;
+		string reason;
+		Label role;
+	};
+
+	exception RecruitmentConflict{
+		Membership source;
+		RecruitmentStatus reason;
+	};
+
+	exception LockedResource{ 
+		Generic source;
+	};
+
+	exception ResourceFactoryProblem{ 
+		ResourceFactory source;
+		CommunityFramework::Problem problem;
+	};
+
+      // supplimentary exception added by OSM dealing with 
+      // conflicts on type when associating a value to a generic resource
+
+	exception GenericTypeConflict
+      { 
+		string required;
+	};
+
+// interfaces
+
+/**
+* Production is the abstract base for the Link valuetypes Produces and  
+* ProducedBy.  Produces is a Link held by a Task that references an  
+* AbstractResource it is producing.  The inverse of this association  
+* is the link ProducedBy, held by the produced AbstractResource,  
+* referencing the Task that is producing it. 
+*/
+
+	abstract interface Model 
+		{
+	};
+
+/**
+* A Simulator is an abstract interface that defines a single attribute 
+* through which a client can access a related Model.  A model valuetype 
+* defines constraints and operational semantics.  Implementations of 
+* concrete simulators (such as Community and Agency) are responsible 
+* for ensuring that the appropriate type of model is returned through 
+* to the client.  For example, a Community implementation of the model 
+* operation will return an instance of MembershipModel.
+*/
+
+	abstract interface Simulator 
+		{
+
+		/**
+    		*Access to a valuetype supporting the abstract Model interface.
+    		*/
+
+		readonly attribute CommunityFramework::Model model; 
+	};
+
+/**
+* The MembershipPolicy valuetype is contained within the CommunityModel 
+* valuetype (and other valuetypes defined under the CollaborationFramework).  
+* MembershipPolicy defines privacy and exclusivity policy of the containing 
+* Membership.
+*/
+
+	valuetype MembershipPolicy
+		{
+
+	   /**
+	    * Qualification of the extent of information to be made available to 
+	    * clients.
+	    * @see org.omg.CommunityFramework.PrivacyPolicyValue
+	    */
+
+		public PrivacyPolicyValue privacy;
+
+	   /**
+	    * Restricts the number of Member instances associated to a Membership to 
+	    * 1 for a given principal identity.
+	    */
+
+		public boolean exclusive;
+	};
+
+/**
+* RolePolicy is a valuetype that defines ceiling limits and quorum policy for a 
+* particular role. The value of the quorum filed defines the minimum number of 
+* Members that must be associated with the role that the policy is associated 
+* with before the role can be considered to have reached quorum.  The ceiling 
+* field defines the maximum number of Members that may be associated under the 
+* role.  The policy field exposes a RolePolicy value that details the mechanism 
+* to quorum calculations.  In the case of a null value for policy or assessment, 
+* the value shall be inferred by the parent policy.  In the case of no parent 
+* policy declaration, quorum policy shall be SIMPLE and assessment policy shall 
+* be LAZY (representing the least restrictive case).  The absence of a ceiling 
+* value shall indicate no limit on the number of associated members.  The 
+* absence of a quorum value shall imply a quorum of 0.
+*/
+
+	valuetype RolePolicy 
+		{
+
+   /**
+    * The minimum number of Members that must be associated with the role 
+    * before the role can be considered to have achieved quorum.   
+    */
+
+		public long quorum;
+
+   /**
+    * The maximum number of Member instances that may be associated to this role.
+    */
+
+		public long ceiling;
+
+   /**
+    * An emanation of SIMPLE or CONNECTED.  When the value is SIMPLE, quorum 
+    * calculation is based on number of Member instances.  When the quorum policy 
+    * is CONNECTED, the quorum calculation is based on the number of Member 
+    * instances that reference a User that is in a connected state.
+    */
+
+		public QuorumPolicy policy;
+
+   /**
+    * An enumeration used to determine the mechanism to be applied to quorum 
+    * assessment.  The enumeration describes STRICT and LAZY assessment policies.  
+    * Under STRICT assessment, the establishment of a quorum is required before the 
+    * membership is considered valid.  Under LAZY assessment, the determination of 
+    * quorum is based on the accumulative count of members during the lifetime of 
+    * the membership.  LAZY assessment introduces the possibility for the execution 
+    * of optimistic processes that depend on valid quorums for finalization and 
+    * commitment of results.
+    */
+
+		public QuorumAssessmentPolicy assessment;
+
+	};
+
+/**
+* Control is an identifiable valuetype used in definition of 
+* valuetypes defining complex models.  Control contains a human 
+* readable label and descriptive note. Control is used as a 
+* utility state container by several valuetypes defined within 
+* the Community and Collaboration frameworks. 
+*/
+
+	valuetype Control 
+		{ 
+
+    /**
+    * Name of the control.
+    */
+
+		public CommunityFramework::Label label;
+
+    /**
+    * Description of the control.
+    */
+
+		public CommunityFramework::Note note;
+	};
+
+
+/**
+* Role is a valuetype that declares the notion of a "business role" 
+* of a User.  The state fields label and note inherited from Control 
+* are used to associate a role name and role description.  Role 
+* supplements this information with an additional three state fields, 
+* policy, is_abstract and roles.  The roles field contains a sequence 
+* of role instances through which role hierarchies can be constructed. 
+* The policy field value is RolePolicy valuetype that qualifies the 
+* quorum, ceiling, quorum assessment and quorum policy applicable to 
+* the containing role.  A Role can be declared as an abstract role by 
+* setting the is_abstract state field value to true.  Declaring the 
+* role as abstract disables direct association of a User to the Role 
+* under a Membership.  Instead, members can associate lower-level roles, 
+* thereby implicitly associating themselves with the containing roles.
+* <p>
+* Examples of business role hierarchies include the logical association 
+* of "customer" and "supplier" as roles under a parent named 
+* "signatories".  In this example, both "customer" and "supplier" would 
+* be modeled as Role instances with is_abstract set to false, and 
+* contained within a single Role named "signatories".  By setting the 
+* "signatories" role is_abstract value to true, Members cannot directly 
+* associate to this role.  Instead, Members associating to either 
+* "customer" or "supplier" are implicitly granted "signatory" association. 
+* <p>
+* An implementation is responsible for ensuring the consistency of quorum 
+* and ceiling values across a role hierarchy.
+*/
+
+	valuetype Role :
+            Control
+		{
+
+    /**
+    * Defines policy associated with an instance of RoleContainer or 
+    * RoleElement.  If null, no direct policy constraint is implied.
+    */
+
+		public RolePolicy policy;
+
+    /**
+    * A sequence of Role instances that are considered as children 
+    * relative to the containing role.  Association of a Member to a 
+    * child role implicitly associates the Member with all parent roles.
+    */
+
+		public CommunityFramework::Roles roles;
+
+   /**
+    * If true, Member instances may not be directly associated with 
+    * the role under a Membership.  Members may be associated implicitly 
+    * through association to a non-abstract sibling.
+    */
+
+		public boolean is_abstract;
+	};
+
+/**
+* Membership is an abstract interface inherited by Community that defines 
+* operations supporting association and retraction of users under Member 
+* links, the qualification of members in terms of business roles, and 
+* operations supporting access to information about associated Users.  
+* A MembershipModel qualifies membership behavior.   The MembershipModel 
+* defines a hierarchy of business roles that qualify the association 
+* between a User and the Membership. In addition, MembershipModel 
+* declares policy concerning privacy of Member relationship information, 
+* User to role association, and exclusivity of the membership.
+*/
+
+	abstract interface Membership :
+		Simulator
+		{
+
+	#pragma version Membership 2.1
+
+
+   /**
+    * Returns the RecruitmentStatus of the Membership.
+    *
+    * @return RecruitmentStatus The value returned is one 
+    * of the enumeration values OPEN_MEMBERSHIP or CLOSED_MEMBERSHIP.  
+    */
+
+		readonly attribute RecruitmentStatus recruitment_status;
+
+
+   /**
+    * Supports access to the number of associated Member instances.  
+    * The valuetype MembershipCount contains two values, the number of 
+    * Member instances associated to the Membership (static field), and the 
+    * number of Member instances referencing connected Users at the time 
+    * of invocation (refer Task and Session, User, Connected State).
+    *
+    * @return MembershipCount a struct containing (a) the number of 
+    * associated, and (b) connected users.
+    */
+
+		readonly attribute MembershipCount membership_count;
+
+   /**
+    * Returns true if all roles defined within the associated MembershipPolicy 
+    * have met quorum – that is to say that for each role, the number of 
+    * member instances associated with that role, equal or exceed the 
+    * quorum value defined under the RolePolicy associated with the given 
+    * role (refer RolePolicy).
+    *
+    * @return boolean true if the membership has reached quorum 
+    */
+
+		readonly attribute boolean quorum_status;
+
+   /**
+    * Set the recrutment status to the supplied value.
+    * @since 2.1
+    * @param  RecruitmentStatus The value to set the recruitment status to
+    *   (either OPEN_MEMBERSHIP or CLOSED_MEMBERSHIP).
+    */
+    		void set_recruitment_status( 
+			in RecruitmentStatus status
+		);
+
+   /**
+    * Quorum status relating to individual roles is available through the 
+    * <code>get_quorum_status</code> operation.  The identifier argument 
+    * corresponds to identify of a role exposed within a MembershipModel. 
+    *
+    * @return RoleStatus a valurtype containing the role status, count and 
+    * role identifier.
+    * @param String identifier - string identifying the role
+    */
+
+		RoleStatus get_quorum_status(
+			in Label identifier // role identifier
+		);
+
+   /**
+    * The join operation allows a client to associate a User reference with 
+    * a Membership under a set of declared business roles (refer 
+    * MembershipPolicy).  The join operation returns a Member instance to 
+    * be maintained by the User instance.
+    *
+    * @see org.omg.CommunityFramework.MembershipPolicy
+    * 
+    * @return Member a role association containing the user
+    *
+    * @param user the User to be associated with the Membership
+    *
+    * @param roles a sequence os String instances representing the 
+    * roles to attribute to the user
+    *
+    * @exception AttemptedCeilingViolation
+    * if the number of Users associated unde the supplied role exceeds 
+    * the maximum allowed under the associated RolePolicy
+    *
+    * @exception AttemptedExclusivityViolation if a user attempts to join 
+    * more than once using the same User identity
+    *
+    * @exception RecruitmentConflict if the current RecruitmentStatus is 
+    * CLOSED_MEMBERSHIP
+    *
+    * @exception RoleAssociationConflict if a supplied role name is an 
+    * abstract role
+    *
+    * @exception MembershipRejected if the implementation chooses to disallow 
+    * user association for an implementation or policy reason
+    *
+    * @exception UnknownRole if a role references in the roles argument is unknown 
+    * within the scope of the Membership
+    */
+
+		Member join(
+			in Session::User user,
+			in Labels roles
+		) raises (
+			AttemptedCeilingViolation,
+			AttemptedExclusivityViolation,
+			RecruitmentConflict,
+			RoleAssociationConflict,
+			MembershipRejected,
+			UnknownRole
+		);
+
+   /**
+    * The leave operation disassociates a Member from a Membership.  
+    *
+    * @param member the Member association to retract from the Membership
+    *
+    * @exception RecruitmentConflict if the current RecruitmentStatus is 
+    * CLOSED_MEMBERSHIP
+    *
+    * @exception UnknownMember if a Member references in the member argument is unknown 
+    * within the scope of the Membership
+    */
+
+		void leave(
+			in CommunityFramework::Member member
+		) raises (
+			RecruitmentConflict,
+			UnknownMember	
+		);
+
+   /**
+    *The add_roles operation enables the addition of business roles attributed to a Member.
+    * 
+    * @exception UnknownMember if the supplied Member is unknown within the scope 
+    * of the Membership.
+    *
+    * @exception RoleAssociationConflict may be invoked if the current RecruitmentStatus 
+    * is a CLOSED_MEMBERSHIP
+    * 
+    * @exception UnknownRole if a role references in the roles argument is unknown 
+    * within the scope of the Membership
+    */
+
+		void add_roles(
+			in CommunityFramework::Member member,
+			in Labels roles
+		) raises (
+			UnknownMember,
+			RoleAssociationConflict,
+			UnknownRole
+		);
+
+   /**
+    * The remove_roles operation disassociated an existing business roles attributed 
+    * to a Member.
+    * 
+    * @param member Member - the association defining the connection 
+    * of the User to the Membership
+    *
+    * @param roles String[] - declaring the names of the roles to which 
+    * this User should be associated under this Membership
+    *
+    * @exception UnknownRole if the supplied Role label is unknown within the scope 
+    * of the Membership.
+    * 
+    * @exception UnknownMember if the supplied Member is unknown within the scope 
+    * of the Membership.
+    *
+    * @exception CannotRemoveRole if the supplied Role label references a role 
+    * cannot be removed.
+    */
+
+		void remove_roles(
+			in CommunityFramework::Member member,
+			in Labels roles 
+		) raises (
+			UnknownRole,
+			UnknownMember,
+			CannotRemoveRole
+		);
+
+   /**
+    * The is_member operation returns true if the supplied User is a member of the membership.
+    *
+    * @exception PrivacyConflict if there is a privacy policy conflict
+    */
+
+		boolean is_member( 
+			in Session::User user
+		) raises (
+			PrivacyConflict 
+		);
+
+   /**
+    * The has_role operation returns true if the supplied User is associated 
+    * to the Membership under a role corresponding to the supplied identifier.
+    *
+    * @exception PrivacyConflict if there is a privacy policy conflict
+    */
+
+		boolean has_role( 
+			in Session::User user,
+			in Label role 
+		) raises (
+			PrivacyConflict 
+		);
+
+   /**
+    * The get_member_roles operation returns the sequence of all role identifiers 
+    * associated with the supplied user.
+    *
+    * @param user User to assess in terms of attributed roles
+    * @exception PrivacyConflict if there is a privacy policy conflict
+    */
+
+		Labels get_member_roles( 
+			in Session::User user
+		) raises (
+			PrivacyConflict 
+		);
+
+   /**
+    * The list_members operation returns an iterator of all User instances 
+    * associated with the Membership.  The max_number argument constrains 
+    * the maximum number of User instances to include in the returned list sequence.
+    *
+    * @param max_number int - the maximum number of User instances to include
+    * in the returned UserHolder sequence
+    *
+    * @param list UsersHolder - a sequence of user instances
+    *
+    * @exception PrivacyConflict if there is a privacy policy conflict
+    */
+
+		Session::UserIterator list_members(
+			in long max_number,
+			out Session::Users list
+		) raises (
+			PrivacyConflict  
+		);
+
+   /**
+    * The list_members_using operation returns an iterator of 
+    * all User instances associated with the Membership under a supplied 
+    * role.  The max_number argument constrains the maximum number 
+    * of Member instances to include in the returned list sequence.
+    * 
+    * @param role String containign the label of the role
+    * 
+    * @param max_number int defining the maximum number of user to include in 
+    * the returned UsersHolder sequence.
+    *
+    * @param list UsersHolder a sequence of User instances
+    *
+    * @exception PrivacyConflict if there is a privacy policy conflict
+    */
+
+		Session::UserIterator list_members_using(
+			in Label role,
+			in long max_number,
+			out Session::Users list
+		) raises (
+			PrivacyConflict
+		);
+
+	};
+
+/**
+* MembershipModel is a valuetype that extends the Model valuetype 
+* through addition of fields containing a MembershipPolicy and a 
+* Role representing the root business role of a role hierarchy.
+*/
+
+	valuetype MembershipModel : 
+		Control supports Model
+		{
+
+    /**
+    * Defines privacy and exclusivity policy of the containing Membership.
+    */
+
+		public MembershipPolicy policy;
+
+   /**
+    * The root role of a role hieriachy.
+    */
+
+		public CommunityFramework::Role role;
+
+	};
+
+/**
+* Criteria is an abstract interface supported by valuetypes that define 
+* factory creation criteria for concrete resource types defined within 
+* Community and Collaboration frameworks.  A Criteria specialisation is 
+* defined for each concrete resource type (refer ResourceFactory Required 
+* Criteria Support).  ExternalCriteria is a special case of Criteria used 
+* to describe a reference to an external artefact (such as an XML 
+* document) that can be resolved in an implementation specific manner.
+*/
+
+
+
+	valuetype Criteria : 
+		Control
+		{
+
+    /**
+    * Implementation specific criteria used as supplementary information 
+    * supporting the identification of a ResourceFactory and
+    * supplimenting arguments to the factory over and above criteria 
+    * specialization. 
+    */
+
+		public Arguments values;
+	};
+
+/**
+* An ExternalCriteria is a container of a reference to an XML resource
+* containing a DPML Criteria description.
+*/
+
+	valuetype ExternalCriteria :
+		Criteria
+		{
+
+    /**
+    * XML public identifier.
+    */
+
+		public CORBA::StringValue common;
+
+    /**
+    * XML system identifier.
+    */
+
+		public CORBA::StringValue system;
+
+	};
+
+    	/**
+	* A Community is a type combining a formal model of membership with 
+	* the Task and Session Workspace.  As a Workspace, a Community is a 
+	* container of AbstractResource instances. As a Membership, a Community 
+	* exposes a MembershipModel detailing the allowable business roles and 
+	* group constraints applicable to associated Users. A new instance of
+	* Community may be created by passing an instance of CommunityCriteria to the 
+	* create operation on ResourceFactory.
+	*
+	* @see org.omg.CommunityFramework.CommunityCriteria
+	* @see org.omg.CommunityFramework.ResourceFactory
+      */
+
+	interface Community : 
+		Session::Workspace,
+		Membership
+		{
+
+		#pragma version Community 2.0
+
+	};
+
+/**
+* CommunityCriteria is a valuetype derived from Criteria and is 
+* used as an argument to a ResourceFactory in the creation of a new Community
+* business object.
+*/
+
+	valuetype CommunityCriteria  :
+		Criteria
+		{
+
+    /**
+    * The MembershipModel defining the policy and constraints
+    * applicable to a Community busienss object.
+    */
+
+		public MembershipModel model;
+	};
+
+
+/**
+* LegalEntity is an abstract interface that defines access to implementation
+* specific criteria such as security policy, public company information and 
+* so forth. A new instance of Agency may be created by passing an instance 
+* of AgencyCriteria to the create operation on ResourceFactory.
+*/
+
+	abstract interface LegalEntity {
+
+   /**
+    * A value that may be used in an implementation specific way to 
+    * expose security and other credentials towards clients.
+    */
+
+		readonly attribute any about;
+	};
+
+
+/**
+ * Agency is a specialization of Community and LegalEntity that introduces 
+ * the notion of organized community such as a company. As a LegalEntity, an 
+ * Agency may be associated to a number of users representing roles relative to 
+ * a resource derived from LegalEntity. LegalEntity is an abstract interface 
+ * that defines access to implementation specific criteria such as security 
+ * policy, public company information and so forth. A new instance of 
+ * Agency may be created by passing an instance of AgencyCriteria to the create 
+ * operation on ResourceFactory.
+ *
+ * @see org.omg.CommunityFramework.AgencyCriteria
+ * @see org.omg.CommunityFramework.ResourceFactory
+ */
+
+	interface Agency :
+		Community, 
+		LegalEntity
+		{
+
+		#pragma version Community 2.0
+
+	};
+
+/**
+* AgencyCriteria is a valuetype derived from CommunityCriteria that is 
+* used as an argument to a ResourceFactory.  A ResourceFactory implementation
+* is responsible for seperating the "about" named value as the value of the 
+* Agency <code>about</code> state member.
+*/
+
+	valuetype AgencyCriteria : CommunityCriteria { };
+
+/**
+* Generic is an abstract interface that exposes operations through 
+* which values (in the form of an any) can be attributed to the resource 
+* in an interoperable manner.  Instances of Generic (such as GenericResource) 
+* are created through a ResourceFactory using an instance of GenericCriteria 
+* as the criteria argument.
+*/
+
+//	abstract interface Generic {
+	interface Generic {
+
+		#pragma version Generic 2.1
+
+
+   /**
+    * Returns the IDL identifier of the type of value that can be 
+    * contained within the generic resource instance.
+    * @since 2.1
+    */
+		readonly attribute string constraint;
+
+   /**
+    * Return a <code>ValueBase</code> instance that is the generic resource value.
+    */
+		readonly attribute ValueBase value; // was any
+
+   /**
+    * Types derived from Generic can be locked to prevent modification
+    * of the value attribute.  The locked atrribute supports setting and getting 
+    * of the locked state of the resource.
+    *
+    * @return true if locked.
+    */
+
+		attribute boolean locked;
+
+   /**
+    * Sets the template state of the resource.
+    */
+
+		attribute boolean template;
+
+   /**
+    * Sets the value of the Generic resource.
+    * @param value org.omg.CORBA.Any a reference to a CORBA Any to be assigned as the 
+    * value of the resource.
+    * This operation has been modified from the spec - the original method took 
+    *  an any as an argument which is where preconditions to the values type
+    *  are declared - modifying the any would result in modification of the
+    *  bound valuetype constraint
+    * @exception LockedResource if invoked under a locked state.
+    * @since 2.1
+    */
+
+		void set_value( 
+			in ValueBase value // was any
+		) raises (
+			LockedResource,
+                  GenericTypeConflict // new in 2.1
+		);
+	};
+
+/**
+* GenericResource is a type of AbstractResource that exposes operations through 
+* which values (in the form of an any) can be attributed to the resource in an 
+* interoperable manner.  Instances of GenericResource are created through a 
+* ResourceFactory using an instance of GenericCriteria as the criteria argument.
+*/
+
+	interface GenericResource :
+		Session::AbstractResource,
+		Generic
+		{
+
+		#pragma version GenericResource 2.1
+
+	};
+
+/**
+* An GenericCriteria is used as an argument to a ResourceFactory enabling 
+* the creation of a new GenericResource business object.
+*/
+
+	valuetype GenericCriteria : Criteria 
+      {
+
+	    #pragma version GenericCriteria 2.1
+
+         /**
+          * IDL type identifier. Declaration of the type of valuetype that 
+	    * can be contained in the generic resource that this criteria 
+          * is used to create. This state member is an extension that enables 
+          * declaration of permissible types that may be inserted as the 
+          * value of the generic resource.
+          * @since 2.1 
+	    */
+          public string identifier;
+      };
+
+/**
+* ResourceFactory is a general utility exposable by FactoryFinder 
+* interfaces on Session::Workspace and Session::User interfaces.  
+* ResourceFactory creates new instances of AbstractResource and derived 
+* types based on a supplied name and Criteria.  The supporting operation 
+* exposes a sequence of default Criteria instances supported by the 
+* factory.  The Criteria types that a resource factory is required to 
+* expose and support are detailed in the following table.
+* 
+*<P>
+* <table cellpadding=0 cellspacing=3 border=0>
+* <tr bgcolor="lightslategray" >
+* <td width="40%">Module</td>
+* <td width="30">Criteria type</td>
+* <td width="30%">Created Resource Type</td>
+* <tr><td>CommunityFramework</td>
+* <td>CommunityCriteria</td>
+* <td>Community</td></tr>
+* <tr><td></td>
+* <td>AgencyCriteria</td>
+* <td>Agency</td></tr>
+* <tr><td></td>
+* <td>GenericCriteria</td>
+* <td>GenericResource</td></tr>
+* <tr><td>CollaborationFramework</td>
+* <td>ProcessorCriteria</td>
+* <td>Processor</td></tr>
+* <tr><td></td>
+* <td></td>
+* <td>EngagementProcessor</td></tr>
+* <tr><td></td>
+* <td></td>
+* <td>VoteProcessor</td></tr>
+* <tr><td></td>
+* <td></td>
+* <td>CollaborationProcessor</td></tr>
+* </table>
+* <p>
+*/
+
+	abstract interface ResourceFactory 
+	{
+
+   /**
+    * Returns a list of the Criteria instances supported by this 
+    * factory implementation.
+    */
+
+		readonly attribute CriteriaSequence supporting;
+
+   /**
+    * Factory operation for the creation of a AbstractResource based on a supplied
+    * Criteria and String.
+    *
+    * @param name String to be used as the name of the AbstractResource
+    * @param criteria Criteria arguments to factory against which the type and 
+    * state of the resulting resource are defined.
+    * @exception ResourceFactoryProblem if an implememntation encounters problems 
+    * in the supplied criteria instance.
+    */
+
+		Session::AbstractResource create( 
+			in CORBA::StringValue name,
+			in CommunityFramework::Criteria criteria
+		) raises (
+			ResourceFactoryProblem
+		);
+	};
+
+   /**
+    * UserCriteria is a valuetype that can be passed to a ResourceFactory 
+    * facilitating the instantiation of a new User instance.
+    * @since 2.0
+    */
+    valuetype UserCriteria : 
+    Criteria
+    {
+    };
+
+   /**
+    * MessageCriteria is a valuetype that can be passed to a ResourceFactory 
+    * facilitating the instantiation of a new Message instance.
+    * @since 2.0
+    */
+    valuetype MessageCriteria : 
+    Criteria
+    {
+    };
+
+};
+
+#endif // _COMMUNITY_IDL_

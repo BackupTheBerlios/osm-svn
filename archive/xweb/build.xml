@@ -1,0 +1,258 @@
+
+<!--
+OSM DEV environment build file.
+-->
+
+<project name="xweb" default="install" basedir=".">
+
+  <property file="local.properties"/>
+  <property name="gateway"  value="gateway" />
+  <property name="finder.ior" value="${gateway}/finder.ior"/>
+
+  <property name="deployment"  value=".." />
+  <property name="common"  value="${deployment}/common" />
+  <property name="general"  value="${deployment}/common" />
+  <property name="core"  value="${deployment}/core" />
+  <property name="mgr"  value="${deployment}/mgr" />
+
+  <property name="lib"  value="lib" />
+  <property name="src"  value="src" />
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+  <property name="psdl"  value="${src}/psdl" />
+  <property name="etc"  value="${src}/etc" />
+  <property name="idl"  value="${src}/idl" />
+
+  <property name="supplier"  value="osm" />
+  <property name="host"  value="localhost" />
+  <property name="package"  value="xweb" />
+  <property name="web.jar"  value="${package}.jar" />
+  <property name="web.war"  value="${package}.war" />
+  <property name="xweb.war"  value="${package}.war" />
+  <property name="xweb.sar"  value="${package}.sar" />
+
+  <property name="tomcat"  value="F:/system/tomcat" />
+  <property name="webapps"  value="${tomcat}/webapps" />
+  <property name="work.package"  value="${tomcat}/work/${host}/${package}" />
+
+  <!-- 
+  ENVIRONMENT 
+  -->
+
+  <path id="system.classpath">
+      <fileset dir="${lib}">
+        <include name="*.jar" />
+      </fileset>
+	<fileset dir="../common/lib">
+	  <include name="*.jar" />
+	</fileset>
+	<fileset dir="../core/dist/lib">
+	  <include name="*.jar" />
+	  <include name="osm-base.jar" />
+	  <include name="osm-common-client.jar" />
+	  <include name="osm-dpml.jar" />
+	  <include name="osm-hub-client.jar" />
+	  <include name="osm-realm-client.jar" />
+	  <include name="osm-util.jar" />
+	  <include name="osm-vault.jar" />
+	</fileset>
+	<fileset dir="../mgr/dist">
+	  <include name="*.jar" />
+	</fileset>
+  </path>
+
+  <target name="environment">
+    <mkdir dir="${lib}"/>
+    <mkdir dir="${build}/war/WEB-INF/lib"/>
+    <mkdir dir="${dist}"/>
+    <available property="tomcat.available" file="${tomcat}" />
+    <available property="webapps.available" file="${webapps}" />
+  </target>
+
+  <!--
+  WEB
+  -->
+
+  <target name="web.environment" depends="environment">
+    <mkdir dir="${build}/web/lib"/>
+    <uptodate property="web.jar.uptodate" targetfile="${dist}/${web.jar}">
+      <srcfiles dir="${src}">
+          <include name="java/**/*"/>
+          <include name="web/**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="web.jar" depends="web.environment" unless="web.jar.uptodate">
+    <javac debug="off" destdir="${build}/web/lib" verbose="false" deprecation="true">
+      <classpath>
+ 	  <path refid="system.classpath"/>
+	</classpath>
+      <src path="${src}/java"/>
+      <src path="${general}/jakarta/jakarta-avalon-phoenix/src/java"/>
+      <include name="net/osm/web/**"/>
+      <include name="net/osm/xweb/**"/>
+    </javac>
+    <copy todir="${build}/web/lib">
+	<fileset dir="${src}/java">
+	  <include name="**/*.gif" />
+	</fileset>
+    </copy>
+    <jar file="${dist}/${web.jar}" basedir="${build}/web/lib"/>
+  </target>
+
+  <target name="xweb.environment" depends="environment">
+    <mkdir dir="${dist}"/>
+    <uptodate property="web.sar.uptodate" targetfile="${dist}/${web.war}">
+      <srcfiles dir=".">
+          <include name="build.xml"/>
+      </srcfiles>
+      <srcfiles dir="${src}">
+          <include name="conf/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="web.war.uptodate" targetfile="${dist}/${web.war}">
+      <srcfiles dir=".">
+          <include name="build.xml"/>
+      </srcfiles>
+      <srcfiles dir="${src}">
+          <include name="java/**/*"/>
+          <include name="web/**/*"/>
+          <include name="conf/**/*"/>
+      </srcfiles>
+      <srcfiles dir="${dist}">
+          <include name="${xweb.sar}"/>
+      </srcfiles>
+      <srcfiles dir="${general}/lib">
+	  <include name="*.jar" />
+      </srcfiles>
+      <srcfiles dir="${general}/phoenix/bin">
+	  <include name="*.jar" />
+      </srcfiles>
+      <srcfiles dir="${core}">
+          <include name="dist/**/*"/>
+      </srcfiles>
+      <srcfiles dir="${mgr}">
+          <include name="dist/**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="xweb.war" depends="xweb.environment,web.jar,xweb.sar" unless="web.war.uptodate">
+    <delete file="${dist}/${xweb.war}"/>
+    <jar file="${dist}/${xweb.war}">
+      <zipfileset dir="${src}/web/">
+	  <include name="**" />
+      </zipfileset>
+      <zipfileset dir="${src}/conf/" prefix="WEB-INF">
+        <include name="web.xml"/>
+        <include name="xweb.xml"/>
+        <include name="xweb.tld"/>
+      </zipfileset>
+      <zipfileset dir="${dist}/" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${general}/lib/" prefix="WEB-INF/lib">
+	  <include name="phoenix-client.jar" />
+	  <include name="avalon-framework*.jar" />
+	  <include name="avalon-excalibur*.jar" />
+	  <include name="avalon-scratchpad*.jar" />
+	  <include name="logkit*.jar" />
+	  <include name="idb.jar" />
+	  <include name="servlet.jar" />
+	  <include name="openorb*.jar" />
+      </zipfileset>
+	<zipfileset dir="${core}/dist/lib" prefix="WEB-INF/lib">
+	  <include name="osm-base.jar" />
+	  <include name="osm-common-client.jar" />
+	  <include name="osm-dpml.jar" />
+	  <include name="osm-hub-client.jar" />
+	  <include name="osm-realm-client.jar" />
+	  <include name="osm-util.jar" />
+	  <include name="osm-orb.jar" />
+	  <include name="osm-pss.jar" />
+	  <include name="osm-vault.jar" />
+        <include name="osm-pki-authority.jar"/>
+        <include name="osm-pki-base.jar"/>
+	</zipfileset>
+	<zipfileset dir="${core}/dist/bar" prefix="WEB-INF/lib">
+	  <include name="osm-time.jar" />
+	</zipfileset>
+      <zipfileset dir="${mgr}/dist/" prefix="WEB-INF/lib">
+        <include name="osm-agent.jar"/>
+        <include name="osm-audit.jar"/>
+        <include name="osm-shell.jar"/>
+      </zipfileset>
+      <zipfileset dir="${general}/phoenix/bin/" prefix="WEB-INF/lib">
+        <include name="phoenix-engine.jar"/>
+      </zipfileset>
+      <zipfileset dir="${dist}/" prefix="WEB-INF/apps">
+        <include name="${xweb.sar}"/>
+      </zipfileset>
+    </jar>
+  </target>
+
+  <target name="xweb.sar" depends="xweb.environment" unless="web.sar.uptodate">
+    <delete file="${dist}/${xweb.sar}"/>
+    <jar file="${dist}/${xweb.sar}">
+      <zipfileset dir="${src}/conf/" prefix="SAR-INF">
+        <include name="environment.xml"/>
+        <include name="assembly.xml"/>
+        <include name="config.xml"/>
+      </zipfileset>
+      <zipfileset dir="${src}/etc/" prefix="conf">
+        <include name="orb.xml"/>
+      </zipfileset>
+    </jar>
+  </target>
+
+  <target name="xweb.deploy" depends="xweb.war" if="webapps.available">
+    <delete dir="${webapps}/${package}"/>
+    <delete file="${webapps}/${xweb.war}"/>
+    <delete dir="${work.package}"/>
+    <copy file="${dist}/${xweb.war}" todir="${webapps}" />
+  </target>
+
+  <!--
+  GENERAL
+  -->
+
+  <target name="install" depends="xweb.deploy"/>
+
+  <target name="clean" depends="purge">
+    <delete dir="${dist}" />
+  </target>
+
+  <target name="purge" >
+    <delete dir="${build}" />
+  </target>
+
+  <target name="patch">
+     <replace 
+       token="org.apache.log.Logger" 
+       value="org.apache.avalon.framework.logger.Logger" 
+       dir="${src}/java" >
+       <include name="**/*.java"/>
+     </replace>
+     <replace 
+       token="Loggable" 
+       value="LogEnabled" 
+       dir="${src}/java" >
+       <include name="**/*.java"/>
+     </replace>
+     <replace 
+       token=".setLogger(" 
+       value=".enableLogging(" 
+       dir="${src}/java" >
+       <include name="**/*.java"/>
+     </replace>
+     <replace 
+       token="void setLogger" 
+       value="void enableLogging" 
+       dir="${src}/java" >
+       <include name="**/*.java"/>
+     </replace>
+  </target>
+
+</project>
+

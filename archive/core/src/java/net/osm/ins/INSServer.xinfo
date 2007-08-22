@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<!--
+InteroperableNamingServiceServer.xinfo
+Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+This software is the proprietary information of OSM SARL.  
+Use is subject to license terms.
+  
+@author  Stephen McConnell
+@version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <version>1.0</version>
+  </block>
+
+  <meta>
+    <contributors>
+      <author name="Stephen McConnell" email="mcconnell@osm.net"/>
+    </contributors>
+  </meta>
+
+  <services>
+    <service name="net.osm.ins.INSService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>ORB</role>
+          <service name="net.osm.orb.ORBService" version="2.3"/>
+      </dependency>
+      <dependency>
+          <role>CONNECTOR</role>
+          <service name="net.osm.pss.PSSConnectorService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>SESSION</role>
+          <service name="net.osm.pss.PSSSessionService" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+</blockinfo>

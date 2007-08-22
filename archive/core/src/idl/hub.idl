@@ -1,0 +1,137 @@
+/*
+ * hub.idl
+ *
+ * Copyright 2000-2001 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.3 18 MAR 2001
+ */
+
+#ifndef _HOME_IDL_
+#define _HOME_IDL_
+#include <CollaborationFramework.idl>
+#include <realm.idl>
+#pragma prefix "osm.net"
+
+module hub
+{
+module home
+{
+
+    interface ResourceFactory;
+
+   /**
+    * Exception thrown by the finder if the supplied name is unknown.
+    */
+    exception UnknownName
+    {
+        string name;
+    };
+
+   /**
+    * Exception thrown by the resource factory <code>resolve_user_reference</code>
+    * operation when the creation policy is false and the current principal does not 
+    * match an existing persistent user identity.
+    */
+    exception UnknownPrincipal{};
+
+
+   /**
+    * Finder is an extension of the CosLifeCycle factory finder that represents
+    * the root client entry point to the OSM platform through exposure of a 
+    * root community and convinence access to a resoruce factory.
+    */
+
+    interface Finder : CosLifeCycle::FactoryFinder
+    {
+
+	 /**
+        * Locates an object by name.
+        */
+        Session::AbstractResource lookup
+	  ( 
+		in string name 
+        )
+        raises( 
+		UnknownName,
+		CommunityFramework::ResourceFactoryProblem
+	  );
+
+       /**
+        * Convinence accessor for the ResourceFactory.
+        */
+        readonly attribute ResourceFactory resource_factory;
+
+       /**
+        * Returns a user object reference representing the user identifier by 
+	  * the security current principal.
+        *
+        * @param policy a boolean value that if true means that the factory
+        *   should create a new user reference if no existing user reference 
+        *   can be found for the pricipal.
+        */
+        Session::User resolve_user
+        ( 
+            in boolean policy 
+	  )
+	  raises
+	  (
+		UnknownPrincipal
+        );
+    };
+    
+
+   /**
+    * Exception thrown by the ResourceFactory interface criterion operation when a request
+    * is made for the supply of a criteria instance with a label unknown to the supplying 
+    * factory.
+    */
+    exception CriteriaNotFound
+    {
+        string label;
+    };
+
+   /**
+    * ResourceFactory is a general utility exposable by FactoryFinder 
+    * interfaces on Session::Workspace and Session::User interfaces.  
+    * ResourceFactory creates new instances of AbstractResource and derived 
+    * types based on a supplied name and Criteria.  The supporting operation 
+    * exposes a sequence of default Criteria instances supported by the 
+    * factory. 
+    */
+    interface ResourceFactory : CommunityFramework::ResourceFactory
+    {
+
+       /**
+        * Returns a single Criteria instance matching the supplied label.
+        */
+        CommunityFramework::Criteria criterion
+        (
+            in string label
+        ) 
+        raises
+	  (
+		CriteriaNotFound
+	  );
+
+    };
+
+   /**
+    * Task Callback is an interface extension introduced by OSM pending availability of
+    * asyncrouse communication services.  It provides a method of notification 
+    * of state change between a processor and the coordinting task.
+    */
+    interface TaskCallback : Session::Task
+    {
+	  oneway void notify_running();
+	  oneway void notify_suspended();
+	  oneway void notify_stopped();
+	  oneway void notify_completed();
+    };
+
+};
+};
+
+#endif // _HOME_IDL_

@@ -1,0 +1,128 @@
+/**
+ */
+
+#ifndef _MESSAGE_PSDL_
+#define _MESSAGE_PSDL_
+#include <extension.idl>
+#include <list.psdl>
+
+#pragma prefix "osm.net"
+
+module session 
+{
+  module message 
+  {
+
+    abstract storagetype FolderStorage;
+ 
+    // typedefs
+
+    typedef CORBA::OctetSeq ID;
+    typedef sequence<ID> IDs;
+    typedef list::LinkedList LinkedList;
+    typedef list::LinkedListBase LinkedListBase;
+
+    //
+    // Message 
+    //
+
+   /**
+    * Message storage type contains the values exposed by a Message resource 
+    * including a MessageHeader valuetype and message body.
+    * @see net.osm.session.message.SystemMessage
+    */
+    abstract storagetype MessageStorage
+    {
+       /**
+        * Storage object unique key.
+        */
+	  state unsigned long long identifier;
+
+       /**
+        * Message header containing subject, priority and message type.
+        */
+	  state session::message::SystemMessage system_message;
+
+    };
+
+   /**
+    * The factory for MessageStorage.
+    */
+    abstract storagehome MessageStorageHome of MessageStorage
+    {
+	  key identifier;
+        factory create( identifier, system_message );
+    };
+
+    //
+    // Folder 
+    //
+
+   /**
+    * Folder storage is a storage type that holds a set of messages 
+    * and is owned by a single user.  The Folder contains a unique 
+    * internal identifier, a name, a reference to the user owning the
+    * folder, and a list of messages.
+    */
+    abstract storagetype FolderStorage
+    {
+
+       /**
+        * The folder internal identifier.
+        */
+	  state unsigned long long identifier;
+
+       
+       /**
+        * The name of this folder.
+        */
+        state string name;
+
+       /**
+        * A list of messages contained within the folder.
+        */
+        state LinkedList messages;
+    };
+
+   /**
+    * The factory for FolderStorage.
+    */
+    abstract storagehome FolderStorageHome of FolderStorage
+    {
+	  key identifier;
+        factory create( identifier, name );
+    };
+
+
+    //
+    // MessageStorageBase
+    //
+
+    storagetype MessageStorageBase
+    implements MessageStorage 
+    {
+    };
+
+    storagehome MessageStorageHomeBase of MessageStorageBase
+    implements MessageStorageHome 
+    { 
+    };
+
+    //
+    // FolderStorageBase
+    //
+
+    storagetype FolderStorageBase
+    implements FolderStorage 
+    {
+        stores messages as ref<LinkedListBase>;
+    };
+
+    storagehome FolderStorageHomeBase of FolderStorageBase
+    implements FolderStorageHome 
+    { 
+    };
+  }; 
+};
+
+#endif // _MESSAGE_PSDL_

@@ -1,0 +1,115 @@
+
+<!--
+Assemble a component instance.
+-->
+
+<kernel>
+
+   <!--
+   Declaration of the logging hierachy and constraints.
+   -->
+   
+   <logger priority="DEBUG"/>
+
+   <!--
+   Declaration of installed extension directories.
+   -->
+
+   <extensions>
+     <dirset dir=".">
+       <include name="deploy"/>
+     </dirset>
+   </extensions>
+
+   <!--
+   Declaration of root kernel classpath available to all containers.
+   -->
+
+   <container name="root">
+
+     <classpath>
+       <fileset dir="dist">
+         <include name="demo.jar"/>
+       </fileset>
+     </classpath>
+
+
+     <!--
+     Declaration of the services hosted by this container.  Service container here 
+     will be managed relative to other provider components at the same level and 
+     may be serviced by components declared in parent container.
+     -->
+
+     <component name="complex" class="net.osm.playground.ComplexComponent">
+
+        <!--
+        Include the following context value in the context supplied a component using this 
+        profile.  Context entries are normally only required in the case where the component
+        type declares a required context type and entry values. Generally speaking, a component
+        will normally qualify it's instantiation criteria through a configuration declaration.
+        Any context values defined at this level will override context values supplied by the
+        container.
+        -->
+
+        <context>
+          <entry name="location" value="Paris"/>
+        </context>
+
+        <!--
+        Apply the following configuration when instantiating the component.  This configuration
+        will be applied as the primary configuration in a cascading configuration chain.  A 
+        type may declare a default configuration under a "classname".xconfig file that will be 
+        used to dereference any configuration requests not resolvable by the configuration 
+        supplied here.
+        -->
+
+        <configuration>
+          <message value="Hello"/>
+        </configuration>
+
+        <!--
+        The parameterization criteria from this instance of the component type.
+        -->
+
+        <parameters/>
+
+     </component>
+
+     <!--
+     A containers declaration will cause the creation of a new registry holding the 
+     child container instances.
+     -->
+
+     <container name="sub-container">
+
+       <classpath>
+         <fileset dir="dist">
+           <include name="assembly.jar"/>
+         </fileset>
+       </classpath>
+
+       <!--
+       Declaration of an embedded container.  A container will be instantiated, initialized
+       and a validation request will be invoked.  In the container is an instance of Container, 
+       the reference to parent container will be supplied.
+       -->
+
+       <component name="test" class="net.osm.merlin.kernel.DefaultContainer">
+         <configuration>
+          <container>
+           <classpath>
+             <fileset dir="dist">
+               <include name="demo.jar"/>
+             </fileset>
+           </classpath>
+          </container>
+        </configuration>
+      </component>
+
+      <component name="simple2" class="net.osm.playground.SimpleComponent"/>
+
+     </container>
+
+   </container>
+
+</kernel>

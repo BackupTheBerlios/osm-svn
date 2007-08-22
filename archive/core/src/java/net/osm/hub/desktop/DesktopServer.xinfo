@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<!--
+ DesktopServer.xinfo
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <version>1.0</version>
+  </block>
+
+  <services>
+      <service name="net.osm.hub.desktop.DesktopService" version="1.0" />
+      <service name="net.osm.hub.desktop.DesktopAdministratorService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>ORB</role>
+          <service name="net.osm.orb.ORBService" version="2.3"/>
+      </dependency>
+      <dependency>
+          <role>PSS-CONNECTOR</role>
+          <service name="net.osm.pss.PSSConnectorService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>PSS-SESSION</role>
+          <service name="net.osm.pss.PSSSessionService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>REGISTRY</role>
+          <service name="net.osm.hub.gateway.Registry" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>FACTORY</role>
+          <service name="net.osm.hub.gateway.ResourceFactoryService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>DOMAIN</role>
+          <service name="net.osm.hub.gateway.DomainService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>RANDOM</role>
+          <service name="net.osm.hub.gateway.RandomService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>CLOCK</role>
+          <service name="net.osm.time.TimeService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>STRUCTURED-PUSH-SUPPLIER</role>
+          <service name="net.osm.hub.resource.StructuredPushSupplierService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>WORKSPACE</role>
+          <service name="net.osm.hub.workspace.WorkspaceService" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+</blockinfo>
+

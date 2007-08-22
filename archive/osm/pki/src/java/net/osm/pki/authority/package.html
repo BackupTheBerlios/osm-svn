@@ -1,0 +1,17 @@
+
+<body>
+<p>The <code>net.osm.pki.authority</code> package provides an implementation of a PKI Registration Authority.</p>
+<p>A Registration Authority (RA) accepts requests for certificates on behalf of a CA and verifies the binding between the public/private key pair and the attributes being certified. Typically one or more RAs exist to provide a means for scaling a PKI within a single management domain. The relationship between the RAs and the CA is similar to the relationship between bank branches and the bank. While the branches are the face of the organization, the bank has the ultimate authority for the granting of transactions. So a request for a certificate may be made on a particular RA, the RA may verify Proof Of Possession (POP) of the private key and then request the certificate from the CA. The certificate obtained is from the CA but the RA provides the point of contact and may perform functions such as POP and checking authentication based on policy.
+</p>
+<p>To summarise, a Registration Authority provides the following primary functions::</p>
+<ul>
+  <li>information about the authority</li>
+  <li>mechanisms to establish and maintain a set of message exchanges with an authority</li>
+  <li>certificate request</li>
+  <li>key recovery</li> 
+  <li>key updating</li>
+  <li>revocation request handling</li>
+</ul>
+</body>
+
+

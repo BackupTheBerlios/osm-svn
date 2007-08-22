@@ -1,0 +1,455 @@
+
+<!-- 
+PKI Framework.
+Copyright 2001-2002 OSM SARL, All Rights Reserved.
+Depends on the Valut project.
+-->
+
+<project name="pki" default="help" basedir=".">
+
+  <property file="local.properties"/>
+  <property file="build.properties"/>
+
+  <target name="help" >
+    <echo>
+
+      Description
+      -----------
+
+      ${project.title}
+
+      General Targets:
+      ----------------
+
+      all              - clean, build and dist
+      build            - invokes the general build target
+      javadoc          - javadoc API generation
+      dist             - executes build, javadoc and support file creation
+      clean            - destroy the build directory
+      
+    </echo>
+  </target>
+
+  <property name="VERSION" value="${MAJOR}.${MINOR}.${MICRO}"/>
+
+  <property name="apps.path" value="../../jakarta-avalon-apps" />
+  <property name="enterprise" value="${apps.path}/enterprise" />
+  <property name="common.path" value="${apps.path}/common" />
+
+  <property name="common.lib.path" value="${common.path}/lib" />
+  <property name="orb.lib.path" value="${enterprise}/orb/lib" />
+  <property name="orb.dist.path" value="${enterprise}/orb/dist" />
+  <property name="idl.class"  value="org.openorb.compiler.IdlCompiler" />
+  <property name="pss.dist.path" value="${enterprise}/pss/dist" />
+  <property name="vault.dist.path" value="../vault/dist" />
+
+  <property name="pki-util.jar" value="pki-util.jar"/>
+  <property name="repository.jar" value="repository.jar"/>
+  <property name="authority.jar" value="authority.jar"/>
+
+  <property name="lib" value="lib" />
+  <property name="src" value="src" />
+  <property name="etc" value="${src}/etc" />
+  <property name="idl" value="${src}/idl" />
+  <property name="psdl" value="${src}/psdl" />
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+
+  <property name="pss.engine.jar"  value="pss-2.0.1.jar" />
+  <property name="psdl.jar"  value="psdl-2.0.1.jar" />
+  <property name="psdl.class"  value="org.apache.pss.compiler.PsdlCompiler" />
+  <property name="persistence" value="file" />
+  <property name="net.osm.pss.connector" value="${persistence}" />
+
+  <property name="javadoc.root.path"  value="${dist}/javadoc" />
+  <property name="avalon.href"  value="http://jakarta.apache.org/avalon/api/" />
+  <property name="jdk.href"  value="http://java.sun.com/j2se/1.4/docs/api/" />
+  <property name="overview.html" value="${etc}/overview.html" />
+
+  <!-- classpath -->
+
+  <path id="project.classpath">
+      <fileset dir="${common.lib.path}">
+        <include name="logkit.jar" />
+        <include name="avalon-framework.jar" />
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${vault.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+  </path>
+
+  <!-- MAIN TARGETS -->
+
+  <target name="all" depends="clean,dist"/>
+  <target name="dist" depends="build,javadoc,support"/>
+
+  <target name="clean">
+     <delete dir="${build}"/>
+     <delete dir="${dist}"/>
+  </target>
+
+  <!-- PREPARE -->
+
+  <target name="prepare"  >
+    <mkdir dir="${dist}" />
+    <mkdir dir="${build}/pki/src" />
+    <mkdir dir="${build}/pki/lib" />
+  </target>
+
+  <!-- VAULT BLOCK -->
+
+  <target name="context" depends="prepare">
+    <mkdir dir="dist"/>
+    <uptodate property="pki.uptodate" targetfile="${dist}/${pki-util.jar}">
+      <srcfiles dir="${src}/java">
+         <include name="net/osm/pki/base/**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${build}/pki/src">
+         <include name="**/*.*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="context.idl" depends="prepare">
+    <uptodate property="pki.modified" targetfile="${idl}/pki.idl">
+      <srcfiles dir="${build}/pki/src">
+	  <include name="org/omg/PKI/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="pkcs.modified" targetfile="${idl}/pkcs.idl">
+      <srcfiles dir="${build}/pki/src">
+	  <include name="net/osm/pki/pkcs/**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <!--
+  Build utilities, repository and authority.
+  -->
+
+  <target name="build" depends="repository,authority"/>
+
+  <!--
+  Build for utility PKI classes and PKCS classes.
+  -->
+
+  <target name="pki.idl" depends="context.idl" if="pki.modified" >
+    <echo message="IDL PKI.idl"/>
+    <antcall target="idl2java" >
+	<param name="destination" value="${build}/pki/src"/>
+      <param name="service" value="${idl}/PKI.idl" />
+    </antcall>
+  </target>
+
+  <target name="pkcs.idl" depends="context.idl" if="pkcs.modified" >
+    <echo message="IDL pkcs.idl"/>
+    <java failonerror="true" classname="${idl.class}" fork="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-d ${build}/pki/src"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-native Subject javax.security.auth.Subject"/>
+	<arg line="-native Principal java.security.Principal"/>
+	<arg line="-native PKCS10Attributes sun.security.pkcs.PKCS10Attributes"/>
+	<arg line="-native X500Name net.osm.pki.base.X500Name"/>
+	<arg line="-native PublicKey java.security.PublicKey"/>
+	<arg line="${idl}/pkcs.idl" />
+    </java>
+  </target>
+
+  <target name="pki" depends="context,pki.idl,pkcs.idl" unless="pki.uptodate" >
+      <echo message="Building PKI Utilities"/>
+      <javac debug="off" destdir="${build}/pki/lib" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+        <src path="${src}/java" />
+        <src path="${build}/pki/src" />
+        <include name="net/osm/pki/base/**" />
+        <include name="net/osm/pki/pkcs/**" />
+        <include name="org/omg/PKI/**" />
+      </javac>
+      <jar jarfile="${dist}/${pki-util.jar}" basedir="${build}/pki/lib"/>
+  </target>
+
+  <!-- PKI REPOSITORY -->
+
+  <target name="repository.prepare"  >
+    <mkdir dir="${build}/repository/src" />
+    <mkdir dir="${build}/repository/lib" />
+  </target>
+
+  <target name="repository.context" depends="repository.prepare">
+    <uptodate property="repository.psdl.modified" targetfile="${psdl}/repository.psdl">
+      <srcfiles dir="${build}/repository/src">
+	  <include name="net/osm/pki/repository/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="repository.idl.modified" targetfile="${idl}/PKIRepository.idl">
+      <srcfiles dir="${build}/repository/src">
+	  <include name="org/omg/**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="repository.idl" depends="repository.context" if="repository.idl.modified">
+    <java failonerror="true" classname="${idl.class}" fork="true">
+        <classpath>
+          <path refid="project.classpath"/>
+	  </classpath>
+	  <arg line="-silence"/>
+	  <arg line="-d ${build}/repository/src"/>
+	  <arg line="-I ${idl}"/>
+	  <arg line="${idl}/PKIRepository.idl" />
+    </java>
+  </target>
+
+  <target name="repository.psdl" depends="pki,repository.context" if="repository.psdl.modified">
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="-d ${build}/repository/src"/>
+	<arg line="${psdl}/repository.psdl"/>
+    </java>
+  </target>
+
+  <target name="repository" depends="repository.psdl,repository.idl,pki" unless="repository.uptodate">
+    <javac debug="off" destdir="${build}/repository/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	  <pathelement path="${dist}/${pki-util.jar}"/>
+	</classpath>
+      <src path="${src}/java"/>
+      <src path="${build}/repository/src"/>
+	<include name="net/osm/pki/repository/*/**" />
+      <include name="org/omg/PKIRepository/**/*"/>
+    </javac>
+    <copy todir="${build}/repository/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/pki/repository/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar jarfile="${dist}/${repository.jar}" manifest="${etc}/repository.mf">
+       <fileset dir="${build}/repository/lib">
+          <include name="net/osm/pki/repository/**/*"/>
+          <include name="org/omg/PKIRepository/**/*"/>
+       </fileset>
+    </jar>
+  </target>
+
+  <!-- PKI AUTHORITY -->
+
+  <!-- PKI REPOSITORY -->
+
+  <target name="authority.prepare"  >
+    <mkdir dir="${build}/authority/src" />
+    <mkdir dir="${build}/authority/lib" />
+  </target>
+
+  <target name="authority.context" depends="authority.prepare">
+    <uptodate property="authority.psdl.modified" targetfile="${psdl}/authority.psdl">
+      <srcfiles dir="${build}/authority/src">
+	  <include name="net/osm/pki/authority/**/*"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="authority.idl.modified" targetfile="${idl}/PKIAuthority.idl">
+      <srcfiles dir="${build}/authority/src">
+	  <include name="org/omg/**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="authority.idl" depends="authority.context" if="authority.idl.modified">
+    <java failonerror="true" classname="${idl.class}" fork="true">
+        <classpath>
+          <path refid="project.classpath"/>
+	  </classpath>
+	  <arg line="-silence"/>
+	  <arg line="-d ${build}/authority/src"/>
+	  <arg line="-I ${idl}"/>
+	  <arg line="${idl}/PKIAuthority.idl" />
+    </java>
+  </target>
+
+  <target name="authority.psdl" depends="pki,authority.context" if="authority.psdl.modified">
+    <java classname="${psdl.class}" fork="yes" failonerror="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-${persistence}"/>
+	<arg line="-I ${idl}"/>
+	<arg line="-I ${psdl}"/>
+	<arg line="-d ${build}/authority/src"/>
+	<arg line="${psdl}/authority.psdl"/>
+    </java>
+  </target>
+
+  <target name="authority" depends="authority.psdl,authority.idl,pki" unless="authority.uptodate">
+    <javac debug="off" destdir="${build}/authority/lib" verbose="false" deprecation="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	  <pathelement path="${dist}/${pki-util.jar}"/>
+	  <pathelement path="${dist}/${repository.jar}"/>
+	</classpath>
+      <src path="${src}/java"/>
+      <src path="${build}/authority/src"/>
+	<include name="net/osm/pki/authority/*/**" />
+      <include name="org/omg/PKIAuthority/**/*"/>
+    </javac>
+    <copy todir="${build}/authority/lib">
+      <fileset dir="${src}/java">
+        <include name="net/osm/pki/authority/**/*.xinfo"/>
+      </fileset>
+    </copy>
+    <jar jarfile="${dist}/${authority.jar}" manifest="${etc}/authority.mf">
+       <fileset dir="${build}/authority/lib">
+          <include name="net/osm/pki/authority/**/*"/>
+          <include name="org/omg/PKIAuthority/**/*"/>
+       </fileset>
+    </jar>
+  </target>
+
+  <!-- INTERNAL UTILITY TARGETS -->
+
+  <target name="support">
+    <copy todir="${dist}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.TXT"/>
+         <include name="README.TXT"/>
+       </fileset>
+    </copy>
+  </target>
+
+  <target name="javadoc" depends="prepare" >
+    <mkdir dir="${javadoc.root.path}/${ant.project.name}" />
+    <copy todir="${javadoc.root.path}/${ant.project.name}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.HTML"/>
+         <include name="license.css"/>
+       </fileset>
+    </copy>
+    <javadoc destdir="${javadoc.root.path}/${ant.project.name}" 
+	doctitle="&lt;h1&gt;${project.title} ${VERSION}&lt;/h1&gt;" 
+      noindex="false" author="false" 
+      use="true"
+      overview="${overview.html}"
+	windowtitle="PKI Framework" 
+      bottom="&lt;a href='{@docRoot}/LICENSE.HTML'/&gt;License, Disclaimer and due credits.&lt;/a&gt;"
+      additionalparam="-breakiterator -J-Xmx128m"
+      packagenames="net.osm.pki.*,org.omg.*"  
+      >
+        <sourcepath path="${build}/pki/src"/>
+        <sourcepath path="${build}/repository/src"/>
+        <sourcepath path="${build}/authority/src"/>
+        <sourcepath path="${src}/java"/>
+        <classpath>
+	    <path refid="project.classpath" />
+          <pathelement path="${dist}/${pki-util.jar}" />
+          <pathelement path="${dist}/${repository.jar}" />
+          <pathelement path="${dist}/${authority.jar}" />
+	  </classpath>
+	  <link href="${jdk.href}" />
+	  <link href="${avalon.href}" />
+    </javadoc>
+  </target>
+
+  <target name="demo-repository" depends="loader.validation,build" if="merlin.available" >
+    <load target="net.osm.pki.repository.RepositoryServer" priority="${demo.priority}"      
+      
+      disposal="${demo.disposal}" 
+      verbose="${demo.verbose}">
+      <fileset dir="${dist}">
+         <include name="${pki-util.jar}"/>
+         <include name="${repository.jar}"/>
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+    </load>
+  </target>
+
+  <target name="demo" depends="loader.validation,build" if="merlin.available" >
+    <load target="net.osm.pki.authority.RegistrationAuthorityServer" priority="${demo.priority}"      
+      
+      disposal="${demo.disposal}" 
+      verbose="${demo.verbose}">
+      <fileset dir="${dist}">
+         <include name="${pki-util.jar}"/>
+         <include name="${repository.jar}"/>
+         <include name="${authority.jar}"/>
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${vault.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+    </load>
+  </target>
+
+
+  <target name="loader.context">
+    <available property="merlin.available" file="${ant.home}/lib/merlin.jar"/>
+  </target>
+
+  <target name="loader.defintion" depends="loader.context" if="merlin.available">
+    <taskdef resource="merlin.properties"/>
+  </target>
+ 
+  <target name="loader.validation" depends="loader.defintion" unless="merlin.available">
+    <echo>
+
+     Merlin is not installed in your Ant library.
+     In order to use the "load" task the following jar files 
+     must be added to your ${ant.home}/lib directory:
+
+       - merlin.jar
+       - avalon-framework.jar
+       - logkit.jar
+       - xerces.jar (for JRE 1.3 and earlier)
+    </echo>
+  </target>
+
+  <target name="idl2java" >
+    <echo message="IDL ${service}"/>
+    <java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+          <classpath>
+		<path refid="project.classpath"/>
+	    </classpath>
+	    <arg line="-silence"/>
+	    <arg line="-d ${destination}"/>
+	    <arg line="-I ${idl}"/>
+	    <arg line="${service}" />
+    </java>
+  </target>
+
+</project>

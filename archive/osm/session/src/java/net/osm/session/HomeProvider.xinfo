@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+
+<!--
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <name>session</name>
+    <version>1.0</version>
+  </block>
+
+  <!-- 
+  services that are offered by this block 
+  -->
+
+  <services>
+      <service name="net.osm.session.HomeService" version="1.0" />
+  </services>
+
+  <!-- 
+  dependencies that this block has on other blocks 
+  -->
+
+  <dependencies>
+      <dependency>
+          <role>orb</role>
+          <service name="org.apache.pss.ORB" version="2.4"/>
+          <configuration>
+
+            <initializer class="org.openorb.adapter.fwd.ForwardInitializer" name="forward"/>
+            <initializer class="net.osm.realm.ServerInitializer" name="realm"/>
+            <initializer class="org.apache.time.Initializer" name="time"/>
+
+            <property name="iiop.port" value="2056"/>
+
+            <value catagory="adapter" idl="IDL:osm.net/adapter/Adapter:1.0" 
+              factory="net.osm.adapter.AdapterValue" />
+            <value category="service" idl="IDL:osm.net/adapter/ServiceAdapter:1.0" 
+              factory="net.osm.adapter.ServiceValue" />
+            <value category="finder" idl="IDL:osm.net/finder/FinderAdapter:1.0" 
+              factory="net.osm.finder.FinderValue" />
+            <value category="chooser" idl="IDL:osm.net/chooser/ChooserAdapter:1.0" 
+              factory="net.osm.chooser.ChooserValue" />
+            <value category="factory" idl="IDL:osm.net/factory/FactoryAdapter:1.0" 
+              factory="net.osm.factory.FactoryValue" />
+            <value category="parameter" idl="IDL:osm.net/factory/Parameter:1.0" 
+              factory="net.osm.factory.DefaultParameter" />
+
+            <value category="session" idl="IDL:osm.net/session/HomeAdapter:1.0" 
+              factory="net.osm.session.HomeValue" />
+            <value category="desktop" idl="IDL:osm.net/session/desktop/DesktopAdapter:1.0" 
+              factory="net.osm.session.desktop.DesktopValue" />
+            <value category="workspace" idl="IDL:osm.net/session/workspace/WorkspaceAdapter:1.0" 
+              factory="net.osm.session.workspace.WorkspaceValue" />
+            <value category="task" idl="IDL:osm.net/session/task/TaskAdapter:1.0" 
+              factory="net.osm.session.task.TaskValue" />
+            <value category="processor" idl="IDL:osm.net/session/processor/ProcessorAdapter:1.0" 
+              factory="net.osm.session.processor.ProcessorValue" />
+            <value category="user" idl="IDL:osm.net/session/user/UserAdapter:1.0" 
+              factory="net.osm.session.user.UserValue" />
+            <value category="principal" idl="IDL:osm.net/session/user/PrincipalAdapter:1.0" 
+              factory="net.osm.session.user.PrincipalValue" />
+
+          </configuration>
+
+      </dependency>
+      <dependency>
+          <role>properties</role>
+          <service name="net.osm.properties.PropertiesService" version="1.0"/>
+      </dependency>
+      <dependency>
+          <role>domain</role>
+          <service name="net.osm.domain.DomainService" version="1.0"/>
+      </dependency>
+
+  </dependencies>
+
+  <configuration>
+
+    <ior value="session.ior" />
+
+    <description name="Session">
+      OSM Business service home.
+    </description>
+
+    <pss>
+
+      <session>
+        <parameter name="PSS.File.DataStore.Directory" value="pss" />
+        <parameter name="PSS.File.DataStore.Name" value="session" />
+      </session>
+
+      <persistence>
+        <storage psdl="PSDL:osm.net/list/EntryStorageBase:1.0"
+            class="net.osm.list.Entry" />
+        <home psdl="PSDL:osm.net/list/EntryStorageHomeBase:1.0"
+            class="net.osm.list.EntryStorageHomeBase" />
+        <storage psdl="PSDL:osm.net/list/LinkedListBase:1.0"
+            class="net.osm.list.List" />
+
+        <storage psdl="PSDL:osm.net/session/linkage/LinkStorageBase:1.0"
+            class="net.osm.session.linkage.Link" />
+        <home psdl="PSDL:osm.net/session/linkage/LinkStorageHomeBase:1.0"
+            class="net.osm.session.linkage.LinkStorageHomeBase" />
+
+        <storage psdl="PSDL:osm.net/session/resource/AbstractResourceStorageBase:1.0"
+            class="net.osm.session.resource.AbstractResourceStorageBase" />
+        <home psdl="PSDL:osm.net/session/resource/AbstractResourceStorageHomeBase:1.0"
+            class="net.osm.session.resource.AbstractResourceStorageHomeBase" />
+
+      </persistence>
+
+    </pss>
+
+    <sps>
+      <pss>
+        <persistence>
+          <storage psdl="PSDL:osm.net/event/EventStorageBase:1.0"
+            class="net.osm.event.EventStorageBase" />
+          <home psdl="PSDL:osm.net/event/EventStorageHomeBase:1.0"
+            class="net.osm.event.EventHome" />
+          <storage psdl="PSDL:osm.net/sps/SubscriberStorageBase:1.0"
+            class="net.osm.sps.Subscription" />
+          <home psdl="PSDL:osm.net/sps/SubscriberStorageHomeBase:1.0"
+            class="net.osm.sps.SubscriberStorageHomeBase" />
+          <storage psdl="PSDL:osm.net/sps/PublisherStorageBase:1.0"
+            class="net.osm.sps.Publisher" />
+          <home psdl="PSDL:osm.net/sps/PublisherStorageHomeBase:1.0"
+            class="net.osm.sps.PublisherStorageHomeBase" />
+        </persistence>
+      </pss>
+    </sps>
+
+    <user>
+
+      <pss>
+        <persistence>
+          <storage psdl="PSDL:osm.net/session/user/UserStorageBase:1.0"
+            class="net.osm.session.user.UserStorageBase" />
+          <home psdl="PSDL:osm.net/session/user/UserStorageHomeBase:1.0"
+            class="net.osm.session.user.UserStorageHomeBase" />
+
+          <storage psdl="PSDL:osm.net/session/message/FolderStorageBase:1.0"
+            class="net.osm.session.message.FolderStorageBase" />
+          <home psdl="PSDL:osm.net/session/message/FolderStorageHomeBase:1.0"
+            class="net.osm.session.message.FolderStorageHomeBase" />
+
+          <storage psdl="PSDL:osm.net/session/message/MessageStorageBase:1.0"
+            class="net.osm.session.message.MessageStorageBase" />
+          <home psdl="PSDL:osm.net/session/message/MessageStorageHomeBase:1.0"
+            class="net.osm.session.message.MessageStorageHomeBase" />
+        </persistence>
+      </pss>
+
+    </user>
+
+    <task>
+
+      <pss>
+        <persistence>
+          <storage psdl="PSDL:osm.net/session/task/TaskStorageBase:1.0"
+            class="net.osm.session.task.TaskStorageBase" />
+          <home psdl="PSDL:osm.net/session/task/TaskStorageHomeBase:1.0"
+            class="net.osm.session.task.TaskStorageHomeBase" />
+        </persistence>
+      </pss>
+
+    </task>
+
+    <workspace> 
+
+      <pss>
+        <persistence>
+           <storage psdl="PSDL:osm.net/session/workspace/WorkspaceStorageBase:1.0"
+            class="net.osm.session.workspace.WorkspaceStorageBase" />
+           <home psdl="PSDL:osm.net/session/workspace/WorkspaceStorageHomeBase:1.0"
+            class="net.osm.session.workspace.WorkspaceStorageHomeBase" />
+        </persistence>
+      </pss>
+
+    </workspace>
+
+    <desktop extends="workspace">
+
+      <pss>
+        <persistence>
+          <storage psdl="PSDL:osm.net/session/desktop/DesktopStorageBase:1.0"
+            class="net.osm.session.desktop.DesktopStorageBase" />
+          <home psdl="PSDL:osm.net/session/desktop/DesktopStorageHomeBase:1.0"
+            class="net.osm.session.desktop.DesktopStorageHomeBase" />
+        </persistence>
+      </pss>
+
+    </desktop>
+
+    <processor>
+
+      <pss>
+        <persistence>
+          <storage psdl="PSDL:osm.net/session/processor/ProcessorStorageBase:1.0"
+            class="net.osm.session.processor.ProcessorStorageBase" />
+          <home psdl="PSDL:osm.net/session/processor/ProcessorStorageHomeBase:1.0"
+            class="net.osm.session.processor.ProcessorStorageHomeBase" />
+        </persistence>
+      </pss>
+
+    </processor>
+
+    <appliance>
+
+      <description name="Appliance Selector">
+Contains a selection of factories that support the creation of new business processes that can be associated to users via task.
+      </description>
+
+      <factories>
+
+        <factory key="hello" provider="net.osm.session.hello.HelloProvider">
+          <description name="Hello Service Factory" >
+The hello service factory is minimal service factory that supports the creation of a simple Hello processor.
+          </description>
+        </factory>
+
+      </factories>
+
+    </appliance>
+
+  </configuration>
+
+  <implementation policy="SINGLETON"/>
+
+</blockinfo>
+

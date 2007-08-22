@@ -1,0 +1,575 @@
+
+// File: CosPersistentState.psdl
+// Copyright 1998-1999 by the Object Management Group. All Rights Reserved.
+// Copyright 2002 by OSM SARL 2002, All Rights Reserved.
+// Specification OMG ptc/01-12-02
+
+#ifndef _COS_PERSISTENT_STATE_PSDL_
+#define _COS_PERSISTENT_STATE_PSDL_
+
+#include <orb.idl>
+#include <CosTransactions.idl>
+
+#pragma prefix "omg.org"
+
+module CosPersistentState 
+{    
+    local interface CatalogBase;
+    local interface Connector;
+    local interface EndOfAssociationCallback;
+    local interface Session;
+    local interface SessionPool;
+    local interface StorageHomeBase;
+    local interface TransactionalSession;
+
+    native StorageObjectBase;
+    native StorageObjectFactory;
+    native StorageHomeFactory;
+    native SessionFactory;
+    native SessionPoolFactory;
+
+    exception NotFound {};
+
+    typedef string TypeId;
+    typedef CORBA::OctetSeq Pid;
+    typedef CORBA::OctetSeq ShortPid;    
+
+    abstract storagetype StorageObject 
+    {
+
+      /**
+       * When called on an incarnation, the <code>destroy_object</code> 
+       * operation destroys the associated storage object (but does not 
+       * destroy any of its incarnation).
+       * @exception PERSIST_STORE if the method is applied to an embedded 
+       *   storage object
+       */
+       void destroy_object();
+        
+      /**
+       * When called on an incarnation, the <code>object_exists</code> operation 
+       * returns TRUE if the target incarnation represents an actual storage object, FALSE
+       *  if it does not.
+       *
+       * @return boolean true if the object represents an actual
+       *   storage object
+       */
+       boolean object_exists();
+
+      /**
+       * Returns the full persistent object identifier of the storage object.
+       *
+       * @return byte[] the object pid
+       * @exception PERSIST_STORE if the method is applied to an embedded 
+       *   storage object
+       */
+       Pid get_pid();
+
+      /**
+       * Returns the short persistent object identifier of the storage object
+       * that identifiews the object within the scope of its storage home.
+       *
+       * @return byte[] the object short pid
+       * @exception PERSIST_STORE if the method is applied to an embedded 
+       *   storage object
+       */
+       ShortPid get_short_pid();
+
+      /**
+       * The <code>get_storage_home</code> operation returns the 
+       * storage home instance that manages the target storage object instance.
+       *
+       * @return StorageHomeBase the storage home for the storage object
+       */
+       StorageHomeBase get_storage_home();
+    };    
+
+   /**
+    * Yield reference. Can be used to define overloaded functions or methods that return
+    * incarnations and references.
+    */
+    enum YieldRef { YIELD_REF };
+
+   /**
+    * FoprUpdate reference. Used to define overloaded accessor function/method
+    * which will update the state member.
+    */     
+    enum ForUpdate { FOR_UPDATE };
+
+   /**
+    * Isolation level constant type.
+    */
+    typedef short IsolationLevel;
+
+   /**
+    * Isolation level constant READ UNCOMMITTED.
+    */
+    const IsolationLevel READ_UNCOMMITTED = 0;
+
+   /**
+    * Isolation level constant READ COMMITTED.
+    */
+    const IsolationLevel READ_COMMITTED = 1;
+
+   /**
+    * Isolation level constant REPEATABLE READ.
+    */
+    const IsolationLevel REPEATABLE_READ = 2;
+
+   /**
+    * Isolation level constant SERIALIZABLE.
+    */
+    const IsolationLevel SERIALIZABLE = 3;
+
+   /**
+    * Transaction policy type declaration.
+    */
+    typedef short TransactionPolicy;
+    
+   /**
+    * Constant transaction policy for non-transaction sessions.
+    */
+    const TransactionPolicy NON_TRANSACTIONAL = 0;
+
+   /**
+    * Constant transaction policy for transactional sessions.
+    */
+    const TransactionPolicy TRANSACTIONAL = 1;
+    
+    typedef short AccessMode;
+    
+   /**
+    * Constant read-only access policy.
+    */
+    const AccessMode READ_ONLY = 0;
+
+   /**
+    * Constant read-write access policy.
+    */
+    const AccessMode READ_WRITE = 1;
+
+   /**
+    * Structure containing a named value pair used as a configuration parameter.
+    */
+    struct Parameter 
+    {
+        string name;
+        any val;
+    };
+
+    typedef sequence<Parameter> ParameterList;
+    typedef sequence<TransactionalSession> TransactionalSessionList;
+
+    //-------------------------------------------------------------
+    // Connector
+    //-------------------------------------------------------------
+
+   /**
+    * A connector is a local object that represents a given PSS implementation.
+    * Sessions and session pools are created by connectors. 
+    * Each ORB-implementation shall provide a per-ORB instance singleton which supports
+    * the local interface <code>ConnectorRegistry</code>. This registry is used by PSS
+    * implementations to register their PSS connectors, and by PSS users to find these
+    * connectors. The <code>implementation_id</code> strings have the following format: “vendor-
+    * id:string” where vendor-id is an id assigned by the OMG, and string is an
+    * implementation-defined string. The connector registry only accepts one connector with
+    * a given implementation-id: an attempt to register a connector with the same
+    * implementation-id as a connector already registered raises the standard exception
+    * <code>BAD_PARAM</code>. The operations <code>find_connector</code> 
+    * and <code>unregister_connector</code>
+    * raise <code>NotFound</code> if the registry has no connector registered with the given
+    * implementation_id parameter.
+    */
+    local interface Connector 
+    {
+        /**
+         * The id of this implementation.
+         */
+         readonly attribute string implementation_id;
+        
+        /**
+         * Returns the persistent object identifier of the supplied storage object.
+         * @param obj the storage object instance
+         * @return byte[] object identifier
+         */
+         Pid get_pid(in StorageObjectBase obj);
+
+        /**
+         * Returns the short persistent object identifier of the supplied storage object.
+         * @param obj the storage object instance
+         * @return byte[] short object identifier
+         */
+         ShortPid get_short_pid(in StorageObjectBase obj);
+
+        /**
+         * The create_basic_session operation creates a basic, non-transactional, session.
+         * @param access_mode the access model for the session
+         * @param additional_parameters will contain information such as file name or database name,
+         * authentication information, etc. supporting connector configuration
+         * @return Session a basic non-transactional session.
+         * @exception PERSIST_STORE if the implementation cannot provide a session with
+         * the desired access mode (or higher)
+         */ 
+         Session create_basic_session(in AccessMode access_mode, in ParameterList additional_parameters );
+        
+        /**
+         * The create_transactional_session operation creates a new transactional session.
+         * @param access_mode the access model for ther session
+         * @param default_isolation_level the default isolation level
+         * @param callback the end-of-association callback handler
+         * @param additional_parameters will contain information such as file name or database name,
+         * authentication information, etc. supporting connector configuration
+         * @return TransactionalSession a transactional session.
+         * @exception PERSIST_STORE if the implementation cannot provide a session with
+         * the desired access mode (or higher) or the desired isolation level
+         */ 
+         TransactionalSession create_transactional_session( in AccessMode access_mode, in IsolationLevel default_isolation_level, in EndOfAssociationCallback callback, in ParameterList additional_parameters );
+
+        /**
+         * The create_session_pool creates a new session pool.
+         * @param access_mode 
+         * @param tx_policy transaction policy
+         * @param additional_parameters will contain information such as file name or database name,
+         * authentication information, etc. supporting connector configuration
+         * @return SessionPool the session pool
+         */ 
+         SessionPool create_session_pool( in AccessMode access_mode, in TransactionPolicy tx_policy, in ParameterList additional_parameters );
+
+        /**
+         * The operation <code>current_session</code>
+         * logically calls <code>sessions</code> with the transaction associated with the calling thread; if a
+         * single session is returned, <code>current_session</code> returns it.
+         * @return TransactionalSession the current transactional session
+         * @exception <code>PERSIST_STORE</code> is no session is associated with the calling thread
+         */ 
+        TransactionalSession current_session();
+
+        /**
+         * The operation <code>sessions</code> returns all the transactional sessions created by this
+         * connector that are associated with resources registered with the given transaction.
+         * @param transaction transaction coordinator
+         * @return TransactionalSessionList list of transactional sessions
+         */ 
+        TransactionalSessionList sessions(in CosTransactions::Coordinator transaction);
+
+       /**
+        * Register a <code>StorageObjectFactory</code> implementation under a PSDL type identifier.
+        * @param storage_type_name the PSDL type name
+        * @param storage_object_factory implementation of a storage type
+        * @return StorageObjectFactory
+        */
+        StorageObjectFactory register_storage_object_factory( in TypeId storage_type_name, in StorageObjectFactory storage_object_factory );
+
+       /**
+        * Register a <code>StorageHomeFactory</code> implementation under a PSDL type identifier.
+        * @param storage_home_type_name the PSDL type name for the home
+        * @param storage_object_factory implementation of a storage type home
+        * @return StorageHomeFactory
+        */
+        StorageHomeFactory register_storage_home_factory( in TypeId storage_home_type_name, in StorageHomeFactory storage_object_factory );
+
+       /**
+        * Register a <code>SessionFactory</code> implementation under a PSDL catalog identifier.
+        * @param session_factory session factory implementation
+        * @return SessionFactory the registered catalog
+        */
+        SessionFactory register_session_factory( in SessionFactory session_factory );
+
+       /**
+        * Register a <code>SessionPoolFactory</code> implementation under a PSDL catalog identifier.
+        * @param session_pool_factory session pool implementation
+        * @return SessionPoolFactory the registered session pool catalog
+        */
+        SessionPoolFactory register_session_pool_factory( in SessionPoolFactory session_pool_factory );
+    };
+        
+    //-------------------------------------------------------------
+    // CatalogBase
+    //-------------------------------------------------------------
+
+   /**
+    * Defintion of a catalog that manages instances of storage homes.
+    * Storage object instances are managed by storage home instances that are themselves
+    * managed by catalogs.
+    * There are two kinds of catalogs: sessions and session pools. Sessions, unlike session
+    * pools, provide a programmatic control over session-allocation and session-transaction
+    * association.
+    * Access to storage objects is also either transactional or non-transactional: this depends
+    * if you use a transactional session or transactional session pool, or not. The
+    * programming model with or without transactions is slightly different: with
+    * transactions, the application must start and end units of work (transactions). Without
+    * transactions, there is no need for demarcation.
+    */
+    local interface CatalogBase 
+    {
+
+       /**
+        * The read-only attribute <code>access_mode</code> returns the access mode of this catalog.
+        * When the access mode is <code>READ_ONLY</code>, the storage object incarnations obtained
+        * through storage home instances provided by this catalog are read-only.
+        */
+        readonly attribute AccessMode access_mode;
+
+       /**
+        * The <code>find_storage_home</code> operation can be used to obtain a storage home instance.
+        * <code>find_storage_home</code> raises <code>NotFound</code> if it cannot find a storage home that
+        * matches the given <code>storage_home_id</code>.
+        * The format of the <code>storage_home_id</code> parameter is mostly implementation-defined.
+        * In the case of type-specific catalogs (declared in PSDL), the provide declarations
+        * define valid <code>storage_home_id</code> parameters. The <code>find_storage_home</code> operation
+        * also understands <code>storage_home_id</code> that have the form of a PSDL type id.
+        * <code>find_storage_home</code> looks up a PSDL-defined storage home with this type id in
+        * the catalog’s default datastore. If the <code>storage_home_id</code> parameter has the form
+        * <i>":datastore_name"</i>, where <i>datastore_name</i> is a string, <code>find_storage_home</code> 
+        * returns a storage home instance for the storage home associated with <code>java.lang.Object</code> 
+        * (Java) in this datastore.
+        */
+        StorageHomeBase find_storage_home(in string storage_home_id)
+            raises (NotFound);
+
+       /**
+        * The <code>find_by_pid</code> operation attempts to locate a storage object
+        * with the given PID in the storage homes provided by the target catalog.
+        * @return StorageObjectBase an incarnation of this storage object
+        * @exception NotFound if it cannot find a storage object with this pid. 
+        */
+        StorageObjectBase find_by_pid(in Pid the_pid) 
+            raises (NotFound);
+
+       /**
+        * The <code>flush</code> operation instructs the PSS implementation to write to disk
+        * any cached modifications of storage object incarnations managed by this catalog.
+        * Often, when an application creates a new storage object or updates a storage object, the
+        * modification is not written directly to disk -- the PSS implementation can cache some
+        * dirty data.
+        */
+        void flush();
+
+       /**
+        * A PSS implementation can cache data read from the datastore(s). The
+        * <code>refresh</code> operation instructs the PSS implementation to refresh any cached storage
+        * object incarnations accessed by this catalog. This operation can invalidate any direct
+        * reference to a storage object incarnation’s data member.
+        */
+        void refresh();
+
+       /**
+        * The operation <code>free_all</code> instructs the catalog 
+        * implementation to set the reference count of all its PSDL storage object instances to 0.
+        * In programming languages without garbage collection, such as C++, PSDL storage
+        * object instances are reference-counted by the application. Further, when a PSDL
+        * storage object A holds a reference to another PSDL storage object B, A’s instance
+        * owns a reference count of B’s instance. When PSDL storage objects form a cyclic
+        * graph, the corresponding instances own reference count of each other; even if the
+        * programmer correctly releases all her reference counts, the cyclic graph will never be
+        * completely released.  The <code>free_all</code> operation deals with this problem.
+        */
+        void free_all();
+
+       /**
+        * The operation <code>close</code> terminates the catalog. When closed, the catalog is also flushed.
+        * If the catalog is associated with one or more transactions when <code>close</code> is
+        * called, these transactions are marked roll-back only.
+        */
+        void close();
+    };
+    
+    //-------------------------------------------------------------
+    // StorageHomeBase
+    //-------------------------------------------------------------
+
+   /**
+    * Base interface for persistent storage type homes.
+    */
+    local interface StorageHomeBase 
+    {
+       /**
+        * Locate a storage object instance given a supplied short pid.
+        * @param short_pid the short persistent object identifier
+        * @return StorageObjectBase the storage object
+        * @exception NotFound if the identifier cannot be resolved with the scope of the home
+        */
+        StorageObjectBase find_by_short_pid(in ShortPid short_pid)
+            raises (NotFound);
+
+       /**
+        * Returns the catalog that manages the storage home.
+        * @return CatalogBase the catalog managing this home
+        */
+        CatalogBase get_catalog();
+    };
+    
+    //-------------------------------------------------------------
+    // Session
+    //-------------------------------------------------------------
+
+   /**
+    * A <code>Session</code> is a local object that provides access to 
+    * storage objects.
+    */
+    local interface Session : CatalogBase {};
+
+    //-------------------------------------------------------------
+    // TransactionalSession
+    //-------------------------------------------------------------
+
+   /**
+    * A <code>TransactionalSession</code> is a local object that provides 
+    * transactional access to storage objects.
+    * <p>At a given point in time, a transactional session can be associated with one resource
+    * object (a datastore transaction), or with no resource at all. The session-resource
+    * association can be active, suspended or ending. The state members of an incarnation
+    * managed by a transactional session can be used only when this session has an active
+    * association with a resource.
+    * Typically, a resource is associated with a single session for its entire lifetime.
+    * However, with some advanced database products, the same resource may be associated
+    * with several sessions, possibly at the same time.
+    */
+    local interface TransactionalSession : Session 
+    {
+
+       /**
+        * The isolation level of the resource associated with the session.
+        */
+        readonly attribute IsolationLevel default_isolation_level;
+
+        typedef short AssociationStatus;
+
+        const AssociationStatus NO_ASSOCIATION = 0;
+        const AssociationStatus ACTIVE = 1;
+        const AssociationStatus SUSPENDED = 2;
+        const AssociationStatus ENDING = 3;
+
+       /**
+        * The <code>start</code> operation re-activates a suspended (or ending) session-resource 
+        * association, when the given transaction matches the transaction of the suspended (or 
+        * ending) association; if there is a suspended (or ending) association but the transactions 
+        * do not match, the standard exception <code>INVALID_TRANSACTION</code> is raised.
+        * else, if a resource compatible with this session is already associated with the given
+        * transaction, <code>start</code> associates this resource with this session, and makes the
+        * association active.
+        * else the session creates a new resource and registers it with the given transaction; it
+        * also associates itself with this resource and makes the association active.
+        * Compatibility between resources and transactional sessions is implementation-defined.
+        * At a minimum, a resource is compatible with the session that created it.
+        * The behavior when several resources compatible with a given session are registered
+        * with a coordinator given to <code>start</code> is implementation-defined.
+        * @param transaction the transaction coordinator
+        */
+        void start(in CosTransactions::Coordinator transaction);
+
+       /**
+        * The <code>suspend</code> operation suspends a session-resource association. <code>suspend</code> 
+        * raises the standard exception <code>PERSIST_STORE</code> if there is no active association, and
+        * <code>INVALID_TRANSACTION</code> if the given transaction does not match the transaction
+        * of the resource actively associated with this session.
+        * @param transaction the transaction coordinator
+        */
+        void suspend(in CosTransactions::Coordinator transaction);
+
+       /** 
+        * The <code>end</code> operation terminates a session-resource association. 
+        * <code>end</code> raises the standard
+        * exception <code>PERSIST_STORE</code> if there is no associated resource, and
+        * transaction <code>INVALID_TRANSACTION</code> if the given transaction does not 
+        * match the the resource associated with this session. 
+        * @param transaction the transaction coordinator
+        * @param success If the <code>success</code> parameter is <code>FALSE</code>,
+        * the resource is rolled back immediately. Like <code>refresh</code>, <code>end</code> 
+        * invalidates direct references to incarnations' data members.
+        */
+        void end( in CosTransactions::Coordinator transaction, in boolean success );
+
+       /** 
+        * The get_association_status operation returns the status of the association (if
+        * any) with this session.
+        * @return AssociationStatus
+        */
+        AssociationStatus get_association_status();
+
+       /** 
+        * The <code>transaction<code> operation returns the coordinator of the transaction with
+        * which the resource associated with this session is registered.<code> transaction<code>
+        * returns a nil object reference when the session is not associated with a resource.
+        */
+        CosTransactions::Coordinator transaction();
+    };
+    
+   /**
+    * Defintion of a end-of-association callback.
+    * When a session-resource association is ended, the session may not become available
+    * immediately. For example, if the session is implemented using an ODBC or JDBC
+    * connection, the PSS implementation will need this connection until the resource
+    * (ODBC/JDBC transaction) is committed or rolled back. 
+    * A session pooling mechanism may want to be notified when a session is released by
+    * the PSS implementation; this is achieved by passing a
+    * <code>EndOfAssociationCallback</code> local object to the
+    * <code>Connector::create_transactional_session</code> operation.
+    */
+    local interface EndOfAssociationCallback 
+    {
+       /**
+        * Notification of a session release.
+        * @param session the session being released
+        */
+        void released(in TransactionalSession session );
+    };
+
+    //-------------------------------------------------------------
+    // SessionPool
+    //-------------------------------------------------------------
+
+   /**
+    * A sequence of pid values.
+    */
+    typedef sequence<Pid> PidList;
+
+   /**
+    * Definion of a <code>SessionPool</code>.
+    */
+    local interface SessionPool : CatalogBase 
+    {
+
+     /**
+      * <code>flush_by_pids</code> operation makes durable all of the modifications to active incarnations
+      * whose PIDs are contained in the <code>pids</code> parameter, regardless of the transactional
+      * context of the calling thread.
+      * If the transaction policy of the target session pool is <code>TRANSACTIONAL</code>,
+      * <code>flush_by_pids</code> behaves as follows:
+      * <ul>
+      * <li>If the invoking thread is associated with a transaction context, <code>flush_by_pids</code>
+      * makes durable all state modifications made in the current transactional scope for
+      * incarnations whose PIDs are contained in the <code>pids</code> parameter, flushing them to the
+      * underlying datastore.
+      * <li>If the invoking thread is not associated with a transactional context, the standard
+      * exception <code>TRANSACTION_REQUIRED</code> is raised.
+      * </ul>
+      * If the session pool implementation is unable to reconcile the changes and make them
+      * durable, then the <code>PERSIST_STORE</code> standard exception is raised.
+      */
+      void flush_by_pids(in PidList pids);
+
+     /**
+      * If the current transaction policy of the session pool is <code>TRANSACTIONAL</code> and the
+      * invoking thread is associated with a transactional context, <code>refresh_by_pids</code> causes
+      * the following behavior:
+      * • All incarnations involved in the current transaction context, and associated with the
+      * given pids, are refreshed.
+      * • If any of the given PIDs are associated with incarnations which are themselves not
+      * associated with the current transaction, the <code>INVALID_TRANSACTION</code>
+      * standard exception is raised.
+      * If the transaction policy of the session pool is <code>TRANSACTIONAL</code> and the invoking
+      * thread is not associated with a transactional context, the standard exception
+      * <code>TRANSACTION_REQUIRED</code> is raised.
+      */
+      void refresh_by_pids(in PidList pids);
+
+     /**
+      * The session pool transaction policy.
+      */
+      readonly attribute TransactionPolicy transaction_policy;
+    };
+
+};
+
+#endif // _COS_PERSISTENT_STATE_PSDL_

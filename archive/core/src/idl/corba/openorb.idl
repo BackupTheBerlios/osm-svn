@@ -1,0 +1,4 @@
+
+// This file includes all openorb defined definitions.
+
+#include "OpenORB_policy.idl"

@@ -1,0 +1,89 @@
+
+A:link {color: blue}
+A:visited {color: lightslategray}
+A:active {color: blue}
+
+H1 { 
+	font-size: 12pt; color: black;  font-style: normal;  font-weight: normal;
+	margin-left: 9px; margin-top: 20px; margin-bottom: 12px; font-family: serif;
+	}
+
+.logo {
+	position:absolute; 
+	top:35px; left:0px;
+	}
+
+.title { 
+	font-size: 12pt; color: black;  
+	margin-left: 9px; margin-top: 120px; margin-bottom: 12px;
+	}
+	
+.title2 { 
+	font-size: 12pt; color: black;  
+	margin-left: 9px; margin-top: 20px; margin-bottom: 12px;
+	}
+	
+.cover { 
+	horizontal-align: center; text-align: center; 
+	margin-left: 9px; margin-top: 3px; margin-bottom: 3px;
+	}
+	
+.sub-title { 
+	font-size: 12pt; color: black; 
+	margin-left: 9px; margin-top: 6px; margin-bottom: 12px;  
+	}
+
+.pre { 
+	margin-left: 37px;
+     }
+	
+.map { 
+	horizontal-align: center; text-align: center; 
+	margin: 3px; margin-top: 48px;
+	}
+	
+.picture { 
+	horizontal-align: center; text-align: center; 
+	margin: 9px;
+	}
+	
+.figure { 
+	horizontal-align: center; text-align: center; font-style: italic; 
+	margin: 36px;
+	}
+
+.icon { 
+	vertical-align: bottom; 
+	margin-left: 3px; margin-top: 24px; margin-right 24px;
+	}
+	
+.note { 
+	vertical-align: bottom; 
+	margin-left: 24px; margin-top: 3px; margin-right: 60px;
+	font-style: italic; 
+	}
+	
+.menu { 
+	vertical-align: bottom; font-size: 10pt; font-style: italic; color: black; 
+	margin-left: 9px; margin-top: 9px;  margin-bottom: 6px;
+	}
+	
+.menu2 { 
+	vertical-align: bottom; font-size: 10pt; font-style: italic; color: black; 
+	margin-left: 37px; margin-top: 3px;  margin-bottom: 3px;
+	}
+	
+.item { 
+	vertical-align: bottom; font-size: 10pt; font-style: italic; color: black; 
+	margin-left: 9px; margin-top: 9px; margin-bottom: 6px;
+	}
+	
+
+.body { 
+	margin-left: 9px; font-size: 12pt; 
+	}
+
+.legal { 
+	vertical-align: bottom; font-size: 10pt; color: black; 
+	margin-left: 9px;
+	}

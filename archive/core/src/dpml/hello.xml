@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<DPML>
+    <processor label="hello" note="Sample processor">
+      <input tag="contract" required="TRUE" type="IDL:omg.org/Session/AbstractResource:2.0" />
+	<context name="location" value="Paris" />
+    </processor>
+</DPML>

@@ -1,0 +1,417 @@
+
+<!-- 
+Web Gateway Service.
+Copyright 2001-2002 OSM SARL, All Rights Reserved.
+-->
+
+<project name="gateway" default="help" basedir=".">
+
+  <property file="local.properties"/>
+  <property file="build.properties"/>
+
+  <target name="help" >
+    <echo>
+
+      Description
+      -----------
+
+      ${project.title}
+
+      General Targets:
+      ----------------
+
+      all              - clean, build and dist
+      build            - invokes the general build target
+      javadoc          - javadoc API generation
+      dist             - executes build, war, javadoc and support file creation
+      deploy           - copies and expands the war file to the Tomcat/webapps directory 
+      clean            - destroy the build directory
+      
+    </echo>
+  </target>
+
+  <property name="VERSION" value="${MAJOR}.${MINOR}.${MICRO}"/>
+
+  <property name="catalina.home" value="../../tomcat" />
+  <property name="apps.path" value="../../jakarta-avalon-apps" />
+  <property name="enterprise" value="${apps.path}/enterprise" />
+  <property name="common.path" value="${apps.path}/common" />
+  <property name="common.lib.path" value="${common.path}/lib" />
+  <property name="orb.path" value="${enterprise}/orb" />
+  <property name="orb.lib.path" value="${orb.path}/lib" />
+  <property name="orb.dist.path" value="${orb.path}/dist" />
+  <property name="ots.path" value="${enterprise}/ots" />
+  <property name="ots.lib.path" value="${ots.path}/lib" />
+  <property name="pss.path" value="${enterprise}/pss" />
+  <property name="pss.dist.path" value="${pss.path}/dist" />
+  <property name="time.path" value="${enterprise}/time" />
+  <property name="time.dist.path" value="${time.path}/dist" />
+  <property name="properties.path" value="../properties" />
+  <property name="properties.dist.path" value="${properties.path}/dist" />
+  <property name="domain.path" value="../domain" />
+  <property name="domain.dist.path" value="${domain.path}/dist" />
+  <property name="sps.path" value="../sps" />
+  <property name="sps.dist.path" value="${sps.path}/dist" />
+  <property name="adapter.path" value="../adapter" />
+  <property name="session.path" value="../session" />
+  <property name="vault.path" value="../vault" />
+  <property name="realm.path" value="../realm" />
+
+  <property name="project.jar" value="${ant.project.name}.jar"/>
+  <property name="project.war" value="${ant.project.name}.war"/>
+
+  <property name="lib" value="lib" />
+  <property name="src" value="src" />
+  <property name="etc" value="${src}/etc" />
+  <property name="idl"  value="${src}/idl" />
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+  <property name="deploy"  value="deploy" />
+
+  <property name="javadoc.root.path"  value="${dist}/javadoc" />
+  <property name="avalon.href"  value="http://jakarta.apache.org/avalon/api/" />
+  <property name="jdk.href"  value="http://java.sun.com/j2se/1.4/docs/api/" />
+  <property name="overview.html" value="${etc}/overview.html" />
+
+  <!-- classpath -->
+
+  <path id="project.classpath">
+      <fileset dir="${orb.lib.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${pss.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${time.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${sps.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${domain.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${properties.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${common.lib.path}">
+        <include name="logkit.jar" />
+        <include name="avalon-framework.jar" />
+        <include name="excalibur-context.jar" />
+        <include name="excalibur-configuration.jar" />
+        <include name="merlin.jar" />
+      </fileset>
+      <fileset dir="${lib}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${session.path}/dist/">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${adapter.path}/dist/">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${vault.path}/dist/">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${realm.path}/dist/">
+        <include name="*.jar"/>
+      </fileset>
+  </path>
+
+  <!-- MAIN TARGETS -->
+
+  <target name="all" depends="clean,dist"/>
+  <target name="dist" depends="build,javadoc,support"/>
+  <target name="build" depends="war"/>
+
+  <target name="clean">
+     <delete dir="${build}"/>
+     <delete dir="${dist}"/>
+  </target>
+
+  <!-- PREPARE -->
+
+  <target name="prepare"  >
+    <mkdir dir="${build}" />
+    <mkdir dir="${build}/gateway" />
+    <mkdir dir="${build}" />
+    <mkdir dir="${dist}" />
+  </target>
+
+  <!-- CONTEXT -->
+
+  <target name="jar.context" depends="prepare">
+    <mkdir dir="dist"/>
+    <uptodate property="jar.uptodate" targetfile="${dist}/${project.jar}">
+      <srcfiles dir="${src}/java">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${etc}">
+         <include name="project.mf"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="war.context" depends="prepare">
+    <mkdir dir="dist"/>
+    <uptodate property="war.uptodate" targetfile="${dist}/${project.war}">
+      <srcfiles dir="${dist}">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${src}/web">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${src}/conf">
+         <include name="**/*"/>
+      </srcfiles>
+      <srcfiles dir="${common.lib.path}" >
+        <include name="logkit.jar" />
+        <include name="avalon-framework.jar" />
+        <include name="excalibur-context.jar" />
+        <include name="merlin.jar" />
+      </srcfiles>
+      <srcfiles dir="${domain.path}/dist/" >
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${adapter.path}/dist/">
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${properties.path}/dist/">
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${realm.path}/dist/">
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${session.path}/dist/">
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${sps.path}/dist/">
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${vault.path}/dist/" >
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${orb.lib.path}" >
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${orb.dist.path}" >
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${ots.lib.path}">
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${pss.dist.path}" >
+        <include name="*.jar"/>
+      </srcfiles>
+      <srcfiles dir="${time.dist.path}" >
+        <include name="*.jar"/>
+      </srcfiles>
+
+    </uptodate>
+  </target>
+
+  <target name="context.idl" depends="prepare">
+    <uptodate property="gateway.modified" targetfile="${idl}/gateway.idl">
+      <srcfiles dir="${build}/gateway">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+  </target>
+
+  <target name="gateway.idl" depends="context.idl" if="gateway.modified" >
+    <java failonerror="true" classname="org.openorb.compiler.IdlCompiler" fork="true">
+          <classpath>
+		<path refid="project.classpath"/>
+	    </classpath>
+	    <arg line="-silence"/>
+	    <arg line="-d ${build}/gateway"/>
+	    <arg line="-I ${idl}"/>
+	    <arg line="-I ${time.path}/src/idl"/>
+	    <arg line="-I ${sps.path}/src/idl"/>
+	    <arg line="-I ${properties.path}/src/idl"/>
+	    <arg line="-I ${domain.path}/src/idl"/>
+	    <arg line="-I ${adapter.path}/src/idl"/>
+	    <arg line="-I ${orb.path}/src/idl"/>
+	    <arg line="-I ${session.path}/src/idl"/>
+	    <arg line="-native GatewayAdapter net.osm.gateway.GatewayAdapter"/>
+	    <arg line="-native PrincipalAdapter net.osm.session.user.PrincipalAdapter"/>
+	    <arg line="${idl}/gateway.idl" />
+    </java>
+  </target>
+
+  <!-- COMPILE -->
+
+  <target name="jar" depends="gateway.idl,jar.context" unless="jar.uptodate" >
+      <echo message="Building Service"/>
+      <mkdir dir="${build}/lib"/>
+      <javac debug="off" destdir="${build}/lib" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+        <src path="${src}/java" />
+        <src path="${build}/gateway" />
+      </javac>
+      <copy todir="${build}/lib">
+        <fileset dir="${src}/java">
+          <include name="**/*.xinfo"/>
+          <include name="**/*.xml"/>
+        </fileset>
+      </copy>
+      <jar jarfile="${dist}/${project.jar}" basedir="${build}/lib" manifest="${etc}/project.mf" />
+  </target>
+
+  <target name="war" depends="jar,war.context" unless="war.uptodate">
+    <delete file="${dist}/${project.war}"/>
+    <jar jarfile="${dist}/${project.war}">
+      <zipfileset dir="${src}/web/">
+	  <include name="**/*" />
+      </zipfileset>
+      <zipfileset dir="${src}/conf/" prefix="WEB-INF">
+        <include name="*.*"/>
+      </zipfileset>
+      <zipfileset dir="${lib}" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${dist}" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${common.lib.path}" prefix="WEB-INF/lib">
+        <include name="logkit.jar" />
+        <include name="avalon-framework.jar" />
+        <include name="excalibur-configuration.jar" />
+        <include name="excalibur-context.jar" />
+        <include name="merlin.jar" />
+      </zipfileset>
+      <zipfileset dir="${domain.path}/dist/" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${adapter.path}/dist/" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${properties.path}/dist/" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${realm.path}/dist/" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${session.path}/dist/" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${sps.path}/dist/" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${vault.path}/dist/" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${orb.lib.path}" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${orb.dist.path}" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${ots.lib.path}" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${pss.dist.path}" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+      <zipfileset dir="${time.dist.path}" prefix="WEB-INF/lib">
+        <include name="*.jar"/>
+      </zipfileset>
+    </jar>
+  </target>
+
+  <target name="deploy" depends="war">
+    <copy todir="${catalina.home}/webapps">
+       <fileset dir="${dist}">
+         <include name="${project.war}"/>
+       </fileset>
+    </copy>
+    <unzip src="${catalina.home}/webapps/${project.war}"
+       dest="${catalina.home}/webapps/${ant.project.name}"/>
+  </target>
+
+  <!-- UTILITY TARGETS -->
+
+  <target name="support">
+    <copy todir="${dist}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.TXT"/>
+         <include name="README.TXT"/>
+       </fileset>
+    </copy>
+  </target>
+
+  <target name="javadoc" depends="prepare" >
+    <mkdir dir="${javadoc.root.path}/${ant.project.name}" />
+    <copy todir="${javadoc.root.path}/${ant.project.name}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.HTML"/>
+         <include name="license.css"/>
+       </fileset>
+    </copy>
+    <javadoc destdir="${javadoc.root.path}/${ant.project.name}" 
+	doctitle="&lt;h1&gt;${project.title} ${VERSION}&lt;/h1&gt;" 
+      noindex="false" author="false" 
+      use="true"
+      overview="${overview.html}"
+	windowtitle="${project.title}" 
+      bottom="&lt;a href='{@docRoot}/LICENSE.HTML'/&gt;License, Disclaimer and due credits.&lt;/a&gt;"
+      additionalparam="-breakiterator -J-Xmx128m"
+      packagenames="net.*" 
+      >
+        <sourcepath path="${src}/java"/>
+        <classpath>
+	    <path refid="project.classpath" />
+          <pathelement path="${dist}/${project.jar}" />
+	  </classpath>
+	  <link href="${jdk.href}" />
+	  <link href="${avalon.href}" />
+	  <link href="${orb.href}" />
+	  <link href="${pss.href}" />
+	  <link href="${properties.href}" />
+	  <link href="${realm.href}" />
+	  <link href="${sps.href}" />
+	  <link href="${domain.href}" />
+	  <link href="${adapter.href}" />
+    </javadoc>
+  </target>
+
+  
+  <target name="demo" depends="loader.validation,build" if="merlin.available" >
+    <load target="${demo.target}" priority="${demo.priority}"      
+      configuration="${etc}/config.xml"
+      disposal="${demo.disposal}" 
+      verbose="${demo.verbose}">
+      <fileset dir="${dist}">
+         <include name="${vault.jar}"/>
+      </fileset>
+    </load>
+  </target>
+
+  <target name="loader.context">
+    <available property="merlin.available" file="${ant.home}/lib/merlin.jar"/>
+  </target>
+
+  <target name="loader.defintion" depends="loader.context" if="merlin.available">
+    <taskdef resource="merlin.properties"/>
+  </target>
+ 
+  <target name="loader.validation" depends="loader.defintion" unless="merlin.available">
+    <echo>
+
+     Merlin is not installed in your Ant library.
+     In order to invoke the target the following jar files 
+     must be added to your ${ant.home}/lib directory:
+
+       - merlin.jar
+       - avalon-framework.jar
+       - logkit.jar
+       - xerces.jar (for JRE 1.3 and earlier)
+    </echo>
+  </target>
+
+</project>

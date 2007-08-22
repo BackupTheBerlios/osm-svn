@@ -1,0 +1,52 @@
+/*
+ * Copyright 2000-2001 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.3 18 MAR 2001
+ */
+
+#ifndef _OSM_GATEWAY_IDL_
+#define _OSM_GATEWAY_IDL_
+#include <finder.idl>
+#include <chooser.idl>
+#include <extension.idl>
+#pragma prefix "osm.net"
+
+module gateway
+{
+    native PrincipalAdapter;
+
+   /**
+    * Exception thrown by the gateway when attempting to resolve a user reference
+    * relative to an underlying principal if the principal is unknown within the scope
+    * of the gateway.
+    */
+    exception UnknownPrincipal
+    {
+       string message;
+    };
+
+   /**
+    * The <code>Gateway</code> interface defines the primary point-of-presence for 
+    * the Task and Session business object model through supply of services enabling
+    * resolution of a principal object identity and access to adapted servies.
+    */
+    interface Gateway : chooser::Chooser, finder::Finder
+    {
+       /**
+        * Returns a user relative to the undelying principal.
+        * @param policy TRUE if a new should be created if the principal is unknown
+        *   otherwise, the UnknownPrincipal exception will be thrown if the principal
+        *   cannot be resolved to a user reference
+        * @return User the user object reference
+        * @exception UnknownPrincipal if the underlying principal does not
+        *    match a registered user.
+        */
+        session::user::User resolve_user( in boolean policy ) raises ( UnknownPrincipal );   
+    };
+
+};
+
+#endif // _OSM_GATEWAY_IDL_

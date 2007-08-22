@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- 
+TITLE: Bilateral Negotiation Collaboration Model.
+
+PURPOSE: 
+
+	This document defines a bilateral process through which two parties
+	may attempt to establish an agreement through a patter of interaction
+	similar to the classic notions of negotiation.  The process enables 
+	the establishment of a negotiation subject any an offered, proposed, 
+	or requested state, and transitions supporting the escalation of  
+	mutual agreement by the parties involved. 
+
+	Copyright OSM SARL 1999,2000.
+ 
+TYPICAL REFERENCE: 
+
+	# "-OSM//XML Model::BILATERAL//EN"
+	# "http://www.osm.net/dpml/BILATERAL.xml"
+
+DEPENDENCIES: 
+
+	Digial Product Modelling Language (DPML)
+	"-//OSM//DTD Specification::DPML//EN"
+	"http://www.osm.net/dpml/DPML.dtd"
+-->
+
+
+<DPML>
+
+    <collaboration label="Bilateral Negotiation" note="Bilateral negotiation process model - A model of collaboration in which two parties can interact through offers, requests, suggestions and proposals, leading to an agreed or non-agreed conclusion.">
+
+      <input tag="subject" required="true" type="IDL:omg.org/Session/AbstractResource:2.1" />
+
+	<state label="negotiable">
+
+		<trigger label="reject" >
+			<launch mode="PARTICIPANT" />
+			<termination class="FAILURE" code="0" />
+		</trigger>
+
+		<trigger label="timeout" >
+			<clock timeout="3600000" />
+			<termination class="FAILURE" code="-1" />
+		</trigger>
+
+		<state label="requested" >
+
+			<trigger label="init.request" >
+				<launch mode="INITIATOR" />
+				<initialization/>
+			</trigger>
+
+			<trigger label="suggest" >
+      			<launch mode="RESPONDENT"/>
+ 				<local reset="TRUE">
+					<input tag="subject" required="TRUE" implied="FALSE"
+                                  type="IDL:omg.org/Session/AbstractResource:2.1"/>
+				</local>
+ 			</trigger>
+
+			<trigger label="offer" >
+				<launch mode="RESPONDENT"/>
+				<transition target="offered">
+					<input tag="subject" required="TRUE" implied="FALSE"
+                                        type="IDL:omg.org/Session/AbstractResource:2.1" />
+				</transition>
+			</trigger>
+
+			<trigger label="propose" >
+				<launch mode="RESPONDENT"/>
+				<transition target="proposed">
+					<input tag="subject" required="TRUE" implied="FALSE"
+                                        type="IDL:omg.org/Session/AbstractResource:2.1" />
+				</transition>
+			</trigger>
+
+		</state>
+
+		<state label="offered" >
+
+			<trigger label="init.offer" >
+				<launch mode="INITIATOR" />
+				<initialization/>
+			</trigger>
+
+			<trigger label="agree" >
+				<launch mode="RESPONDENT" />
+					<move source="subject" target="result" switch="TRUE"/>
+ 					<termination class="SUCCESS" code="1">
+						<output tag="result" type="IDL:omg.org/Session/AbstractResource:2.1" />
+                        	</termination>
+			</trigger>
+
+			<state label="proposed" >
+
+				<trigger label="init.propose" >
+					<launch mode="INITIATOR" />
+					<initialization/>
+				</trigger>
+
+				<trigger label="request" >
+				      <launch mode="RESPONDENT"/>
+					<transition target="requested">
+						<input tag="subject" required="TRUE" implied="FALSE"
+                                                type="IDL:omg.org/Session/AbstractResource:2.1" />
+					</transition>
+				</trigger>
+			</state>
+		</state>
+	</state>
+</collaboration>
+</DPML>

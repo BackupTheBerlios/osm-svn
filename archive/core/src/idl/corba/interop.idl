@@ -1,0 +1,12 @@
+
+// This file groups together all the idl which contain definitions for
+// data structures relivant to interoperability between orbs
+
+#include "BiDirPolicy.idl"
+
+#include "CONV_FRAME.idl"
+
+// GIOP.idl includes IIOP.idl includes IOP.idl includes IOP_DCE.idl 
+#include "GIOP.idl"
+
+#include "SendingContext.idl"

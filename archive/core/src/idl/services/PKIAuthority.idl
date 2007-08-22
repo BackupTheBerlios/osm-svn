@@ -1,0 +1,515 @@
+#ifndef __PKIAUTHORITY_IDL
+#define __PKIAUTHORITY_IDL
+
+#include <PKI.idl>
+#include <PKIRepository.idl>
+
+#pragma prefix "omg.org"
+
+/**
+ *
+ * PKIAUTHORITY Module for CORBA's PKI Services
+ *
+ * This contains client interface for PKI-Authority
+ *
+ * @author Security Unit, DSTC
+ *
+ * @version 1.2 (post denver)
+ */
+
+ /* $Revision: 1.1 $
+ *
+ *
+ **/
+
+module PKIAuthority {
+
+    // Forward declaration...
+    interface CertificateStatusResponder;
+
+    abstract interface RequestManager;
+    interface RequestCertificateManager;
+    interface RequestRevocationManager;
+    interface RequestKeyUpdateManager;
+    interface RequestKeyRecoveryManager;
+
+
+    //SJM: change to a valuetype
+    //SJM: corrected IDL to have same member names as in the spec
+    //SJM: changed supportedCertRevocationTypes value to a list
+    //SJM: added public key and URL members
+    /**
+     * Structure to store common information related to the particular
+     * implementation to describe supported standards.
+     */
+    valuetype AuthorityProviderInfo 
+    {
+        public string standardVersion;
+        public string standardDescription;
+        public string productVersion;
+        public string productDescription;
+        public string productVendor;
+        public PKI::CertificateInfoList supportedCertificates;
+        public PKI::CRLInfoList supportedCRLs;
+        public PKI::CertificateRequestInfoList supportedCertRequestTypes;
+        public PKI::CertificateRevocationInfoList supportedCertRevocationTypes;
+        public PKI::KeyRecoveryInfoList supportedKeyRecoveryTypes;
+
+        //
+	  // additions
+	  //
+
+        public PKI::CertificateList publicKeys;
+        public string publicKeyURL;
+        public string policyURL;
+    };
+
+    /**
+     * Exception reporting either the Certificate, CertificateRequest,
+     * CertificateStatusRequest, etc. supplied
+     * is not a supported type by the PKIAuthority interface.
+     */
+    exception UnsupportedTypeException {
+        string description;
+    };
+
+    /** Exception reporting either the Certificate, CertificateRequest,
+     *  CertificateStatusRequest, etc. supplied
+     *  is using an unsupported encoding type.
+     */
+    exception UnsupportedEncodingException {
+        string description;
+    };
+
+    /** Exception reporting either the Certificate, CertificateRequest,
+     *  CertificateStatusRequest, etc. supplied
+     *  is in some way malformed and cannot be interpreted.
+     */
+    exception MalformedDataException {
+        string description;
+    };
+
+    /** Exception reporting either the Certificate, CertificateRequest,
+     *  CertificateStatusRequest, etc. supplied
+     *  is attempting an unnecessary continue operation.
+     */
+    exception UnexpectedContinueException {
+         string description;
+    };
+
+    /** RegistrationAuthority interface providing operations for
+     * making certificate requests, revocation requests, key update
+     * requests  and key recovery requests.
+     */
+    interface RegistrationAuthority {
+
+	/**
+       * Get the provider info for this authority.
+	 */
+        AuthorityProviderInfo get_provider_info();
+
+      /** 
+       * Used for passing general messages between
+       * client entity and authority. For example this may provide a
+       * method for a client to determine the authentication policy of
+       * the authority.
+	 *
+       * @param in_authority_info The encoded message input to authority.
+	 * @param out_authority_info The encoded returned message from
+	 *              authority.
+	 * @return Status value.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        PKI::PKIStatus get_authority_info(
+            in PKI::AuthorityInfo  in_authority_info,
+            out PKI::AuthorityInfo out_authority_info
+            )
+            raises(UnsupportedTypeException,UnsupportedEncodingException,
+                   MalformedDataException);
+
+
+	/** 
+       * Called to make a request for a certificate from an
+	 * authority such as a Certificate Authority (CA) or Registration
+	 * Authority (RA).
+	 *
+	 * @param certificate_request <code>PKI::CertificateRequest</code>
+	 *              structure containing details of the clients request.
+	 *
+	 * @return <code>RequestCertificateManager</code> object reference to
+	 *              extract details regarding the particular request,
+       *              continue interaction and obtain results.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+       RequestCertificateManager request_certificate
+       (
+           in PKI::CertificateRequest certificate_request
+       )
+       raises
+	 (
+		UnsupportedTypeException,UnsupportedEncodingException,
+                   MalformedDataException
+	 );
+
+	/** 
+       * Called to request revocation of a certificate from a (CA)
+	 * or (RA). Has only in parameters.
+	 *
+	 * @param cert_rev_request <code>PKI::CertRevRequest</code> structure
+	 *              containing details of the clients request for
+	 *              certificate revocation.
+	 * @return <code>RequestRevocationManager</code> object reference
+	 *              used to extract details pertaining to the request,
+       *              continue interaction and obtain results.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        RequestRevocationManager request_revocation
+            (in PKI::CertRevRequest      cert_rev_request)
+            raises(UnsupportedTypeException,UnsupportedEncodingException,
+                   MalformedDataException);
+
+	/** 
+       * Called to request key update of a certificate from a (CA)
+	 * or (RA).
+	 *
+	 * @param  key_request <code>PKI::CertificateRequest</code> structure
+	 *              containing details of the clients request for key
+	 *              update.
+	 *
+	 * @return <code>RequestKeyUpdateManager</code> object reference
+	 *              used to extract details pertaining to the
+	 *              request, continue interaction and obtain results.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        RequestKeyUpdateManager request_key_update
+            (in PKI::CertificateRequest   key_request)
+            raises(UnsupportedTypeException,UnsupportedEncodingException,
+                   MalformedDataException);
+
+	/** 
+       * Called to request key recovery from a (CA) or (RA) where
+	 * the authority provides key archive.
+	 *
+       * @param key_request <code>PKI::CertificateRequest</code> structure
+       *              containing details of the clients request for key
+       *              recovery.
+       * @return <code>RequestKeyRecoveryManager</code> object reference
+       *              that can be used extract details pertaining to the
+       *              request, continue interaction and obtain results.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+       */
+        RequestKeyRecoveryManager request_key_recovery
+            (in PKI::CertificateRequest   key_request)
+            raises(UnsupportedTypeException,UnsupportedEncodingException,
+                   MalformedDataException);
+
+    };
+
+
+    /**
+     * Interface defining operations that can be performed on a Certificate
+     * Authority object.
+     */
+    interface CertificateAuthority : RegistrationAuthority {
+
+      /** 
+       * Returns the certificate of the CertificateAuthority
+       * @param certificate_list List of certificates for CA.
+       * @return <code>PKI::PKIStatus</code> indicating the status of the
+       *              request.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+       */
+      PKI::PKIStatus get_ca_certificate(
+		  out PKI::CertificateList certificate_list)
+	raises (UnsupportedTypeException,UnsupportedEncodingException,
+		MalformedDataException);
+
+      /**
+       *  Return the current CRL of the CertificateAuthority
+       *
+       * @param crl The CRL published by the CertificateAuthority
+       * @return <code>PKI::PKIStatus</code>  indicating the status of the
+       *              request.
+       */
+      PKI::PKIStatus get_crl (out PKI::CRL crl);
+
+      /**
+       * Return a reference to certificate status responder.
+       *
+       * @return Reference to <code>CertificateStatusResponder</code>
+       *              object for the CA.
+       */
+      CertificateStatusResponder get_certificate_status_responder();
+
+      // SJM: Changed the return value to PKIRepository::Directory
+      //      and changed the operation name from get_repository to 
+      //      get_directory
+	/**
+	 * Return a reference to the repository which the CA uses to store
+	 * certificates, CRL's, etc.
+	 *
+	 * @return <code>PKIRepository::Directory</code> object reference.
+       * @exception org.omg.PKIRepository.RepositoryError
+	 */
+       PKIRepository::Directory get_directory()
+		raises(PKIRepository::RepositoryError);
+    };
+
+    // SJM: changed to an abstract interface
+    /**
+     * Generic interface for a manager object.
+     */
+    abstract interface RequestManager {
+
+      /**
+       * An attribute representing the status of the transaction
+       * associated with the manager object.
+       */
+        readonly attribute PKI::PKIStatus status;
+
+      /**
+       * A read only attribute representing an identifier for a particular
+       * transaction
+       */
+       readonly attribute long long transaction_ID;
+
+      /**
+	 * Operation to acknowledge negotiation is complete.
+	 *
+	 * @param confirm_data message to confirm content is correct and
+	 *              received.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+       void confirm_content
+       (
+		in PKI::ConfirmData     confirm_data
+	 )
+       raises
+	 (
+		UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException
+	 );
+    };
+
+
+    /**
+     * Interface to extract details, continue interaction and extract results
+     * pertaining to a particular certificate request. Inherits attributes and
+     * operations from RequestManager interface.
+     */
+    interface RequestCertificateManager : RequestManager {
+
+	/**
+	 * Used for continuing a certificate request that has
+	 * already been initiated but requires more interaction to complete
+	 * the request. An example of the use of this operation is for Proof
+	 * Of possession (POP) of the private key.
+	 *
+	 * @param request_data <code>PKI::RequestData</code> structure
+	 *              containing details for the continuation of the
+	 *              initial request.
+	 * @param certificates List of certificates possibly partially
+	 *              formed.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        void continue_request_certificate
+            (in PKI::RequestData        request_data,
+             in PKI::CertificateList    certificates)
+            raises (UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException);
+
+	/**
+	 * Obtains final or interim results of a particular request.
+	 *
+	 * @param certificates A list of certificates
+	 * @param response_data <code> PKI::ResponsData</code> structure
+	 *              containing details of the request thus far.
+	 * @return  <code>PKI::PKIStatus</code>, indicating the status of
+	 *              the request.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        PKI::PKIStatus get_certificate_request_result
+            (out  PKI::CertificateList    certificates,
+             out PKI::ResponseData        response_data)
+            raises (UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException);
+    };
+
+    /**
+     * Interface to extract details, continue interaction and extract results
+     * pertaining to a particular revocation request. Inherits attributes and
+     * operations from RequestManager interface.
+     */
+    interface RequestRevocationManager : RequestManager {
+
+	/**
+	 * Used for continuing a revocation request that has already been
+	 * initiated but requires more interaction to complete the request.
+	 *
+	 * @param request_data <code>PKI::RequestData</code> structure
+	 *              containing details for the continuation of the
+	 *              initial request.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        void continue_request_revocation
+            (in PKI::RequestData     request_data)
+            raises (UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException);
+
+	/**
+	 * Obtains final or interim results of a particular request.
+	 *
+       * @param cert_rev_response <code>PKI::CertRevResponse</code>
+       *              structure containing details of the response of the
+       *              the revocation request.
+	 * @param response_data <code>PKI::ResponsData</code> structure
+	 *              containing details of the request thus far for
+       *              continuing the request.
+	 * @return <code>PKI::PKIStatus</code>, indicating the status of
+	 * the request.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        PKI::PKIStatus get_request_revocation_result
+            (out PKI::CertRevResponse     cert_rev_response,
+             out PKI::ResponseData        response_data)
+            raises (UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException);
+    };
+
+
+    /**
+     * Interface to extract details, continue interaction and extract results
+     * pertaining to a particular key update request. Inherits attributes and
+     * operations from RequestManager interface.
+     */
+    interface RequestKeyUpdateManager : RequestManager {
+
+	/**
+	 * Used for continuing a key recovery request that has already been
+	 * initiated but requires more interaction to complete the request.
+	 *
+	 * @param request_data <code>PKI::RequestData</code> structure
+	 *              containing details for the continuation of the
+	 *              initial request.
+	 * @param certificate <code>PKI::Certificate</code>
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        void continue_key_update
+            (in PKI::RequestData      request_data,
+             in PKI::Certificate      certificate)
+            raises (UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException);
+
+	/**
+	 * Obtains final or interim results of a particular request.
+	 *
+	 * @param certificate The new certificate after key update.
+	 * @param response_data <code>PKI::ResponsData</code> structure
+	 *              containing details of the request thus far.
+	 * @return <code>PKI::PKIStatus</code>, indicating the status of
+	 * the request.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        PKI::PKIStatus get_request_key_update_result
+            (out PKI::Certificate       certificate,
+             out PKI::ResponseData         response_data)
+            raises (UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException);
+    };
+
+
+
+    /**
+     * Interface to extract details, continue interaction and extract results
+     * pertaining to a particular key recovery request. Inherits attributes
+     * and operations from RequestManager interface.
+     */
+    interface RequestKeyRecoveryManager : RequestManager {
+
+	/**
+	 * Used for continuing a key recovery request that has already been
+	 * initiated but requires more interaction to complete the request.
+	 *
+	 * @param request_data <code> PKI::RequestData</code> structure
+	 * containing details for the continuation of the initial request.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        void continue_key_recovery
+            (in PKI::RequestData      request_data)
+             raises (UnsupportedTypeException,UnsupportedEncodingException,
+                     MalformedDataException);
+
+	/**
+	 * Obtains final or interim results of a particular request.
+	 *
+	 * @param response_data <code>PKI::ResponsData</code> structure
+	 *              containing details of the request thus far.
+	 * @return <code>PKI::PKIStatus</code>, indicating the status of
+	 *              the request.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+        PKI::PKIStatus get_request_key_recovery_result
+            (out PKI::ResponseData         response_data)
+            raises (UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException);
+    };
+
+
+    /**
+     * Interface for an online certificate status responder
+     */
+    interface CertificateStatusResponder {
+
+	/**
+	 * Obtains details for the request of a certificate status from
+	 * an online certificate status server.
+	 *
+	 * @param request <code>PKI::CertificateStatusRequest</code> request
+	 *              structure containing details of the request.
+	 * @param response <code> PKI::CertificateStatusResponse</code>
+	 *              structure containing details of the return response.
+	 *
+	 * @return <code>PKI::PKIStatus</code> indicating the status of the
+	 *              request.
+       * @exception UnsupportedTypeException
+       * @exception UnsupportedEncodingException
+       * @exception MalformedDataException
+	 */
+	PKI::PKIStatus request_certificate_status(
+            in PKI::CertificateStatusRequest request,
+            out PKI::CertificateStatusResponse response)
+            raises (UnsupportedTypeException,UnsupportedEncodingException,
+                    MalformedDataException);
+    };
+};
+#endif

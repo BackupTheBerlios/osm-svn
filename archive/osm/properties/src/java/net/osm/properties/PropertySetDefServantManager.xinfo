@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<!--
+ PropertySetDefServantManager.xinfo
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 17/03/2002
+-->
+
+<blockinfo>
+
+  <block>
+    <name>properties</name>
+    <version>1.0</version>
+  </block>
+
+  <services>
+      <service name="net.osm.properties.PropertiesService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>orb</role>
+          <service name="org.apache.pss.ORB" version="2.4"/>
+      </dependency>
+  </dependencies>
+
+  <configuration>
+
+    <!--
+    Service publication
+    -->
+
+    <ior value="properties.ior"/>
+
+    <!--
+    The PSS configuration.
+    -->
+
+    <pss>
+
+      <session>
+        <parameter name="PSS.File.DataStore.Directory" value="pss" />
+        <parameter name="PSS.File.DataStore.Name" value="properties" />
+      </session>
+
+      <persistence>
+        <storage psdl="PSDL:osm.net/properties/PropertyStorageBase:1.0"
+          class="net.osm.properties.PropertyStorageBase" />
+        <home psdl="PSDL:osm.net/properties/PropertyStorageHomeBase:1.0"
+          class="net.osm.properties.PropertyStorageHomeBase" />
+        <storage psdl="PSDL:osm.net/properties/PropertySetDefStorageBase:1.0"
+          class="net.osm.properties.PropertySetDefStore" />
+        <home psdl="PSDL:osm.net/properties/PropertySetDefStorageHomeBase:1.0"
+          class="net.osm.properties.PropertySetDefStorageHomeBase" />
+      </persistence>
+
+    </pss>
+
+  </configuration>
+
+  <implementation policy="SINGLETON"/>
+
+</blockinfo>
+

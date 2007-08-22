@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: OSM SARL
+
+Name: net/osm/finder/DefaultFinder.class
+Avalon-Block: true
+
+Name: net/osm/chooser/DefaultChooser.class
+Avalon-Block: true
+

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- 
+
+    TITLE: Promissory Contract Model.
+
+    PURPOSE: 
+
+	This document defines a bilateral promissory contract model through 
+	which an initiating party can establish a contractual offer of service
+	fulfillment, a recipricating party can request fulfillment, followed
+	which, the initiating party can exercise fulfillment under an external 
+	fulfillment process.
+	
+	Copyright OSM SARL 1999,2000.
+ 
+    TYPICAL REFERENCE: 
+
+	# "-OSM//XML Model::PROMISSORY//EN"
+	# "http://www.osm.net/dpml/promissory.xml"
+
+    DEPENDENCIES: 
+
+	Digial Product Modelling Language (DPML)
+	"-//OSM//DTD Specification::DPML//EN"
+	"http://www.osm.net/dpml/DPML.dtd"
+-->
+
+<!--
+  <!DOCTYPE DPML PUBLIC 
+ 	"-//OSM//DTD Specification::DPML//EN" 
+	"src/dpml/DPML.dtd"> 
+-->
+
+<DPML>
+
+    <collaboration label="bilateral" note="Promissory contract process model. This criteria defines a model of collaboration in which an initiating party can establish a promise towards another party, where the reciprocating party can call the promise, thereby establishing an obligation on the promising party, leading to the launching of a fulfillment process (defined under a separate processor model).">
+
+      <input tag="contract" required="TRUE" type="IDL:omg.org/Session/AbstractResource:2.1" />
+
+      <role label="party" abstract="TRUE">
+            <rpolicy ceiling="1" quorum="1" assessment="STRICT" policy="CONNECTED" />
+            <role label="supplier" abstract="FALSE"/>
+            <role label="consumer" abstract="FALSE"/>
+      </role>
+
+	<state label="promised">
+
+            <trigger label="waive" >
+		<launch mode="PARTICIPANT" />
+ 		<external label="waiving" public="-OSM//XML Model::BILATERAL//EN" 
+                        system="http://home.osm.net/dpml/bilateral.xml">
+                </external>
+		<on class="SUCCESS">
+		    <termination class="SUCCESS" code="0" />
+                </on>
+		<on class="FAILURE">
+ 		    <local reset="FALSE"/>
+	        </on>
+            </trigger>
+
+	    <trigger label="dispute" >
+                <launch mode="PARTICIPANT" />
+                <copy source="contract" target="subject" />
+ 	        <external label="disputing" public="-OSM//XML Model::BILATERAL//EN"
+			system="bilateral.xml">
+                </external>
+		<on class="SUCCESS">
+                    <move source="result" target="contract" switch="TRUE"/>
+		    <local reset="TRUE"/>
+                </on>
+		<on class="FAILURE">
+		    <termination class="FAILURE" code="-2" />
+	        </on>
+	    </trigger>
+
+	    <state label="right">
+
+		<trigger label="promise" >
+			<launch role="supplier" />
+			<initialization/>
+		</trigger>
+
+		<trigger label="expire" >
+			<clock timeout="12000000" />
+ 			<termination class="FAILURE" code="-1" />
+		</trigger>
+
+		<trigger label="call" >
+			<launch role="consumer" />
+			<transition target="pending" />
+		</trigger>
+
+	    </state>
+
+	    <state label="obligation">
+
+                <state label="pending">
+
+	            <trigger label="fulfill" >
+		        <launch role="supplier" />
+ 		        <external label="fulfillment" 
+                                public="-OSM//XML Model::BILATERAL//EN"
+				system="http://home.osm.net/dpml/bilateral.xml">
+                        </external>
+                        <on class="SUCCESS">
+                            <move source="result" target="deliverable" switch="FALSE"/>
+		            <termination class="SUCCESS" code="1">
+                                <output tag="deliverable" type="IDL:omg.org/Session/AbstractResource:2.1" />
+                            </termination>
+		        </on>
+		        <on class="FAILURE">
+ 			    <local reset="TRUE"/>
+		        </on>
+	            </trigger>
+
+		    <trigger label="timeout" >
+                        <clock timeout="240000000" />
+                        <transition target="overdue" />
+                    </trigger>
+
+                    <state label="overdue"/>
+
+                </state>
+
+	    </state>
+
+	</state>
+
+    </collaboration>
+
+</DPML>

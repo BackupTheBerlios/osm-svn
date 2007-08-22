@@ -1,0 +1,223 @@
+/*
+ * Copyright 2000-2002 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.3 18 MAR 2001
+ * @version 2.0 31 MAR 2002
+ */
+
+#ifndef _OSM_FACTORY_IDL_
+#define _OSM_FACTORY_IDL_
+#pragma prefix "osm.net"
+#include <adapter.idl>
+
+module _factory
+{
+
+    //
+    // Factory
+    //
+
+   /**
+    * Exception thrown by a factory as a result of a creation failure.
+    */
+    exception CreationException
+    {
+        string message;
+    };
+
+   /**
+    * Exception thrown by the finder in response to a creation request where the 
+    * supplied criteria argument is unknown.
+    */
+    exception UnrecognizedCriteria
+    {
+        string message;
+    };
+
+   /**
+    * Exception thrown by the finder in response to a creation request where the 
+    * supplied criteria argument is recognized but not accepted.
+    */
+    exception InvalidCriteria
+    {
+        string message;
+    };
+
+   /**
+    * Valuetype supplied within the state of a factory profile that 
+    * contains a description of a single parameter.
+    */
+    valuetype Parameter
+    {
+       /**
+        * Unique parameter key.
+        */
+        private string m_key;
+
+       /**
+        * Parameter name for presentation purposes.
+        */
+        private string m_name;
+
+       /**
+        * Short description of the role of the parameter.
+        */
+        private string m_description;
+
+       /**
+        * Flag indicating if this parameter is required or optional.
+        */
+        private boolean m_required;
+
+       /**
+        * An any qualifying the type of parameter value allowed.
+        */
+        private any m_type;
+
+       /**
+        * Return the parameter key.
+        * @return String the parameter key
+        */
+        string getKey();
+
+       /**
+        * Return the parameter name.
+        * @return String the parameter name
+        */
+        string getName();
+
+       /**
+        * Return the parameter description.
+        * @return String the parameter description
+        */
+        string getDescription();
+
+       /**
+        * Return the parameter required flag.
+        * @return boolean required flag TRUE if this parameter is required
+        */
+        boolean getRequired();
+
+       /**
+        * Return the type argument.
+        * @return Any an any qualifing the argument type.
+        */
+        any getType();
+
+    };
+
+    typedef sequence<Parameter> ParameterSequence;
+
+   /**
+    * Valuetype used a client to hold a single parameter value.
+    */
+    valuetype Argument
+    {
+       /**
+        * The name of the parameter that the value is associated to.
+        */
+        private string m_key;
+
+       /**
+        * The argument value.
+        */
+        private any m_value;
+    };
+
+    typedef sequence<Argument> ArgumentSequence;
+
+   /**
+    * <code>Factory</code> is an object that provides support for the 
+    * creation of new object references based on a supplied 
+    * argument sequence.
+    */
+    interface Factory : adapter::Adaptive
+    {
+       /**
+        * Returns the default name to apply to instances created by this factory.
+        * @return String default instance name
+        */
+        string get_default_name();
+
+       /**
+        * Returns an array of <code>Parameter</code> values describing 
+        * the arguments to the <code>create</code> operation.
+        * @return Parameter[] parameter array
+        */
+        ParameterSequence get_parameters();
+
+       /**
+        * Creates and returns an object reference to an <code>AdapterManager</code>.
+        * @param arguments a sequence of <code>Argument</code> values
+        * @return AdapterManager an object reference to an adapter provider
+        */
+        adapter::Adaptive create
+        (
+            in ArgumentSequence arguments 
+        )
+        raises
+        (
+            UnrecognizedCriteria, InvalidCriteria, CreationException
+        );
+    };
+
+   /**
+    * The <code>FactoryAdapter</code> provides client side support 
+    * for factory operations based on an underlying factory capabilities.
+    */
+    abstract valuetype FactoryAdapter : adapter::ServiceAdapter
+    {
+       /**
+        * Returns the default name to apply to instances created by this factory.
+        * @return String default name
+        */
+        string getDefaultName();
+
+      /**
+        * Creates a new adapted object via the underlying factory
+        * @param arguments an array of arguments to supply to the factory
+        * @return Adapter an adapter wrapping the created object
+        * @exception UnrecognizedCriteria if the arguments established by the
+        *    adapter implementation is unknown to the factory
+        * @exception InvalidCriteria if the arguments created by the 
+        *   implementation is recognized but rejected as invalid
+        */
+        adapter::Adapter create
+        (
+            in ArgumentSequence arguments 
+        )
+        raises
+        ( 
+            UnrecognizedCriteria, InvalidCriteria, CreationException
+        );
+
+       /**
+        * Returns the set of parameters for this factory.
+        * @return Parameter[] an array of parameter descriptors
+        */
+        ParameterSequence getParameters();
+
+    };
+
+   /**
+    * Valuetype containing the factory profile.
+    */
+    valuetype FactoryValue : adapter::ServiceValue, FactoryAdapter
+    {
+       /**
+        * Sequence of parameter descriptors.
+        */
+        private ParameterSequence m_params;
+
+       /**
+        * Default instance name.
+        */
+        private string m_default;
+
+    };
+};
+
+#endif // _OSM_FACTORY_IDL_

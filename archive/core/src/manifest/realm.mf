@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: OSM SARL
+
+Name: net/osm/service/realm/Realm.class
+Avalon-Block: true

@@ -1,0 +1,19 @@
+
+<!-- 
+Example configuration used by the demo target.
+Copyright 2001-2002 OSM SARL, All Rights Reserved.
+-->
+
+<configuration>
+
+   <!--
+   Configuration of the dependent vault service.  The
+   interactive attribute may be TRUE or FALSE.  TRUE triggers
+   assignment of a dialog based challenge.  FALSE triggers 
+   background authentication based on a JAAS login configuration
+   or supplied vault context.
+   -->
+
+   <vault interactive="true"/>
+
+</configuration>

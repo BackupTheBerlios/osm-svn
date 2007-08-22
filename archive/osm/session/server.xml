@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<!--
+ Copyright 2002 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<!--
+The following configuration block defines the primary configuration
+component of a cascading configuration backed by the default gateway
+configuration profile.
+-->
+
+<configuration>
+
+  <ior value="../../content/gateway/session.ior"/>
+
+
+</configuration>
+

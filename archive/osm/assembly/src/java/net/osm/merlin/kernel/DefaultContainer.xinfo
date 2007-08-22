@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<!--  
+Copyright (C) The Apache Software Foundation. All rights reserved.
+This software is published under the terms of the Apache Software License
+version 1.1, a copy of which has been included with this distribution in
+the LICENSE.txt file.
+
+@author  Stephen McConnell
+@version 1.0 12/03/2001
+-->
+
+<component-info>
+
+  <component>
+    <name>container</name>
+    <version>1.0</version>
+  </component>
+
+  <context>
+    <entry key="classloader" type="org.apache.exccalibur.merlin.kernel.ContainerClassLoader" optional="false"/>
+  </context>
+
+  <services>
+    <service>
+      <service-ref type="net.osm.merlin.kernel.Container" version="1.0"/>
+    </service>
+  </services>
+
+</component-info>

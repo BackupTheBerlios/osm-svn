@@ -1,0 +1,243 @@
+
+<!-- 
+PSS Service.
+Copyright 2001-2002 OSM SARL, All Rights Reserved.
+-->
+
+<project name="discovery" default="help" basedir=".">
+
+  <property file="local.properties"/>
+  <property file="build.properties"/>
+
+  <target name="help" >
+    <echo>
+
+      Description
+      -----------
+
+      ${project.title}
+
+      General Targets:
+      ----------------
+
+      all              - clean, build and dist
+      build            - invokes the general build target
+      javadoc          - javadoc API generation
+      dist             - executes build, javadoc and support file creation
+      clean            - destroy the build directory
+      
+    </echo>
+  </target>
+
+  <property name="VERSION" value="${MAJOR}.${MINOR}.${MICRO}"/>
+
+  <property name="apps.path" value="../../jakarta-avalon-apps" />
+  <property name="enterprise" value="${apps.path}/enterprise" />
+
+  <property name="common.path" value="${apps.path}/common" />
+  <property name="common.lib.path" value="${common.path}/lib" />
+
+  <property name="orb.path" value="${enterprise}/orb" />
+  <property name="orb.lib.path" value="${orb.path}/lib" />
+  <property name="orb.dist.path" value="${orb.path}/dist" />
+  <property name="idl.class"  value="org.openorb.compiler.IdlCompiler" />
+
+  <property name="time.path" value="${enterprise}/time" />
+  <property name="time.dist.path" value="${time.path}/dist" />
+
+  <property name="discovery.jar" value="discovery.jar"/>
+
+  <property name="lib" value="lib" />
+  <property name="src" value="src" />
+  <property name="idl" value="${src}/idl" />
+  <property name="etc" value="${src}/etc" />
+  <property name="build"  value="build" />
+  <property name="dist"  value="dist" />
+
+  <property name="javadoc.root.path"  value="${dist}/${ant.project.name}" />
+  <property name="avalon.href"  value="http://jakarta.apache.org/avalon/api/" />
+  <property name="jdk.href"  value="http://java.sun.com/j2se/1.4/docs/api/" />
+  <property name="overview.html" value="${etc}/overview.html" />
+
+  <!-- classpath -->
+
+  <path id="project.classpath">
+      <fileset dir="${common.lib.path}">
+        <include name="logkit.jar" />
+        <include name="avalon-framework.jar" />
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${time.dist.path}">
+        <include name="*.jar" />
+      </fileset>
+  </path>
+
+  <!-- MAIN TARGETS -->
+
+  <target name="all" depends="clean,dist"/>
+  <target name="dist" depends="build,javadoc,support"/>
+
+  <target name="clean">
+     <delete dir="${build}"/>
+     <delete dir="${dist}"/>
+  </target>
+
+  <!-- PREPARE -->
+
+  <target name="prepare"  >
+    <mkdir dir="${build}" />
+    <mkdir dir="${build}/src"/>
+    <mkdir dir="${build}/lib"/>
+    <mkdir dir="${dist}" />
+  </target>
+
+  <!-- DISCOVERY BLOCK -->
+
+  <target name="context" depends="prepare">
+    <uptodate property="uptodate" targetfile="${dist}/${discovery.jar}">
+      <srcfiles dir="${src}/java">
+         <include name="**/*.*"/>
+      </srcfiles>
+      <srcfiles dir="${etc}">
+         <include name="discovery.mf"/>
+      </srcfiles>
+    </uptodate>
+    <uptodate property="idl.modified" targetfile="${idl}/discovery.idl">
+      <srcfiles dir="${build}/src">
+	  <include name="**/*"/>
+      </srcfiles>
+    </uptodate>
+
+  </target>
+
+  <target name="idl" depends="context" if="idl.modified" >
+    <echo message="IDL discovery.idl"/>
+    <java failonerror="true" classname="${idl.class}" fork="true">
+      <classpath>
+	  <path refid="project.classpath"/>
+	</classpath>
+	<arg line="-silence"/>
+	<arg line="-d ${build}/src"/>
+	<arg line="-I ${idl}"/>
+	<arg line="${idl}/discovery.idl" />
+    </java>
+  </target>
+
+  <target name="build" depends="context,idl" unless="uptodate" >
+      <echo message="Building Discovery Component"/>
+      <javac debug="off" destdir="${build}/lib" deprecation="true">
+        <classpath>
+	    <path refid="project.classpath" />
+	  </classpath>
+        <src path="${src}/java" />
+        <src path="${build}/src" />
+      </javac>
+      <copy todir="${build}/lib">
+        <fileset dir="${src}/java">
+          <include name="**/*.xinfo"/>
+          <include name="**/*.xml"/>
+        </fileset>
+      </copy>
+      <jar jarfile="${dist}/${discovery.jar}" basedir="${build}/lib" manifest="${etc}/discovery.mf" />
+  </target>
+
+  <!-- UTILITY TARGETS -->
+
+  <target name="support">
+    <copy todir="${dist}">
+       <fileset dir="${etc}">
+         <include name="LICENSE.TXT"/>
+         <include name="README.TXT"/>
+       </fileset>
+    </copy>
+  </target>
+
+  <target name="javadoc" depends="prepare" >
+    <echo message="${javadoc.root.path}/${ant.project.name}" />
+    <mkdir dir="${javadoc.root.path}/${ant.project.name}" />
+    <copy todir="${javadoc.root.path}/">
+       <fileset dir="${etc}">
+         <include name="LICENSE.HTML"/>
+         <include name="license.css"/>
+       </fileset>
+    </copy>
+    <javadoc destdir="${javadoc.root.path}/${ant.project.name}" 
+	doctitle="&lt;h1&gt;${project.title} ${VERSION}&lt;/h1&gt;" 
+      noindex="false" author="false" 
+      use="true"
+      overview="${overview.html}"
+	windowtitle="Registration and Discovery" 
+      bottom="&lt;a href='{@docRoot}/LICENSE.HTML'/&gt;License, Disclaimer and due credits.&lt;/a&gt;"
+      additionalparam="-breakiterator -J-Xmx128m"
+      packagenames="net.*" 
+      >
+        <sourcepath path="${src}/java"/>
+        <sourcepath path="${build}/src"/>
+        <classpath>
+	    <path refid="project.classpath" />
+          <pathelement path="${dist}/${discovery.jar}" />
+	  </classpath>
+	  <link href="${jdk.href}" />
+	  <link href="${avalon.href}" />
+	  <link href="${orb.href}" />
+	  <link href="${time.href}" />
+    </javadoc>
+  </target>
+
+  
+  <target name="demo" depends="loader.validation,build" if="merlin.available" >
+    <load target="net.osm.discovery.PortalProvider" priority="${demo.priority}"      
+      disposal="${demo.disposal}" 
+      verbose="${demo.verbose}">
+      <fileset dir="${dist}">
+         <include name="${discovery.jar}"/>
+      </fileset>
+      <fileset dir="${time.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.dist.path}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${orb.lib.path}">
+         <include name="*.jar"/>
+      </fileset>
+    </load>
+  </target>
+
+  <target name="loader.context">
+    <available property="merlin.available" file="${ant.home}/lib/merlin.jar"/>
+  </target>
+
+  <target name="loader.defintion" depends="loader.context" if="merlin.available">
+    <taskdef resource="merlin.properties"/>
+  </target>
+ 
+  <target name="loader.validation" depends="loader.defintion" unless="merlin.available">
+    <echo>
+
+     Merlin is not installed in your Ant library.
+     In order to use the "load" task the following jar files 
+     must be added to your ${ant.home}/lib directory:
+
+       - merlin.jar
+       - avalon-framework.jar
+       - logkit.jar
+       - xerces.jar (for JRE 1.3 and earlier)
+    </echo>
+  </target>
+
+  <target name="patch">
+     <replace 
+	 token="net.osm.portal"
+	 value="net.osm.discovery"
+	 dir="${src}" >
+         <include name="**/*.*"/>
+     </replace>
+  </target>
+
+</project>

@@ -1,0 +1,1311 @@
+
+/*
+ * Session.idl
+ *
+ * Copyright 2000-2001 OSM SARL.
+ * Rights to world-wide unlimited distribution of version 2.0 
+ * granted to the Object Management Group by OSM SARL 2001. This 
+ * version (2.1 contains supplimentary specifications that are
+ * copyright OSM SARL.  OSM reserves all rights pending incorporation 
+ * a part of all of these revisions under future revisions of the 
+ * OMG Business Object Domain Specifications.
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 2.1 2 APR 2001
+ */
+
+#ifndef _SESSION_
+#define _SESSION_
+#include <CosLifeCycle.idl>
+#include <CosObjectIdentity.idl>
+#include <CosCollection.idl>
+#include <NamingAuthority.idl> 
+#include <CosNotifyComm.idl>
+#include <CosPropertyService.idl>
+#include <TimeBase.idl>
+#include <orb.idl>
+
+#pragma prefix "omg.org"
+
+module Session {
+
+	interface AbstractResource;
+	interface Task;
+	interface Workspace;
+	interface AbstractPerson;
+	interface User;
+	interface Message;
+	interface Desktop;
+
+	abstract valuetype Link;
+	valuetype BaseBusinessObjectKey;
+
+	// sequence defintions
+
+	/**
+	* A sequence of AbstractResource instances.
+	*/
+	typedef sequence<Session::AbstractResource>AbstractResources;
+
+	/**
+	* A sequence of Task instances.
+	*/
+	typedef sequence<Session::Task>Tasks;
+
+	/**
+	* A sequence of Messages instances.
+	*/
+	typedef sequence<Session::Message>Messages;
+
+	/**
+	* A sequence of User instances.
+	*/
+	typedef sequence<Session::User>Users;
+
+	/**
+	* A sequence of Workspace instances.
+	*/
+	typedef sequence<Session::Workspace>Workspaces;
+
+	/**
+	* A sequence of Link instances.
+	*/
+	typedef sequence<Session::Link>Links;
+
+	// iterator defintions
+
+
+	/**
+	* An iterator of AbstractResource instances.
+	*/
+	interface AbstractResourceIterator : CosCollection :: Iterator { };
+
+	/**
+	* An iterator of Task instances.
+	*/
+
+	interface TaskIterator : CosCollection :: Iterator { };
+
+	/**
+	* An iterator of Message instances.
+	*/
+	interface MessageIterator : CosCollection :: Iterator { };
+
+	/**
+	* An iterator of Workspace instances.
+	*/
+	interface WorkspaceIterator : CosCollection :: Iterator { };
+
+	/**
+	* An iterator of User instances.
+	*/
+	interface UserIterator : CosCollection :: Iterator { };
+
+	/**
+	* An iterator of Link instances.
+	*/
+	interface LinkIterator : CosCollection :: Iterator { 
+	};
+
+	// abstract interfaces
+
+/**
+* Tagged is an abstract interface that declartes a tag accessor operation.  It is 
+* used by usage links to declare a role of a resource within the scope of a usage 
+* association.
+*/
+	abstract interface Tagged {
+
+     /**
+      * The tag method returns the string value the defines the role of a resource
+	* within the scope of a usage relationship.
+      * @return String tagged usage role
+	*/
+
+		CORBA::StringValue tag( ); 
+	};
+
+/**
+* The Link type is used within the Task and Session framework as an argument to 
+* operations that establish relationship dependencies between resources such as 
+* usage and containment.  The Link type is used as an argument to the bind, replace 
+* and release operations of an AbstractResource and as a type exposed under the 
+* expand operation.
+* Link represents an abstract association of one resource towards another. Link 
+* contains a single operation named resource that returns a reference to an 
+* AbstractResource.  Link serves as an abstract base to a series of other abstract 
+* relationship families – Containment, Privilege, Containment, Usage and Execution.  
+* Unless otherwise stated, a link represents a weak aggregation relationship.
+*/
+
+	abstract valuetype Link { 
+
+    	     /**
+     		* The resource operation returns the <code>AbstractResource</code> that 
+     		* another <code>AbstractResource</code> is dependant on.
+     		* @return AbstractResource that this link declares a dependency on.
+     		*/
+
+		AbstractResource resource( );
+
+           /**
+            * Factory operation through which the inverse link can be created.
+            * @param resource the <code>AbstractResource</code> to bind as the 
+            *  source of the inverse relationship.
+            */
+            Link inverse( in AbstractResource resource );
+
+	};
+
+/**
+* Containment is an abstract Link that represents the set of concrete Link 
+* definitions dealing with a Collects of AbstractResource by a Workspace, 
+* and the inverse notion of a AbstractResource being CollectedBy a Workspace. 
+* An instance of Workspace maintains a set of n Collects link instances, 
+* each holding a reference to exactly one collected AbstractResource.  For 
+* every instance of Collects, there is an opposite CollectedBy Link instance 
+* maintained by an AbstractResource that references the collecting Workspace.  
+* A specialization of both Collects and CollectedBy is defined to represent 
+* a Workspace containing an AbstractResource, where an implementation wishes 
+* to express strong aggregation from the containing Workspace to the contained 
+* AbstractResource.  This is defined under the ComposedOf and IsPartOf links 
+* where ComposedOf is a type of Collects and IsPartOf is a type of CollectedBy.
+*/
+
+	abstract valuetype Containment : Link{
+	};
+
+/**
+Privilege is a type of abstract link, representing a family of abstract 
+relationships dealing with Access and Ownership.  
+*/
+
+	abstract valuetype Privilege  : Link{ 
+	};
+
+/**
+* Access is an abstract Link that serves as the abstract base type for Accesses and 
+* AccessedBy. Accesses is a Link held by a User that reference a Workspace – similar 
+* to a bookmark.  AccessedBy is a Link held by a Workspace referencing a User that 
+* has attached a bookmark to it.  The specialisation of Accesses and AccessedBy 
+* named Administers and AdministeredBy provide a qualification of the access 
+* relationship whereby external clients can establish the identity of an 
+* administrating user identity.  
+*/
+
+	abstract valuetype Access : Privilege { 
+	};
+
+/**
+* Ownership is an abstract link used to reflect the bi-directional relationship between 
+* a User and a Task.  Every Task is owned by exactly one user, reflected under the 
+* OwnerBy link.  A User Owns between zero and may Tasks.   
+*/
+	abstract valuetype Ownership : Privilege { 
+	};
+
+/**
+* Usage is abstract Link that captures the notions of the bi-directional 
+* relationships between a Task and the AbstractResource references that 
+* are associated through consumption and production relationships.  
+* Usage is an abstract base type for Consumption and Production that  
+* extends the notion of Link through the introduction of the tag operation.   
+* Any concrete valuetype supporting usage is required to expose a state  
+* field named tag.  The tag value is equivalent to an argument name,  
+* facilitating the establishment of naming conventions on the resources  
+* consumed by  and produced by a Task. 
+*/
+
+	abstract valuetype Usage : Link supports Tagged { 
+	};
+
+/**
+* Consumption is the abstract base for the Link valuetypes Consumes and  
+* ConsumedBy.  Consumes is a Link held by a Task that references an  
+* AbstractResource it is consuming.  The inverse of this association  
+* is the Link ConsumedBy, held by the consumed AbstractResource,  
+* referencing the Task that is consuming it. 
+*/
+
+	abstract valuetype Consumption : Usage{ 
+	};
+
+/**
+* Production is the abstract base for the Link valuetypes Produces and  
+* ProducedBy.  Produces is a Link held by a Task that references an  
+* AbstractResource it is producing.  The inverse of this association  
+* is the link ProducedBy, held by the produced AbstractResource,  
+* referencing the Task that is producing it. 
+*/
+
+	abstract valuetype Production : Usage{ 
+	};
+
+/** 
+* The abstract link Execution is defined under the Session module.   
+* It represents the abstract family of relationships between a processor  
+* and Task.  The definition of concrete associations between a Task and  
+* the processing source is implementation dependent.
+*/
+
+	abstract valuetype Execution : Link{ 
+	};
+
+/**
+* Consumes is a Link held by a Task that references an AbstractResource it is 
+* consuming.  The inverse of this association is the Link ConsumedBy, held by 
+* the consumed AbstractResource, referencing the Task that is consuming it. 
+*/
+
+	valuetype Consumes : Consumption {
+
+   /**
+    * The AbstractResource that is consumed by the Task holding this link.
+    */
+		public AbstractResource resource_state;
+
+   /**
+    * The role of the resource.
+    */
+		public CORBA::StringValue tag; 
+	};
+
+/**
+* The <code>ConsumedBy</code> link is held by an instance <code>AbstractResource</code> that
+* is consumed by a <code>Task</code>.
+*/
+
+	valuetype ConsumedBy : Consumption {
+
+   		/**
+    		* The <code>Task</code> that is consuming the <code>AbstractResource</code> 
+            * holding this link.
+    		*/
+		public Task resource_state;
+
+   		/**
+    		* The role of the <code>Task</code> relative to the resource.
+    		*/
+		public CORBA::StringValue tag; 
+	};
+	
+/**
+ * The Produces link is a link exposed by an Task.  The Produces link 
+ * contains a reference to the AbstractResource that the Task is 
+ * producing.
+ */
+	valuetype Produces : Production  {
+
+		public AbstractResource resource_state;
+		public CORBA::StringValue tag; 
+	};
+
+/**
+ * The ProducedBy link is a link exposed by an AbstractResource that 
+ * is being produced by a Task. The ProducedBy link contains a reference
+ * to the Task that the holding AbstractResource is produced by.
+ */
+	valuetype ProducedBy : Production {
+
+		public Task resource_state;
+		public CORBA::StringValue tag; 
+	};
+	
+/**
+ * The Collects link is held be a Workspace and reference a single instance of 
+ * an AbstractReosurce collected by the workspace.
+ */
+	valuetype Collects : Containment {
+		public AbstractResource resource_state;
+	};
+
+/**
+ * The CollectedBy link is held be a AbstractResource and reference a single instance of 
+ * an Workspace that is is contained within.
+ */
+	valuetype CollectedBy : Containment {
+		public Workspace resource_state;
+	};
+
+/**
+ * The ComposedOf link is held be a Workspace and reference a single instance of 
+ * a Workspace that is logically part of the containing Workspace.
+ */
+	valuetype ComposedOf : Collects { 
+	};
+
+/**
+ * The IsPartOf link is held be a Workspace and reference a single instance of 
+ * a parent Workspace that it is logically part of.
+ */
+	valuetype IsPartOf : CollectedBy { 
+	};
+
+/**
+ * The Accesses link is held by a User and reference a single instance of 
+ * an Workspace that it has access to.
+ */
+	valuetype Accesses : Access {
+		public Workspace resource_state;
+	};
+
+/**
+ * The AccessedBy link is held by a Workspace and reference a single instance of 
+ * an User that has access to it.
+ */
+	valuetype AccessedBy  : Access {
+		public User resource_state;
+	};
+
+/**
+ * The Administers link is held by a User and reference a single instance of 
+ * an resource that it administers.
+ */
+	valuetype Administers : Accesses { 
+	};
+
+/**
+ * The AdministeredBy link is held by a resource and reference a single instance of 
+ * an User that administers it.
+ */
+	valuetype AdministeredBy : AccessedBy { 
+	};
+
+/**
+ * The Owns link is held by a User and reference a single instance of 
+ * a task that it owns.
+ */
+	valuetype Owns : Ownership {
+		public Task resource_state;
+	};
+
+/**
+ * The OwnedBy link is held by a resource and reference a single instance of 
+ * an User that owns it.
+ */
+	valuetype OwnedBy : Ownership {
+		public User resource_state;
+	};
+
+	// interfaces
+
+/**
+* IdentifiableDomainObject is an abstract base type for  
+* BaseBusinessObject through which object identity may be  
+* managed across independently managed domain.  The  
+* attribute domain qualifies the name space associated  
+* with the object identity provided under the IdentifiableObject  
+* interface. The AuthorityId type is a struct containing the  
+* declaration of a naming authority (ISO, DNS, IDL, OTHER, DCE),  
+* and a string defining the naming entity. The same_domain  
+* operation is a convenience operation to compare two  
+* IdentifiableDomainObject object instances for domain  
+* equivalence.
+*/
+
+	interface IdentifiableDomainObject : 
+		CosObjectIdentity::IdentifiableObject 
+		{
+
+		/**
+		* The attribute domain qualifies the name space associated with the 
+		* object identity provided under the IdentifiableObject interface. 
+		* The AuthorityId type is a struct containing the declaration of a 
+		* naming authority (ISO, DNS, IDL, OTHER, DCE), and a string defining 
+		* the naming entity. 
+		*/
+		readonly attribute NamingAuthority::AuthorityId domain;
+
+		/**
+		* The same_domain operation is a convenience operation to compare two 
+		* IdentifiableDomainObject object instances for domain equivalence.
+		* @return boolean true if the supplied IdentifiableDomainObject reference
+		* has the same domain identity as this instance.
+		* @param IdentifiableDomainObject comparable object
+		*/
+		boolean same_domain( 
+			in IdentifiableDomainObject other_object
+		);
+		
+	};
+
+/**
+* IdentifiableDomainConsumer defines a StructuredPushConsumer  
+* callback object that can be passed to an implementation of  
+* BaseBusienssObject under the add_consumer operation.  An  
+* implementation of this operation is required to establish  
+* the association of the consumer with an instance of  
+* StructuredPushSupplier before returning the supplier to the  
+* invoking client.
+*/
+	interface IdentifiableDomainConsumer :
+		Session::IdentifiableDomainObject,
+		CosNotifyComm::StructuredPushConsumer
+		{
+	};
+
+/**
+Declaration of a UTC Time value.
+*/
+
+	valuetype Timestamp TimeBase::UtcT ;
+
+
+/**
+* BaseBusinessObject is the abstract base class for all  
+* principal Task and Session objects. It has identity, is  
+* transactional, has a lifecycle, and is a notification  
+* supplier. The CosNotification service defines a StructuredEvent 
+* that provide a framework for the naming of an event and the  
+* association of specific properties to that event.  All events  
+* specified within this facility conform to the StructuredEvent  
+* interface.  This specification requires specific event types  
+* to provide the following properties as a part of the  
+* filterable_data of the structured event header. Under the  
+* CosNotification specification all events are associated with  
+* a unique domain name space. This specification establishes  
+* the domain namespace "org.omg.session" for structured events  
+* associated with AbstractResource and its sub-types.  
+* IdentifiableDomainConsumer defines a StructuredPushConsumer  
+* callback object that can be passed to an implementation of  
+* BaseBusienssObject under the add_consumer operation.  An  
+* implementation of this operation is required to establish  
+* the association of the consumer with an instance of  
+* StructuredPushSupplier before returning the supplier to the  
+* invoking client. The operations, creation, modification,  
+* and access return a Timestamp value.  
+*/
+
+	interface BaseBusinessObject : 
+		IdentifiableDomainObject,
+		CosLifeCycle::LifeCycleObject
+		{ 
+
+		#pragma version BaseBusinessObject 2.1
+
+		/**
+		* The <code>add_consumer</code> method takes a client supplied 
+            * <code>IdentifiableDomainConsumer</code> and returns a 
+		* <code>StructuredPushSupplier</code> event channel interface.
+		* This operation allows clients to establish event subscriptions
+		* to structured events produced by this BaseBusinessObject.
+		*/
+
+		CosNotifyComm::StructuredPushSupplier add_consumer(
+			in IdentifiableDomainConsumer consumer
+		);
+
+		/**
+		* The creation operation returns the date and time of the creation of 
+		* this BaseBusinessObject.  
+		*/
+
+		Timestamp creation( );
+
+		/**
+		* The modification operation returns the last modification date and time 
+		* (where modification refers to a modification of the state of a concrete 
+		* derived type).
+		*/
+
+		Timestamp modification( );
+
+		/**
+		* The access operation returns the date and time a derived type was accessed.
+		*/
+
+		Timestamp access( );
+	};
+
+	exception ResourceUnavailable{ };
+	exception ProcessorConflict{ };
+	exception SemanticConflict{ };
+
+/**
+* An AbstractResource is a transactional and persistent CORBA  
+* objects contained in one or more Workspaces. They may be  
+* selected, consumed and produced by Tasks. AbstractResources  
+* are found and selected by tools and facilities that present  
+* lists of candidate resources. These lists may be filtered by  
+* things like security credentials, by type, and by  
+* implementation. CORBAservice Trading can be used to build  
+* resource candidate lists. Resources selected from the lists  
+* are then wrapped by the tool or facility as AbstractResources.  
+* Task and Workspace are dependent on the AbstractResources  
+* they use and contain. Implementations are required to notify  
+* Task and Workspace of changes and defer deletion requests  
+* until all linked Tasks signal their readiness to handle. 
+* <p> 
+* 
+* The bind, replace and release operations enable a client to  
+* declare a dependency on an AbstractResource.  When a Task,  
+* User or Workspace establishes a usage of containment dependency  
+* on an AbstractResource, it is required to invoke the bind  
+* operation.  When dependencies are changed, such as the modification  
+* of the owner of a Task or the replacement of a resource within a  
+* workspaces, an implementation is required to invoke the replace  
+* operation.  When a relationship is retracted, as a result of the  
+* completion of a task, an implementation is required to invoke  
+* the release operation on resources to which it has established  
+* a dependency.<p> 
+*  
+* Exceptions raised under the bind and replace operations include  
+* ResourceUnavailable, ProducerConflict and SemanticConflict.   
+* The ResourceUnavailable and ProducerConflict exception may be  
+* raised by an implementation to indicate that the resource that  
+* is the target of a bind or replace operation is unable to  
+* fulfill the request.  ResourceUnavailable may be raised as a  
+* result of a concurrency control conflict.  The ProducerConflict  
+* exception may be raises in a situation where the producer  
+* resource is unable to support the association (for example,  
+* as a result of a processing capacity limit). A SemanticConflict  
+* exception may be raised if an attempt is made to violate the  
+* cardinality or type rules concerning the link kind referenced  
+* under the Link argument.<p>
+*/
+
+	interface AbstractResource : 
+		BaseBusinessObject {
+
+		#pragma version AbstractResource 2.1
+
+		/**
+		* The name of the <code>AbstractResource</code>.
+		*/
+		attribute string name;
+
+		/**
+		* The most derived type that this <code>AbstractResource</code> represents.
+		*/
+		readonly attribute CORBA::TypeCode resourceKind; 
+
+		/**
+		* Resource may declare dependecies on each other by invoking the bind operation
+		* on the resource to which a dependency exists.  For example, a Task has dependecies 
+		* on the resource it consumes and produces.  These resource have reciprical 
+            * associations towards the Task.  When associating a resource with another, the 
+		* dependant resource creates a new Link instance referencing itself as the dependent 
+	      * resource and passes this Link to the bind operation on the resource it is dependant
+		* on.  E.g. the implementation of create_task on User is responsible for declaring
+		* the association from the Task to the owning User.  The implementation does this 
+		* by creating a new <code>Owns</code> instance, setting the resource value to the 
+		* newly created <code>Task</code> and invoking bind on User, passing the 
+		* <code>Owns</code> instance as the link argument. An implememntation of Task is 
+		* responsible for returning <code>OwnedBy</code> link under the expand operation, 
+		* reflecting the ownership association to the User.  An implementation of User 
+		* is responsible for returning 0..n <code>Owns</code> instances referncing the
+		* <code>Task</code> instances it owns.
+		* 	
+     		* @param link a Link declaring the resource that has a dependency on the resource that 
+		* is the target of invocation - where the type of dependency is qualified by the 
+		* most derived type of the Link instance.
+     		* <P>
+     		* @exception ResourceUnavailable 
+     		* if the resource cannot accept the link binding due to an implementation 
+		* dependent constraint.
+     		* @exception ProcessorConflict
+     		* processor is unable or unwilling to provide processing services to a Task. 
+     		* @exception SemanticConflict
+     		* if the resource cannot accept the link binding due to a cardinality constraint.
+		*/
+
+		void bind(
+			in Session::Link link
+		) raises (
+			ResourceUnavailable,
+			ProcessorConflict,
+			SemanticConflict
+		);
+
+
+		/**
+		* Replaces an existing dependecy with another.
+		* @param old the Link to replace
+		* @param new the replacement Link
+     		* @exception ResourceUnavailable
+		* if the resource cannot accept the new link binding
+     		* @exception ProcessorConflict
+		* if a processor is unable or unwilling to provide processing services to a Task. 
+     		* @exception SemanticConflict
+     		* if the resource cannot accept the link binding due to a cardinality constraint.
+		*/
+
+		void replace(
+			in Link old,
+			in Link new
+		) raises (
+			ResourceUnavailable,
+			ProcessorConflict,
+			SemanticConflict
+		);
+
+		/**
+		* Releases an existing dependecy.
+		* @param link the Link to retract
+		*/
+		void release(
+			in Session::Link link
+		);
+
+		/**
+		* Returns a list of Workspaces containing this resource.
+		* @param max_number long the maximum number of Workspace instances to 
+		* include in the returned Workspaces sequence.
+		* @param workspaces Session::Workspaces a sequence of Workspace instances of 
+		* a length no greater than max_number.
+		* @param wsit WorkspaceIterator an iterator of the Workspace instances 
+		* containing this resource.
+		*/
+		void list_contained (
+			in long max_number,
+			out Session::Workspaces workspaces,
+			out WorkspaceIterator wsit
+		);
+
+		/**
+		* Returns a list of Tasks using or consuming this resource.
+		* @param max_number long the maximum number of Task instances to 
+		* include in the returned Tasks sequence.
+		* @param tasks Session::Tasks a sequence of Task instances of 
+		* a length no greater than max_number.
+		* @param wsit TaskIterator an iterator of the Task instances 
+		* consuming this resource.
+		*/
+		void list_consumers (
+			in long max_number,
+			out Tasks tasks,
+			out TaskIterator taskit
+		); 
+
+		/**
+		* Returns the Task that produced this resource.
+		* @return Task producing this resource.
+		*/
+
+	 	Task get_producer( );
+
+		/**
+		* Returns the number of Links held by an AbstractResource corresponding to a 
+		* given TypeCode filter criteria.  Filter criteria is based on the same 
+		* filtering model as applied under the expand operation. 
+		*
+		* @see org.omg.Session.AbstractResource#expand(org.omg.CORBA.TypeCode type, int max_number, org.omg.Session.LinksHolder seq)
+		*
+		* @return int number of links corresponding to the supplied type. 
+		* @param type CORBA::TypeCode a type code of a Link or type derived from Link
+		*/
+		short count(
+			in CORBA::TypeCode type
+		);
+
+		/**
+		* Returns a set of resources linked to it by a specific relationship. 
+		* Objects returned are, or are created as, AbstractResources. This operation 
+		* may be used by desktop managers to present object relationship graphs.
+		* @return LinkIterator an iterator of Link instances
+		* @param max_number maximum number of Link instance to include in the 
+		* seq value.
+		* @param seq Links a sequence of Links matching the type filter
+		*/
+		LinkIterator expand (
+			in CORBA::TypeCode type,
+			in long max_number,
+			out Links seq
+		);
+
+	};
+
+/**
+* The AbstractPerson interface is a placeholder for organization and other  
+* models that define information about people. When AbstractPerson uses an  
+* organization model it obtains information about Users (role_of  
+* AbstractPerson) is including things like roles and membership within  
+* projects and organizations.  AbstractPerson inherits from the interface  
+* CosPropertyService::PropertySetDef, providing mechanisms through which  
+* implementations may attribute features to a person such as a name,  
+* address information, or history.  
+*/
+	interface AbstractPerson : 
+		CosPropertyService::PropertySetDef 
+		{ 
+	};
+
+/**
+* This represents the basic current state of a User connection (logically  
+* at, or not at, the desktop). Asynchronous processes and events are managed  
+* in the disconnected state within the limitations this state imposes. When  
+* the User reconnects informational messages and actions required, if any,  
+* are presented. 
+* Information which people expect to be retained between connections is  
+* persistent. The currency of this information must be sufficient to  
+* provide consistency over synchronous and asynchronous (including abrupt  
+* system failure) terminations.
+*/
+
+	enum connect_state {
+		connected, 
+		disconnected
+	};
+
+	exception AlreadyConnected {};
+	exception NotConnected {};
+
+
+/**
+* User is a role of a person in a distributed computing environment. Information  
+* about the person is inherited by User. In this specification Users have tasks  
+* and resources located in workspaces on a desktop, as well as a message queue  
+* and a connection state. A specialization of User can add things like  
+* preferences.
+*/
+
+	interface User  : 
+		AbstractResource, 
+		AbstractPerson,
+		CosLifeCycle::FactoryFinder
+		{
+
+		#pragma version User 2.0
+
+		/**
+		* Returns the connected state of the User.
+		*/
+
+		readonly attribute connect_state connectstate; 
+
+		/**
+		* Connect establishes the User session for clients, such as desktop 
+		* managers to present Workspaces and the computing environment. 
+		* Successful completion of this operation will result in the session 
+		* state being changed to connected. 
+     		* @exception AlreadyConnected
+     		* if the User is already connected
+		*/
+
+		void connect(
+		) raises (
+			AlreadyConnected
+		);
+
+		/**
+		* Clients disconnect with the User 
+		* and the computing environment to close the session. When complete 
+		* the session state is set to disconnected.
+     		* @exception NotConnected
+     		* if the User is already disconnected
+		*/
+		void disconnect(
+		) raises (
+			NotConnected
+		);
+
+		/**
+		* The enqueue_message operation is used to notify a user of a 
+		* message.  Messages, passed as arguments to this operation, are created 
+		* though a MessageFactory. Message factory location is achieved through 
+		* invocation of the find_factories operation (inherited from the 
+		* CosLifeCycle::FactoryFinder interface), and passing the 
+		* CosNaming::Name sequence of "Factory" and "MessageFactory" as the 
+		* factory_key argument.  Client applications may choose to create a message 
+		* within or external to the domain of the User to whom a message is enqueued.
+		* 
+		* @param new_message Message the Message to enqueue
+		*/
+		void enqueue_message (
+			in Message new_message
+		);
+
+		/**
+		* Removes a message from the queue of messages for this User.
+		* @param message Message the Message to remove from the User message queue.
+		*/
+		void dequeue_message (
+			in Session::Message message
+		);
+
+		/**
+		* Returns an iterator and sequence of messages queued for this user.
+		* @param max_number long the maximum number of Message instances to 
+		* include in the returned Messages sequence.
+		* @param tasks Session::Messages a sequence of Message instances of 
+		* a length no greater than max_number.
+		* @param wsit MessageIterator an iterator of the Message instances 
+		*/
+
+		void list_messages(
+			in long max_number, 
+			out Messages messages,
+			out MessageIterator messageit
+            );
+
+		/**
+		* Task creation includes the initial specification of "who", "what", and 
+		* "how" for the Task. The User instance of this interface is "who", the 
+		* "what" is the AbstractResource data to update or produce, and the "how" 
+		* is the AbstractResource process (workflow, tool, etc.) used.
+		* @return Task the new Task instance bound to the supplied processor and data
+		* @param process AbstractResource acting as a Processor
+		* @param data AbstractResource data to update or produce
+		*/
+
+		Task create_task (
+			in string name,
+			in AbstractResource process, 
+			in AbstractResource data
+		);
+
+		/**
+		* Returns an iterator and sequence of Tasks owned by this user.
+		* @param max_number long the maximum number of Task instances to 
+		* include in the returned Tasks sequence.
+		* @param tasks Session::Tasks a sequence of Task instances of 
+		* a length no greater than max_number.
+		* @param wsit TaskIterator an iterator of the Task instances 
+		*/
+
+		void list_tasks (
+			in long max_number,
+			out Tasks tasks,
+			out TaskIterator taskit
+		);
+
+		/**
+		* Returns the Desktop that links one User to many Workspaces. Workspaces 
+		* may have many Users linked via Desktop.
+		* @return Desktop the User's private Desktop.
+		*/
+
+		Desktop get_desktop ( );
+
+		/**
+		* Users may create Workspaces with this operation. As Workspace may be shared 
+		* implementations must set access control lists to the Users sequence specified 
+		* with the create operation. On creation of a new workspace the principal User 
+		* creating the new instance is implicitly associated with the workspace as 
+		* administrator.  As administrator, the User holds rights enabling the modification 
+		* of the access control list through bind, replace and release operations. 
+		*
+		* @return Workspace administrated by this User.
+		* @param accesslist Users 
+		* a sequence of user instances to associate in the Workspace ACL.
+		*/
+
+		Workspace create_workspace (
+			in string name,
+			in Users accesslist
+		);
+
+		/**
+		* Returns an interator and limited length sequence of Workspaces created by 
+		* this User.
+		*
+		* @param max_number long the maximum number of Workspace instances to 
+		* include in the returned Workspace sequence.
+		* @param tasks Session::Workspace a sequence of Workspace instances of 
+		* a length no greater than max_number that are administered by this User.
+		* @param wsit WorkspaceIterator an iterator of the Workspace instances 
+		*/
+
+		void list_workspaces (
+			in long max_number, 
+			out Session::Workspaces workspaces,
+			out WorkspaceIterator wsit
+		);
+	};  
+
+/**
+* The Message interface defines the basic structure for messages that are  
+* enqueued to Users and dequeued for presentation by a desktop manager or  
+* used, as needed, by other clients. It is expected that Message will be  
+* specialized by implementations and user message definition standards.  
+* Typical messages include asynchronous completion, notification of  
+* Workspace content changes, and communications from other people.
+*/
+
+	interface Message : AbstractResource {
+
+		#pragma version Message 2.1
+
+		/**
+		* Message identifier.
+		*/
+
+		attribute any message_id;
+
+		/**
+		* Message body.
+		*/
+
+		attribute any message;
+	};  
+
+/**
+* Message factory location is achieved through invocation of the  
+* find_factories operation (inherited from the CosLifeCycle::FactoryFinder  
+* interface), and passing the CosNaming::Name sequence of "Factory" and  
+* "MessageFactory" as the factory_key argument.  Client applications may  
+* choose to create a message within or external to the domain of the User  
+* to whom a message is enqueued.
+*/
+
+	interface MessageFactory{
+
+		/**
+		* Creates a new instance of Message.
+		* @return Message
+		* @param message_id any message identifier
+		* @param message any message body
+		*/
+		Message create(
+			in any message_id,
+			in any message
+		);
+	};
+
+/**
+* Workspace defines private and shared places where resources, including  
+* Task and Session objects, may be contained. Workspaces may contain  
+* Workspaces.  The support for sharing and synchronizing the use of  
+* objects available in Workspaces is provided by the objects and their  
+* managers. Each Workspace may contain any collection of private and  
+* shared objects that the objects and their managers provide access to,  
+* and control use of.
+*/
+
+	interface Workspace : 
+		AbstractResource,
+		CosLifeCycle::FactoryFinder 
+		{
+
+		#pragma version Workspace 2.1
+
+		/**
+		* Adds the supplied <code>AbstractResource</code> to the <code>Workspace</code>.
+		* An implementation of add_contains_resource must invoke the bind operation on 
+		* the target resource with the link kind of contains and the containing Workspace 
+		* as the resource argument.
+		*/
+
+		void add_contains_resource( 
+			in AbstractResource resource
+		);
+
+		/**
+		* Remove a containment association between a resource and its 
+		* containing Workspace.
+		* An implementation of remove_contains_resource must invoke the release operation on 
+		* the target resource with the link kind of contains and the issuing Task as the resource. 
+		*/
+
+ 		void remove_contains_resource(
+			in AbstractResource resource
+		);
+
+		/**
+		* Creation of a sub-workspace to this Workspace.
+		* An implementation of create_subworkspace must invoke the bind operation on newly 
+		* created workspace using the Contains link kind and the parent workspace as the resource 
+		* argument. On creation of a new workspace the principal User creating the new 
+		* instance is implicitly associated with the workspace as administrator.  
+		* As administrator, the User holds rights enabling the modification of the access control 
+		* list through bind, replace and release operations. 
+		*/
+
+		Workspace create_subworkspace (
+			in string name,
+			in Users accesslist
+		);
+
+		/**
+		* The list resources operation will return a list of all Workspace resources 
+		* by type. This facilitates organization of resource types by user interfaces and 
+		* use by task creation, workflow, and other functions requiring specified types.
+		* @param resourcetype org.omg.CORBA.TypeCode restricts returned resources to 
+		* be of a type equal to or derived from this type.
+		* @param max_number long the maximum number of AbstractResources instances to 
+		* include in the returned AbstractResources sequence.
+		* @param resources Session::AbstractResources a sequence of AbstractResources instances of 
+		* a length no greater than max_number that are contained by this Workspace that cortrespond in 
+		* type to the supplied typecode.
+		* @param resourceit AbstractResourceIterator an iterator of the AbstractResource instances 
+		*/
+
+		void list_resources_by_type(
+			in CORBA::TypeCode resourcetype, 
+			in long max_number,
+			out AbstractResources resources,
+			out AbstractResourceIterator resourceit
+		);
+	};
+
+/**
+* The Desktop interface links Users to many Workspaces and Workspaces to many Users. 
+* Each User has one Desktop and many Workspaces. Workspaces may be shared so they 
+* may have many Users.
+*/
+
+	interface Desktop:Workspace {
+
+		#pragma version Desktop 2.1
+
+		/**
+		* Sets the User to whom this Workspace is assigned to.
+		*/
+
+		void set_belongs_to(
+			in User user
+		);
+
+		/**
+		* Returns the User that this Desktop is assigned to.
+		*/
+
+		User belongs_to();
+	};
+
+	exception CannotStart {};
+	exception AlreadyRunning {};
+	exception CannotSuspend {};
+	exception CurrentlySuspended {};
+	exception CannotStop {};
+	exception NotRunning {};
+
+	enum task_state {
+	    open, not_running, notstarted, running,
+	    suspended, terminated, completed, closed
+	};
+
+/**
+* A Task represents a unit of work defined by users. It represents  
+* the binding (which can be dynamic) between the data to be processed,  
+* the method for processing, and the User responsible. The duration of  
+* a Task can range from a short, single, non-repeatable process step  
+* to long process steps that can be repeated many times. A Task can  
+* be completed with the execution of a single tool, or the execution  
+* of a flow. Tasks may be suspended to the extent that the tool or  
+* flow used to execute them can be suspended. Tasks can serve as the  
+* repository of execution history information.<p>
+*/
+	interface Task : 
+		AbstractResource
+		{
+
+		#pragma version Task 2.1
+
+		/**
+		* The task state is determined by the state of its execution and the state of the 
+		* data content being processed. The task state and data state are related but 
+		* independent. The data state contains information about the application or 
+		* system object. The task state contains information about the task. For example, 
+		* when a fault simulator completes execution it is not necessarily true that the 
+		* fault simulation task has completed – the completeness depends on the value 
+		* of the fault coverage. The value of the fault coverage is based on the data, what 
+		* has been called the "data state". The execution of the fault simulator is independent 
+		* of the results of the execution. Also the fault coverage may be changed, independent 
+		* of the fault simulator, if the parameters of the design are changed.
+		* <P>
+		* <table cellpadding=0 cellspacing=3 border=0>
+		* <tr bgcolor="lightslategray" ><td width="30%">Value</td><td width="70%">Description</td></TR>
+		* <tr><td>open</td><td>Task is not finished and active.</td></TR>	
+		* <tr><td>closed</td><td>Task is finished and inactive.</td></TR>	
+		* <tr><td>not_running</td><td>Task is active and quiescent, but ready to execute.</td></TR>	
+		* <tr><td>running</td><td>Task is active and executing.</td></TR>
+		* <tr><td>notstarted</td><td>Task is active and ready to be initialized and started.</td></TR>	
+		* <tr><td>suspended</td><td>Task is active, has been started and suspended.</td></TR>
+		* <tr><td>completed</td><td>Task is finished and completed normally.	</td></TR>
+		* <tr><td>terminated</td><td>Task finished and stopped before normal completion.</td></TR>
+		* </table>
+		* <p>
+		*
+		* @return task_state current state of the Task
+		*/
+		task_state get_state( );
+
+		/**
+		* Returns the User that a Task is owned by.  This operation is 
+		* equivilient to expansion of the resource using the <code>OwnedBy</code>
+		* Link typecode.
+		*
+		* @return User owning this Task
+		*/
+
+		User owned_by();
+
+		/**
+		* Sets the owner of the Task to the User referenced under the input 
+		* argument new_task_owner.
+		*
+		* @param new_task_owner User - the User to assign as Task owner
+		*/
+
+		void set_owned_by ( 
+			in User new_task_owner
+		);
+
+
+		/**
+		* Adds a resource under a consumption relationship to this Task.
+		* @param resource AbstractResource to be added as a consumed resource
+		* @param tag String role of the resource relative to the Task
+		*/
+
+		void add_consumed( 
+			in AbstractResource resource,
+			in string tag
+		);
+
+		/**
+		* Removes a resource currently assigned under a consuption relationship.
+		* 
+		* @param resource AbstractResource to be removed from the set of consumption relationships.
+		*/
+
+		void remove_consumed( 
+			// removal requires the tag, not the resource
+			//in AbstractResource resource 
+			in string tag
+		);
+
+		/**
+		* The list_consumed operation will return a list of all AbstractResource instances
+		* consumed by thie Task. 
+		* @param max_number long the maximum number of AbstractResources instances to 
+		* include in the returned AbstractResources sequence.
+		* @param resources Session::AbstractResources a sequence of AbstractResources instances of 
+		* a length no greater than max_number that are consumed by this Task.
+		* @param resourceit AbstractResourceIterator an iterator of the consumed 
+            *   <code>AbstractResource</code> instances 
+		* @param linkit LinkIterator an iterator of the Link instances 
+		*/
+		void list_consumed (
+			in long max_number,
+			out AbstractResources resources,
+			out AbstractResourceIterator resourceit,
+			out LinkIterator linkit
+		);
+
+	     /**
+		* The get_consumed operation returns a single Consumed link instances
+		* referenced by the Task under the supplied usage role.
+            * This is a supplimentary OSM operation introduced under the 2.1 interface.
+		* @param tag the name of the role under which the resource is bound.
+            * @exception ResourceUnavailable if the request link is unknown
+		*/
+		Consumes get_consumed (
+			in string tag
+		) raises (
+			ResourceUnavailable
+		);
+
+		/**
+		* Add an AbstractResource under a production relationship.
+		*
+		* @param resource Session::AbstractResources - the resource to add 
+		* @param tag String - the role of the resource towards the Task 
+		*/
+		void add_produced( 
+			in AbstractResource resource,
+			in string tag
+		);
+
+		/**
+		* Removes a resource currently assigned under a production relationship.
+		* 
+		* @param resource AbstractResource to be removed from the set of production relationships.
+		*/
+		void remove_produced( 
+			in AbstractResource resource
+		);
+
+		/**
+		* The list_produced operation will return a list of all AbstractResource instances
+		* produced by this Task. 
+		* @param max_number long the maximum number of AbstractResources instances to 
+		* include in the returned AbstractResources sequence.
+		* @param resources Session::AbstractResources a sequence of AbstractResources instances of 
+		* a length no greater than max_number that are produced by this Task.
+		* @param resourceit AbstractResourceIterator an iterator of the produced 
+                <code>AbstractResource</code> instances 
+		* @param linkit LinkIterator - an iterator of the Link instances corresponding to 
+		*  the class <code>Produces</code>
+		*/
+ 		void list_produced (
+			in long max_number, 
+			out AbstractResources resources,
+			out AbstractResourceIterator resourceit,
+			out LinkIterator linkit 
+		);
+
+		/**
+		* Sets the processor for this Task.
+		* An implementation of set_process must ensure that appropriate bind 
+		* and release operations are invoked on the processor resources in order to 
+		* ensure referential integrity.  When a task is initially created, the implementation 
+		* is responsible for invocation of the bind operation on the abstract resource that 
+		* is serving as the processor, using the ProcessedBy link kind.  Subsequent 
+		* invocations of set_processor are responsible for the releasing and 
+		* re-establishing processed_by links on the old and new process resource using 
+		* the release and bind operation on the respective process resources.
+		* @param processor Session::AbstractResource 
+		* the processor running this Task
+		* @exception ProcessorConflict 
+		* if the processor cannot accept processing responsibility
+		*/
+		void set_processor( 
+			in Session::AbstractResource processor
+		) raises (
+			ProcessorConflict
+		);
+
+		/**
+		* Returns a Processor associated to this Task.
+		*
+		* @return AbstractResource processor of the Task.
+		*/
+		AbstractResource get_processor( ); 
+
+		/**
+		* The task description.
+		*/
+		attribute string description;
+
+		/**
+		* Starts a Task.
+		* @exception CannotStart if the processor cannot be started.
+		* @exception AlreadyRunning if the processor is already in a running state.
+		*/
+		void start ( 
+		) raises (
+			CannotStart, 
+			AlreadyRunning
+		);
+
+		/**
+		* Suspends a Task.
+		* @exception CannotSuspend if the processor cannot be suspended.
+		* @exception CurrentlySuspended if the processor is already in a suspended state.
+		*/
+		void suspend 
+            ( 
+		) 
+            raises 
+            (
+			CannotSuspend, 
+			CurrentlySuspended
+		);
+
+		/**
+		* Stops a Task.
+		* @exception CannotStop if the processor cannot be stopped.
+		* @exception NotRunning if the processor is not in a running state.
+		*/
+		void stop ( 
+		) raises (
+			CannotStop, 
+			NotRunning
+		);
+	};
+
+};
+
+#endif /* _SESSION_ */

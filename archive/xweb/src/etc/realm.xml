@@ -1,0 +1,19 @@
+
+<!--
+This file contains the static configuration of an instance of net.osm.security.realm.BasicRealm.
+-->
+
+<realm ior="file:///F:/dev/gateway/realm.ior">
+
+    <!--
+    Delcaration of properties required to configure the ORB.
+    -->
+
+    <orb class="org.openorb.CORBA.ORB" singleton="org.openorb.CORBA.ORBSingleton">
+        <property name="openorb.debug" value="1" />
+        <property name="openorb.config" file="orb.xml" />
+        <property name="openorb.profile" value="default" />
+        <property name="openorb.home" file="." />
+    </orb>
+
+</realm>

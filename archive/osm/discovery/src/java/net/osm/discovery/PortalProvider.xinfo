@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<!--
+PortalProvider.xinfo
+Copyright 2000 OSM SARL. All Rights Reserved.
+
+This software is the proprietary information of OSM SARL.  
+Use is subject to license terms.
+  
+@author  Stephen McConnell
+@version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <name>discovery</name>
+    <version>1.0</version>
+  </block>
+
+  <!-- services that are offered by this block -->
+
+  <services>
+    <service name="net.osm.discovery.Portal" version="1.0" />
+  </services>
+
+  <!-- dependencies that this block has on other blocks -->
+
+  <dependencies>
+      <dependency>
+          <role>orb</role>
+          <service name="org.apache.orb.ORB" version="2.4"/>
+          <configuration>
+            <property name="iiop.port" value="2509"/>
+          </configuration>
+      </dependency>
+      <dependency>
+          <role>time</role>
+          <service name="org.omg.CosTime.TimeService" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+  <implementation policy="SINGLETON"/>
+
+  <configuration>
+     <ior value="discover.ior"/>
+     <repository path="apps"/>
+  </configuration>
+
+</blockinfo>

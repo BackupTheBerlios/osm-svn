@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<!--
+ PSSServer.xinfo
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <version>1.0</version>
+  </block>
+
+  <!-- 
+  services that are offered by this block 
+  -->
+
+  <services>
+      <service name="net.osm.pss.PSSConnectorService" version="1.0" />
+      <service name="net.osm.pss.PSSSessionService" version="1.0" />
+  </services>
+
+  <!-- 
+  dependencies that this block has on other blocks 
+  -->
+
+  <dependencies>
+      <dependency>
+          <role>ORB</role>
+          <service name="net.osm.orb.ORBService" version="2.3"/>
+      </dependency>
+  </dependencies>
+
+</blockinfo>
+

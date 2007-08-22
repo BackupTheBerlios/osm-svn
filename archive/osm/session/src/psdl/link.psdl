@@ -1,0 +1,63 @@
+/**
+ */
+
+#ifndef _LINK_PSS_PSDL_
+#define _LINK_PSS_PSDL_
+#include <Session.idl>
+
+#pragma prefix "osm.net"
+
+module session {
+module linkage {
+
+   /**
+    * Storage of Link valuetype and supplimentary information indicating if the resource 
+    * held by the link is local or remote.
+    * @see org.omg.Session.Link
+    */
+    abstract storagetype LinkStorage
+    {
+       /**
+	  * Link valuetype describing the type of link and holding within it
+	  * the resource referenced under the link association.
+        */
+	  state Session::Link link;
+
+	 /**
+ 	  * Returns true if the supplied link is equal to the link contained by this
+ 	  * link storage instance.
+        * @param link - the link to compare with
+	  */
+	  boolean equal
+        ( 
+	      in Session::Link link 
+	  );
+
+    };
+
+   /**
+    * Storage home for all LinkStorage instances.
+    */
+    abstract storagehome LinkStorageHome of LinkStorage
+    {
+        factory create( link );
+    };
+
+    //
+    // LinkStorageBase
+    //
+
+    storagetype LinkStorageBase
+    implements LinkStorage
+    { 
+    };
+
+    storagehome LinkStorageHomeBase of LinkStorageBase
+    implements LinkStorageHome
+    { 
+    };
+
+}; 
+};
+
+#endif // _LINK_PSS_PSDL_

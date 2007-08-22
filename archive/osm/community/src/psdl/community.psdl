@@ -1,0 +1,96 @@
+/**
+ */
+
+#ifndef _COMMUNITY_PSDL_
+#define _COMMUNITY_PSDL_
+#include <CommunityFramework.idl>
+#include <workspace.psdl>
+
+#pragma prefix "osm.net"
+
+module community
+{
+    typedef CORBA::OctetSeq ID;
+
+    abstract storagetype MembershipStorage
+    {
+
+	 /**
+        * Policy control model containing rules related to membership 
+	  * administration.
+        */
+	  state CommunityFramework::MembershipModel model;
+
+       /**
+        * Recruitment status of the membership.
+        */
+        state CommunityFramework::RecruitmentStatus recruitment;
+
+       /**
+        * The set of Member associations (representing the set of Users
+        * associated to the Membership as Members).
+        */
+	  state list::LinkedList members;
+
+    };
+
+    //
+    // Community 
+    //
+
+   /**
+    * Community storage type is an interface to the persistent storage of a 
+    * community supporting association to multiple members through a contained 
+    * MembershipStorage instance.
+    */
+
+    abstract storagetype CommunityStorage : session::workspace::WorkspaceStorage
+    {
+
+       /**
+        * Short PID identifier of the MembershipStorage instance governing
+        * the policy for this community.
+        */
+        readonly state MembershipStorage membership;
+    };
+
+
+   /**
+    * The factory and home interface for MembershipStorage storage types.
+    */
+    abstract storagehome MembershipStorageHome of MembershipStorage 
+    {
+    };
+
+    storagetype MembershipStorageBase 
+    implements MembershipStorage 
+    {
+        stores members as ref<list::LinkedListBase>;
+    };
+
+    storagehome MembershipStorageHomeBase of MembershipStorageBase
+    implements MembershipStorageHome 
+    {
+    };
+
+   /**
+    * The factory and home interface for CommunityStorage storage types.
+    */
+    abstract storagehome CommunityStorageHome of CommunityStorage : session::workspace::WorkspaceStorageHome 
+    {
+    };
+
+    storagetype CommunityStorageBase : session::workspace::WorkspaceStorageBase
+    implements CommunityStorage 
+    {
+        stores membership as ref<MembershipStorageBase>;
+    };
+
+    storagehome CommunityStorageHomeBase of CommunityStorageBase
+    implements CommunityStorageHome 
+    { 
+    };
+
+};
+
+#endif // _COMMUNITY_PSDL_

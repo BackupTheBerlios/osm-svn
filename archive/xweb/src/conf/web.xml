@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" 
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+
+<web-app>
+
+    <display-name>XWEB</display-name>
+    <description>OSM Web Gateway</description>
+
+    <!--
+    Servlet 
+    -->
+
+    <servlet>
+
+        <servlet-name>xweb</servlet-name>
+        <display-name>OSM Web Gateway</display-name>
+        <servlet-class>net.osm.xweb.XWEB</servlet-class>
+
+        <!--
+        configuration file for the home
+        -->
+
+        <init-param>
+            <param-name>configuration</param-name>
+            <param-value>/WEB-INF/xweb.xml</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>log-priority</param-name>
+            <param-value>INFO</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>application-name</param-name>
+            <param-value>xweb</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>application-location</param-name>
+            <param-value>/WEB-INF/apps/xweb.sar</param-value>
+        </init-param>
+
+        <load-on-startup></load-on-startup>
+
+    </servlet>
+
+    <!-- Servlet Mapping -->
+
+    <!--
+    <servlet-mapping>
+        <servlet-name>XWEB-Home</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    -->
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <taglib>
+        <taglib-uri>http://home.osm.net/xweb</taglib-uri>
+        <taglib-location>/WEB-INF/xweb.tld</taglib-location>
+    </taglib>
+
+</web-app>
+

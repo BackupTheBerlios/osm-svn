@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+
+<!--
+ RegistrationAuthorityServer.xinfo
+ Copyright 2001 OSM SARL. All Rights Reserved.
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+ @author  Stephen McConnell
+ @version 1.0 28/12/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <name>authority</name>
+    <version>1.0</version>
+  </block>
+
+  <!-- 
+  services that are offered by this block 
+  -->
+
+  <services>
+      <service name="net.osm.pki.authority.RegistrationAuthorityService" version="1.0" />
+  </services>
+
+  <dependencies>
+      <dependency>
+          <role>orb</role>
+          <service name="org.apache.orb.ORB" version="2.4"/>
+          <configuration>
+            <property name="iiop.port" value="2512" />
+            <initializer class="org.apache.pss.Initializer" name="pss"/>
+          </configuration>
+      </dependency>
+	<dependency>
+          <role>vault</role>
+          <service name="net.osm.vault.Vault" version="1.0"/>
+      </dependency>
+	<dependency>
+          <role>repository</role>
+          <service name="net.osm.pki.repository.RepositoryService" version="1.0"/>
+      </dependency>
+  </dependencies>
+
+  <configuration>
+
+    <!--
+    Service publication
+    -->
+
+    <ior value="authority.ior"/>
+
+    <info>
+
+      <provider public-key-url="http://home.osm.net/planet/keys.html" 
+        policy-url="http://home.osm.net/planet/pki-policy.html"/>
+      <standard name="OMG PKI Authority" version="1.1"/>
+	<product name="OSM PKI" version="1.0" vendor="OSM">
+The OSM Registration Authority (RA) accepts requests for certificates on behalf of a CA and verifies the binding between the public/private key pair and the attributes being certified. Typically one or more RAs exist to provide a means for scaling a PKI within a single management domain. The relationship between the RAs and the CA is similar to the relationship between bank branches and the bank. While the branches are the face of the organization, the bank has the ultimate authority for the granting of transactions. So a request for a certificate may be made on a particular RA, the RA may verify Proof Of Possession (POP) of the private key and then request the certificate from the CA. The certificate obtained is from the CA but the RA provides the point of contact and may perform functions such as POP and checking authentication based on policy.
+       </product>
+       <certificate-info>
+	    <type value="X509v1Certificate" encoding="DEREncoding"/>
+          <type value="X509v2Certificate" encoding="DEREncoding"/>
+	    <type value="X509v3Certificate" encoding="DEREncoding"/>
+       </certificate-info>
+       <crl-info>
+	    <type value="X509v1CRL" encoding="DEREncoding"/>
+	 </crl-info>
+     </info>
+
+     <certification title="OSM PKI Certification Service">
+
+       <!--
+       The PSS configuration.
+        -->
+
+       <pss>
+
+         <connector value="file" />
+
+         <session>
+           <parameter name="PSS.File.DataStore.Directory" value="pss" />
+           <parameter name="PSS.File.DataStore.Name" value="pki-authority" />
+         </session>
+
+         <persistence>
+           <storage psdl="PSDL:osm.net/pki/authority/RequestCertificateStorageBase:1.0"
+             class="net.osm.pki.authority.RequestCertificateStorageBase" />
+           <home psdl="PSDL:osm.net/pki/authority/RequestCertificateStorageHomeBase:1.0"
+             class="net.osm.pki.authority.RequestCertificateStorageHomeBase" />
+         </persistence>
+
+       </pss>
+
+       <certificate-request value="PKCS10CertificateRequest" encoding="DEREncoding">
+          <policy>
+	      <user>
+               <grant role="USER" validity="90" pop="REQUIRED"/>
+	      </user>
+          </policy>
+       </certificate-request>
+
+     </certification>
+
+  </configuration>
+
+</blockinfo>
+

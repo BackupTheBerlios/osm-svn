@@ -1,0 +1,80 @@
+/**
+ */
+
+#ifndef _PKI_AUTHORITY_PSDL_
+#define _PKI_AUTHORITY_PSDL_
+#include <PKI.idl>
+#pragma prefix "osm.net"
+
+module pki
+{
+
+  module authority
+  {
+
+     /**
+      * Abstract request storage type.
+      */
+      abstract storagetype RequestStorage
+      {
+	   /**
+	    * Transaction identifier.
+	    */
+          state long long tid;
+
+	   /**
+	    * Transaction status.
+	    */
+          state PKI::PKIStatus status;
+      };
+
+     /**
+      * Certificate request storage type local interface.
+      */
+      abstract storagetype RequestCertificateStorage : RequestStorage
+      {
+	   /**
+	    * Certificate request supplied by the client.
+	    */
+          state PKI::CertificateRequest request;
+
+	   /**
+	    * Data to supplied in response to a request for a 
+          * certificate result status query (established
+          * the request manager).
+	    */
+          state PKI::ResponseData response;
+
+	   /**
+	    * Certificate to be supplied in response to a 
+	    * <code>get_certificate_request_result</code>.
+	    */
+          state PKI::CertificateList certificates;
+
+      };
+
+     /**
+      * Certificate request storage type implementation.
+      */
+      storagetype RequestCertificateStorageBase implements RequestCertificateStorage { };
+
+     /**
+      * Certificate request storage home local interface.
+      */
+      abstract storagehome RequestCertificateStorageHome of RequestCertificateStorage
+      {
+          key tid;
+          factory create( tid, status, request, response, certificates );
+      };
+
+     /**
+      * Certificate request storage home implementation.
+      */
+      storagehome RequestCertificateStorageHomeBase of RequestCertificateStorageBase 
+		implements RequestCertificateStorageHome{ };
+
+    };
+
+};
+
+#endif // _PKI_AUTHORITY_PSDL_

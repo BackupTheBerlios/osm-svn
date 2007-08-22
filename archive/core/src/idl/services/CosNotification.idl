@@ -1,0 +1,145 @@
+//file: CosNotification.idl
+#ifndef _COS_NOTIFICATION_IDL_
+#define _COS_NOTIFICATION_IDL_
+#pragma prefix "omg.org"
+
+/**
+* The CosNotification module defines the Structured Event data type, along with a data
+* type used for transmitting sequences of Structured Events. In addition, this module
+* provides constant declarations for each of the standard quality of service (QoS) and
+* administrative properties supported by all Notification Service implementations. Some0
+* properties also have associated constant declarations which indicate their possible
+* settings. Finally, administrative interfaces are defined for managing sets of QoS and
+* administrative properties.
+*/
+
+module CosNotification {
+
+	/**
+	* A type used to represent property name strings.
+	*/
+
+	typedef string Istring;
+
+	/**
+	* A property name.
+	*/
+
+	typedef Istring PropertyName;
+
+	/**
+	* A property value.
+	*/
+
+	typedef any PropertyValue;
+
+	/**
+	* A struct defining a property composed of a named and value pair.
+	*/
+
+	struct Property {
+		PropertyName name;
+		PropertyValue value;
+	};
+
+	/**
+	* Named value pair sequence.
+	*/
+
+	typedef sequence<Property> PropertySeq;
+
+	/**
+	* Named value pair sequence defining the optional header fields.
+	*/
+
+	typedef PropertySeq OptionalHeaderFields;
+
+	/**
+	* Named value pair sequence defineing a filterable event body.
+	*/
+
+	typedef PropertySeq FilterableEventBody;
+
+	/**
+	* The Event Type is a structure containing a domain name and type name.
+	* <p>The domain_name field contains a string which identifies the vertical industry domain
+	* (e.g., telecommunications, healthcare, finance, etc.) within which the type of event
+	* which characterizes a given Structured Event is defined. The definition of this field
+	* enables each vertical domain to define their own set of event types without worrying
+	* about name collisions with those defined by other vertical domains.
+	* <p>The event_type field contains a string which identifies the type of event contained
+	* within a given Structured Event. This name should be unique among all event types
+	* defined within a given vertical domain, which is identified by the domain_type field.
+	*/
+
+	struct EventType {
+		string domain_name;
+		string type_name;
+	};
+
+	/**
+	* Sequence of EventType instances.
+	*/
+
+	typedef sequence<EventType> EventTypeSeq;
+
+	/**
+	* A FixedEventFeader contains an EventType and an event_name.  
+	* The event_name field contains a string which names a specific instance of Structured
+	* Event. This name is not interpreted by any component of the Notification Service, and
+	* thus the semantics associated with it can be defined by end-users of the service. This
+	* field can be used, for instance, to associate names with individual Structured Events
+	* which can be used to uniquely identify an instance of a particular type of Structured
+	* Event within a given installation of the Notification Service.
+	*/
+
+	struct FixedEventHeader { 
+		EventType event_type;
+		string event_name;
+	};
+
+	/**
+	* An EventHeader collects together a FixedEventHeader (a 
+	* PropertySeq) with a OptionalHeaderFields.
+	*/
+
+	struct EventHeader {
+		FixedEventHeader fixed_header;
+		OptionalHeaderFields variable_header;
+	};
+
+	/**
+	* The StructuredEvent data structure defines the fields which comprise a Structured
+	* Event.  These include the EventHeader, a FilterableEventBody and an any representing 
+	* the remainder of the body of the event.<p>
+	* The filterable_data portion of the body of a Structured Event is a sequence of name-value
+	* pairs, where name is of type string and the value is a CORBA::Any. The main
+	* purpose of this portion of the event body is to provide a convenient structure into
+	* which event body fields upon which filtering is likely to be performed can be placed.
+	* It is anticipated that mappings of standard event types to the Structured Event will be
+	* defined such that standard event body field names correspond to values of well-known
+	* data types. Examples of such mappings for common event types used within the
+	* Telecommunications industry are provided in section 4 of this document. In addition,
+	* end users can define their own name-value pairs which comprise the filterable portion
+	* of any proprietary event types.<p>
+	* The remainder_of_body portion of the event body is intended to hold event data upon
+	* which filtering is not likely to be performed. From a logical point of view, the
+	* “interesting” fields of the event data should be placed into the filterable_data portion,
+	* and the “rest” of the event placed here. Obviously it is not possible to predict what
+	* portion of the event will be interesting (or not) to all consumers. The division of the
+	* event body within the structured event in this fashion merely provides a hint to
+	* consumers. It is still possible to perform filtering on the contents of the
+	* remainder_of_body portion of the event body, however this will require decomposing
+	* the Any data structure which contains this portion into actual typed data elements,
+	* using the typecode contained within the Any. Thus filtering on this portion of the event
+	* body is likely to be less efficient than filtering on the filterable_data portion.
+	*/
+
+	struct StructuredEvent {
+		EventHeader header;
+		FilterableEventBody filterable_data;
+		any remainder_of_body;
+	};
+};
+
+#endif

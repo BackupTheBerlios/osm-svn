@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<!--
+Copyright 2000-2001 OSM SARL All Rights Reserved.
+This configuration is the proprietary information of OSM SARL.
+Use is subject to license terms.  Entitys of this document 
+are derived from prior work of the Apache Software
+Foundation open source projects.
+
+@author  Stephen McConnell <mailto:mcconnell@osm.net>
+@version 1.0 20-JUN-2001
+-->
+
+<!--
+server.xml
+Basic config file that sets up context for server application.
+-->
+
+<environment>
+
+    <logs>
+
+      <category name="" target="xweb" priority="WARN" />
+      <category name="agent" target="xweb" priority="WARN" />
+      <category name="audit" target="xweb" priority="WARN" />
+      <category name="vault" target="xweb" priority="WARN" />
+      <log-target name="xweb" location="log/xweb.log" />
+
+    </logs>
+
+    <policy>
+      <grant code-base="file:${app.home}${/}SAR-INF${/}lib${/}*">
+        <permission class="java.security.AllPermission" />
+      </grant>
+    </policy>
+
+</environment>

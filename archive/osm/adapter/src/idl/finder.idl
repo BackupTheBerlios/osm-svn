@@ -1,0 +1,88 @@
+/*
+ * Copyright 2000-2002 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.3 18 MAR 2001
+ * @version 2.0 31 MAR 2002
+ */
+
+#ifndef _OSM_FINDER_IDL_
+#define _OSM_FINDER_IDL_
+#pragma prefix "osm.net"
+#include <adapter.idl>
+
+module finder
+{
+
+   /**
+    * Exception thrown by the finder when the supplied path cannot be resolved
+    * to an object.
+    */
+    exception ObjectNotFound
+    {
+        string message;
+    };
+
+   /**
+    * Exception thrown by the finder when the supplied path is considered invalid
+    * relative to the implementation resolution policy.
+    */
+    exception InvalidPath
+    {
+        string message;
+    };
+
+   /**
+    * Finder is the server interface that provides support for the 
+    * resolution of objects based on a supplied name.  Unlike chooser, 
+    * resolution under a finder support navigation of registered services
+    * whereas chooser provides lookup against a list of know services.
+    */
+    interface Finder : adapter::Adaptive
+    {
+
+       /**
+        * Returns a object resolved from the supplied path.
+        * @param path a string that identifies a path to an object
+        * @return Adapter an adapter backed by an object reference
+        * @exception InvalidPath thrown if the path is invalid
+        * @exception ObjectNotFound thrown if the path cannot be resolved
+        */
+        adapter::Adaptive resolve
+        ( 
+            in string path 
+        )
+        raises
+        (
+            InvalidPath, ObjectNotFound
+        );
+    };
+
+   /**
+    * Client-side support for chooser related operations.
+    */
+    abstract valuetype FinderAdapter : adapter::Adapter
+    {
+
+       /**
+        * Returns a object resolved from the supplied path.
+        * @param path a string that identifies a path to an object
+        * @return Adapter an adapter backed by an object reference
+        * @exception InvalidPath thrown if the path is invalid
+        * @exception ObjectNotFound thrown if the path cannot be resolved
+        */
+        adapter::Adapter resolve
+        ( 
+            in string path 
+        )
+        raises
+        (
+            InvalidPath, ObjectNotFound
+        );
+    };
+
+};
+
+#endif // _OSM_FINDER_IDL_

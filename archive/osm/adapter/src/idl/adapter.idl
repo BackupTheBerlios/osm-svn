@@ -1,0 +1,151 @@
+/*
+ * Copyright 2002 OSM SARL All Rights Reserved.
+ * This document is the proprietary information of OSM SARL.
+ * Use is subject to license terms.  
+ *
+ * @author  Stephen McConnell <mailto:mcconnell@osm.net>
+ * @version 1.0 31 MAR 2002
+ */
+
+#ifndef _OSM_ADAPTER_IDL_
+#define _OSM_ADAPTER_IDL_
+#pragma prefix "osm.net"
+
+module adapter
+{
+    native URL;
+
+    typedef sequence<string> KeySequence;
+
+   /**
+    * Valuetype exposing a primary object reference that is exposed by 
+    * an <code>AdapterManager</code> reference.  
+    */
+    abstract valuetype Adapter
+    {
+       /**
+        * Returns the static base keyword for the entity.
+        */
+        string getBase();
+
+       /**
+        * Returns the primary object reference that the adapter is adapting.
+        * @return org.omg.CORBA.Object object reference
+        */
+        Object getPrimary();
+
+       /**
+        * Returns a URL for the adapter.
+        */
+        string getURL();
+
+       /**
+        * Return the corbaloc address of the primary object reference.
+        * @return URL the corbaloc URL of the primary object
+        */
+        URL getCorbaloc();
+
+    };
+
+   /**
+    * Abstract interface enabling access to a <code>Adapter</code> valuetype.
+    */
+    abstract interface Adaptive
+    {
+       /**
+        * Returns an <code>Adapter</code> that provides client side 
+        * functionality related to the adapter's primary object.
+        * @return Adapter the adapter valuetype
+        */
+        Adapter get_adapter();
+
+    };
+  
+   /**
+    * <p>The <code>AdapterValue</code> is a valuetype that implements the 
+    * <code>Adapter</code> interface enabling server implementations
+    * to publish variations of adapter implementations that enable 
+    * specialized client side functionality.</p> 
+    * <p>Specialization of <code>AdapterValue</code> should include
+    * the following in their implementation:</p>
+    * <pre>
+    *  //static truncatable ids declaration
+    *  static final String[] _ids_list = 
+    *   { "IDL:osm.net/session/workspace/WorkspaceAdapter:1.0", };
+    *
+    *  public String [] _truncatable_ids()
+    *  {
+    *      return _ids_list;
+    *  }
+    *</pre>
+    * <pr>
+    * The client ORB will attempt to locate a value factory suppporting
+    * the valuetype (in this example, a falue valuefactory named
+    * WorkspaceAdapterDefaultFactory or a factory registered with the ORB
+    * </p>
+    */
+    valuetype AdapterValue : Adapter 
+    {
+       /**
+        * Primary object reference.
+        */
+        private Object m_primary;
+
+       /**
+        * Corbaloc URL of the primary object.
+        */
+        private string m_corbaloc;
+    };
+
+    //
+    // services
+    //
+
+   /**
+    * The <code>ServiceAdapter</code> provides client side convinience
+    * access to a service description, name and reference.
+    */
+    abstract valuetype ServiceAdapter : Adapter
+    {
+       /**
+        * Returns the service name.
+        */
+        KeySequence getKey();
+
+       /**
+        * Returns the service name.
+        */
+        string getName();
+
+       /**
+        * Returns the service description.
+        */
+        string getDescription();
+
+    };
+
+   /**
+    * Abstract valuetype used by object services that publish a short name and 
+    * description.
+    */
+    valuetype ServiceValue : AdapterValue, ServiceAdapter
+    {
+       /**
+        * Service identifier.
+        */
+        private KeySequence m_key;
+
+       /**
+        * A short presentation name of the factory.
+        */
+        private string m_name;
+
+       /**
+        * Text describing the factory.
+        */
+        private string m_description;
+    };
+
+};
+
+#endif // _OSM_ADAPTER_IDL_

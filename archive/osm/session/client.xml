@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<!--
+ Copyright 2002 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<!--
+The following configuration block defines the primary configuration
+component of a cascading configuration backed by the default gateway
+client configuration profile.
+-->
+
+<configuration>
+
+  <ior value="http://home.osm.net/gateway/session.ior"/>
+
+  <!--
+  <orb>
+    <property name="openorb.debug.trace" value="DEBUG"/>
+    <property name="openorb.debug.level" value="HIGH"/>
+  </orb>
+  -->
+
+</configuration>
+

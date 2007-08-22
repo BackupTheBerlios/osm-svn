@@ -1,0 +1,137 @@
+#ifndef _PKCS_IDL
+#define _PKCS_IDL
+
+#include <orb.idl>
+#include <PKI.idl>
+#pragma prefix "osm.net"
+
+module pki 
+{
+module pkcs 
+{
+
+    native X500Name;
+    native PublicKey;
+    native PKCS10Attributes;
+    native Principal;
+    native Subject;
+
+   /**
+    * Valuetype for a PKCS#10 certificate request type.
+    * A PKCS10 certification request consists of a distinguished name, a public key, and 
+    * optionally a set of attributes, collectively signed by the entity requesting certification. 
+    * PKCS10 Certification requests are sent to a certification authority, who transforms the 
+    * request to an X.509 public-key certificate, or a PKCS #6 extended certificate. The intention 
+    * of including a set of attributes is twofold: to provide other information about a given 
+    * entity, such as the postal address to which the signed certificate should be returned if 
+    * electronic mail is not available, or a "challenge password" by which the entity may later 
+    * request certificate revocation; and to provide attributes for a PKCS #6 extended 
+    * certificate. A non-exhaustive list of attributes is given in PKCS #9. Certification 
+    * authorities may also require non-electronic forms of request and may return non-electronic 
+    * replies. It is expected that descriptions of such forms will be available from the certification 
+    * authority.
+    * <p>
+    * A certification request shall have ASN.1 type CertificationRequest: </p>
+    * <p>
+    * <pre>
+    * CertificationRequest ::= SEQUENCE 
+    * { 
+    *     certificationRequestInfo CertificationRequestInfo, 
+    *     signatureAlgorithm SignatureAlgorithmIdentifier, 
+    *     signature Signature 
+    * } 
+    *
+    * SignatureAlgorithmIdentifier ::= AlgorithmIdentifier 
+    *
+    * Signature ::= BIT STRING 
+    *
+    * CertificationRequestInfo: 
+    *
+    * CertificationRequestInfo ::= SEQUENCE 
+    * { 
+    *    version Version, 
+    *    subject Name, 
+    *    subjectPublicKeyInfo SubjectPublicKeyInfo, 
+    *    attributes [0] IMPLICIT Attributes
+    * }
+    * 
+    * Version ::= INTEGER 
+    *
+    * Attributes ::= SET OF Attribute 
+    *
+    * </pre>
+    * <p/>
+    * <p>The fields of type CertificationRequest have the following meanings:</p> 
+    * <ul>
+    *   <li>certificateRequestInfo is the "certification request information." It is the value being signed. </li>
+    *   <li>signatureAlgorithm identifies the signature algorithm (and any associated parameters) under 
+    *       which the certification-request information is signed.</li>
+    * </ul>
+    * 
+    * The fields of type CertificationRequestInfo have the following meanings:</p>
+    * <ul>
+    *  <li> version is the version number, 0 for compatibility with future revisions 
+    *       of PKCS#10. </li>
+    *  <li> subject is the distinguished name of the certificate subject (the 
+    *       entity whose public key is to be certified). </li>
+    *  <li> subjectPublicKeyInfo contains information about the public key being 
+    *       certified. The information identifies the entity's public-key algorithm 
+    *       (and any associated parameters); examples of public-key algorithms 
+    *       include X.509's rsa and PKCS #1's rsaEncryption. The information also 
+    *       includes a bit-string representation of the entity's public key. For both 
+    *       public-key algorithms just mentioned, the bit string contains the BER 
+    *       encoding of a value of X.509/PKCS #1 type RSAPublicKey. </li>
+    *  <li> attributes is a set of attributes providing additional information about 
+    *       the subject of the certificate. Some attribute types that might be useful 
+    *       here are defined in PKCS #9. An example is the challenge-password 
+    *       attribute, which specifies a password by which the entity may request that 
+    *       the certificate revocation. Another example is the 
+    *       extended-certificate-attributes attribute, which specifies attributes for 
+    *       a PKCS #6 extended certificate. </li>
+    * </ul>
+    * <p>Refer to <a href="ftp://ftp.isi.edu/in-notes/rfc2314.txt">
+    * PKCS #10: Certification Request Syntax V1.5</a>
+    */
+    valuetype PKCS10 : PKI::CertificateRequest
+    {
+
+	 /**
+        * Returns the subject's public key.
+        */
+        PublicKey getSubjectPublicKeyInfo();
+
+	 /**
+        * Returns the subject's name.
+        */
+        X500Name getPrincipalName();
+
+	 /**
+        * Returns the additional attributes requested.
+        */
+        PKCS10Attributes getAttributes();
+
+	 /**
+        * Returns the encoded and signed certificate request as a DER-encoded byte array.
+        */
+        PKI::Opaque getEncoded();
+
+    };
+
+    valuetype PKCS7
+    {
+	 /**
+        * PKCS7 DER encoded value.
+        */
+	  private PKI::EncodedData data;
+
+	 /**
+        * Returns the encoded PKCS7 response.
+        */
+        PKI::Opaque getEncoded();
+
+    };
+
+
+};
+};
+#endif

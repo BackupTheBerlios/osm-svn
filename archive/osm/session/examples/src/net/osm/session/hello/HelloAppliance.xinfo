@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<!--
+ Copyright 2000 OSM SARL. All Rights Reserved.
+ 
+ This software is the proprietary information of OSM SARL.  
+ Use is subject to license terms.
+  
+ @author  Stephen McConnell
+ @version 1.0 12/03/2001
+-->
+
+<blockinfo>
+
+  <block>
+    <name>hello</name>
+    <version>1.0</version>
+  </block>
+
+  <!-- 
+  services that are offered by this block 
+  -->
+
+  <services/>
+
+  <!-- 
+  dependencies that this block has on other blocks 
+  -->
+
+  <dependencies/>
+
+  <configuration>
+
+     <message>Hello World</message>
+     <count value="10"/>
+     <pause value="3000"/>
+     
+     <description name="Hello Service" >
+The hello service is a simple demonstration appliance that executes an internal step/pause process during which logging messages are generated. On completion the appliance signals sucessfull completion to its coordinating task and terminates.
+      </description>
+
+  </configuration>
+
+  <implementation policy="SINGLETON"/>
+
+</blockinfo>
+

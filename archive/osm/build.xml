@@ -1,0 +1,187 @@
+
+<!--
+Top level build file.
+-->
+
+<project name="osm" default="help" basedir=".">
+
+  <property file="local.properties"/>
+
+  <property name="jakarta.root" value=".."/>
+  <property name="avalon.path" value="${jakarta.root}/jakarta-avalon"/>
+  <property name="excalibur.path" value="${jakarta.root}/jakarta-avalon-excalibur"/>
+  <property name="phoenix.path" value="${jakarta.root}/jakarta-avalon-phoenix"/>
+  <property name="logkit.path" value="${jakarta.root}/jakarta-avalon-logkit"/>
+  <property name="apps.path" value="${jakarta.root}/jakarta-avalon-apps"/>
+  <property name="system" value="../system"/>
+
+  <property name="collaboration" value="collaboration"/>
+  <property name="community" value="community"/>
+  <property name="session" value="session"/>
+  <property name="domain" value="domain"/>
+  <property name="discovery" value="discovery"/>
+  <property name="gateway" value="gateway"/>
+  <property name="pki" value="pki"/>
+  <property name="properties" value="properties"/>
+  <property name="realm" value="realm"/>
+  <property name="adapter" value="adapter"/>
+  <property name="sps" value="sps"/>
+  <property name="vault" value="vault"/>
+
+  <property name="doc" value="doc"/>
+  <property name="src" value="src"/>
+  <property name="build" value="build"/>
+  <property name="dist" value="dist"/>
+  <property name="lib" value="lib"/>
+
+  <property name="jdk.href"  value="http://java.sun.com/j2se/1.4/docs/api/" />
+  <property name="target.dir"  value="../../content/doc" />
+
+  <target name="help" >
+    <echo>
+
+      Help
+      ----
+
+      Top level build procedure for the osm.enterprise platform and supporting resources.
+      Copyright OSM SARL, 2001-2002.
+      All rights reserved.
+
+      General Targets:
+      ----------------
+
+      clean     - invokes clean on all OSM packages
+      build     - invokes build on all OSM packages
+      dist      - copies distributionjar file to a common dist directory
+      javadoc   - invokes the javadoc target on all packages
+      all       - invokes clean, build, dist and javadoc on all packages
+
+    </echo>
+  </target>
+
+  <property name="phase" value="build"/>
+
+  <!--
+  The following generic targets handle OSM package updating and reconstruction.
+  -->
+
+  <target name="clean">
+    <antcall target="allpackages">
+      <param name="phase" value="clean"/>
+    </antcall>
+  </target>
+
+  <target name="build" depends="external">
+    <antcall target="allpackages">
+      <param name="phase" value="build"/>
+    </antcall>
+  </target>
+
+  <target name="dist" depends="build">
+    <mkdir dir="dist"/>
+    <copy todir="${dist}" flatten="true">
+        <fileset dir=".">
+           <include name="*/dist/*.jar"/>
+        </fileset>
+    </copy>
+  </target>
+
+  <target name="javadoc" depends="build">
+    <antcall target="allpackages">
+      <param name="phase" value="javadoc"/>
+    </antcall>
+  </target>
+
+  <target name="all" depends="clean,dist,javadoc"/>
+
+  <!--
+  The following target build individual packages and dependents.
+  -->
+
+  <target name="vault">
+    <echo message="Building vault."/>
+    <ant dir="${vault}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="adapter">
+    <echo message="Building adapter."/>
+    <ant dir="${adapter}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="domain">
+    <echo message="Building domain."/>
+    <ant dir="${domain}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="realm" depends="vault">
+    <echo message="Building realm."/>
+    <ant dir="${realm}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="pki" depends="realm">
+    <echo message="Building pki."/>
+    <ant dir="${pki}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="discovery">
+    <echo message="Building registration and discovery service."/>
+    <ant dir="${discovery}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="sps">
+    <echo message="Building SPS."/>
+    <ant dir="${sps}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="properties">
+    <echo message="Building properties."/>
+    <ant dir="${properties}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="session" depends="adapter,domain,realm,sps,properties">
+    <echo message="Building session."/>
+    <ant dir="${session}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="community" depends="session">
+    <echo message="Building community."/>
+    <ant dir="${community}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="collaboration" depends="community">
+    <echo message="Building collaboration."/>
+    <ant dir="${collaboration}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="gateway" depends="session">
+    <echo message="Building gateway."/>
+    <ant dir="${gateway}" target="${phase}" inheritall="false"/>
+  </target>
+
+  <target name="deploy" depends="session" >
+    <echo message="Deploying gateway."/>
+    <ant dir="${gateway}" target="deploy" inheritall="false"/>
+  </target>
+
+  <target name="allpackages" depends="collaboration,gateway,discovery,pki" />
+
+  <target name="external">
+     <mkdir dir="lib"/>
+     <copy todir="${lib}" flatten="true">
+        <fileset dir="${apps.path}/common/lib">
+           <include name="avalon-framework.jar"/>
+           <include name="excalibur-configuration.jar"/>
+           <include name="excalibur-context.jar"/>
+           <include name="merlin.jar"/>
+        </fileset>
+        <fileset dir="${apps.path}/enterprise">
+           <include name="orb/dist/orb-manager*.jar"/>
+           <include name="orb/lib/openorb-*.jar"/>
+           <include name="pss/dist/pss-*.jar"/>
+           <include name="time/dist/*.jar"/>
+        </fileset>
+     </copy>
+  </target>
+
+</project>
+

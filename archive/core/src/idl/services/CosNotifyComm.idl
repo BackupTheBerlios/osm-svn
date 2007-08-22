@@ -1,0 +1,135 @@
+
+//file: CosNotifyComm.idl
+#ifndef _COS_NOTIFY_COMM_IDL_
+#define _COS_NOTIFY_COMM_IDL_
+#include <CosNotification.idl> //EventType, EventTypeSeq, StructuredEvent
+#include <CosEventComm.idl> // Disconnected exception
+#pragma prefix "omg.org"
+
+/**
+* The CosNotifyComm module defines the interfaces which support Notification
+* Service clients that communicate using Anys, Structured Events, or sequences of
+* Structured Events. In addition, this module defines the interfaces which enable event
+* suppliers to be informed when the types of events being subscribed to by their
+* associated consumers change, and event consumers to be informed whenever there is a
+* change in the types of events being produced by their suppliers.
+*/
+
+module CosNotifyComm {
+
+	exception InvalidEventType { CosNotification::EventType type; };
+
+	/**
+	* The NotifyPublish interface supports an operation which allows a supplier of
+	* Notifications to announce, or publish, the names of the types of events it will be
+	* supplying, It is intended to be an abstract interface which is inherited by all
+	* Notification Service consumer interfaces, and enables suppliers to inform consumers
+	* supporting this interface of the types of events they intend to supply.
+	*/
+
+	interface NotifyPublish {
+
+		/**
+		* The NotifyPublish interface supports an operation which allows a supplier of
+		* Notifications to announce, or publish, the names of the types of events it will be
+		* supplying, It is intended to be an abstract interface which is inherited by all
+		* Notification Service consumer interfaces, and enables suppliers to inform consumers
+		* supporting this interface of the types of events they intend to supply.
+		*/
+
+		void offer_change (
+				in CosNotification::EventTypeSeq added,
+				in CosNotification::EventTypeSeq removed )
+			raises ( InvalidEventType );
+	};
+
+	/**
+	* The NotifySubscribe interface supports an operation which allows a consumer of
+	* notifications to inform suppliers of notifications of the types of notifications it wishes
+	* to receive. It is intended to be an abstract interface which is inherited by all
+	* Notification Service supplier interfaces. In essence, its main purpose is to enable
+	* notification consumers to inform suppliers of the types of notifications that are of
+	* interest to them, ultimately enabling the suppliers to avoid supplying notifications that
+	* are not of interest to any consumer.
+	*/
+
+	interface NotifySubscribe {
+
+		/**
+		* The subscription_change operation takes as input two sequences of event type names:
+		* the first specifying those event types which the associated Consumer wants to add to
+		* its subscription list, and the second specifying those event types which the associated
+		* consumer wants to remove from its subscription list. This operation raises the
+		* InvalidEventType exception if one of the event type names supplied in either input
+		* parameter is syntactically invalid. If this case, the invalid name is returned in the type
+		* field of the exception.
+		*/
+
+		void subscription_change(
+				in CosNotification::EventTypeSeq added,
+				in CosNotification::EventTypeSeq removed )
+			raises ( InvalidEventType );
+	};
+
+	/**
+	 * The StructuredPushConsumer interface supports an operation which enables
+	* consumers to receive Structured Events by the push model. It also defines an operation
+	* which can be invoked to disconnect the push consumer from its associated supplier. In
+	* addition, the StructuredPushConsumer interface inherits the NotifyPublish interface
+	* described above, enabling a notification supplier to inform an instance supporting this
+	* interface whenever there is a change to the types of events it intends to produce.
+	*/
+
+	interface StructuredPushConsumer : NotifyPublish {
+
+		/**
+		* The push_structured_event operation takes as input a parameter of type
+		* StructuredEvent as defined in the CosNotification module. Upon invocation, this
+		* parameter will contain an instance of a Structured Event being delivered to the
+		* consumer by the supplier to which it is connected. If this operation is invoked upon a
+		* StructuredPushConsumer instance that is not currently connected to the supplier of
+		* the event, the Disconnected exception will be raised.
+		*/
+
+		void push_structured_event(
+			in CosNotification::StructuredEvent notification)
+			raises(CosEventComm::Disconnected);
+
+		/**
+		* The disconnect_structured_push_consumer operation is invoked to terminate a
+		* connection between the target StructuredPushConsumer, and its associated supplier.
+		* This operation takes no input parameters and returns no values. The result of this
+		* operation is that the target StructuredPushConsumer will release all resources it had
+		* allocated to support the connection, and dispose its own object reference.
+		*/
+
+		void disconnect_structured_push_consumer();
+	};
+
+	/**
+	* The StructuredPushSupplier interface supports the behavior of objects that transmit
+	* Structured Events using push-style communication. It defines an operation which can
+	* be invoked to disconnect the push supplier from its associated consumer. In addition,
+	* the StructuredPushSupplier interface inherits the NotifySubscribe interface
+	* described above, enabling a notification consumer to inform an instance supporting
+	* this interface whenever there is a change to the types of events it is interested in
+	* receiving.
+	*/
+
+	interface StructuredPushSupplier : NotifySubscribe {
+
+		/**
+		* The disconnect_structured_push_supplier operation is invoked to terminate a
+		* connection between the target StructuredPushSupplier, and its associated consumer.
+		* This operation takes no input parameters and returns no values. The result of this
+		* operation is that the target StructuredPushSupplier will release all resources it had
+		* allocated to support the connection, and dispose its own object reference.
+		*/
+
+		void disconnect_structured_push_supplier();
+
+	};
+
+};
+
+#endif /* _COS_NOTIFY_COMM_IDL_ */

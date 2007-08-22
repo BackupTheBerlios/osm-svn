@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<!--
+assembly.java
+
+Copyright 2000-2001 OSM SARL All Rights Reserved.
+This configuration is the proprietary information of OSM SARL.
+Use is subject to license terms.
+@author  Stephen McConnell <mailto:mcconnell@osm.net>
+@version 1.0 20 JUN 2000
+-->
+
+<avalon>
+
+    <block-listener name="desktop" class="net.osm.shell.Desktop" />
+
+    <!-- Vault -->
+    <block class="net.osm.vault.LocalVault" name="vault" />
+
+    <!-- Shell -->
+    <block class="net.osm.shell.MGR" name="shell"/>
+
+    <!-- ORB -->
+    <block class="net.osm.orb.ORBServer" name="orb" />
+
+    <!-- Audit -->
+    <block class="net.osm.audit.AuditServer" name="audit">
+        <provide name="orb" role="ORB"/>
+    </block>
+
+    <!-- Agent -->
+    <block class="net.osm.agent.AgentServer" name="agent">
+        <provide name="orb" role="ORB"/>
+        <provide name="shell" role="SHELL"/>
+        <provide name="audit" role="AUDIT"/>
+        <provide name="vault" role="VAULT"/>
+    </block>
+
+</avalon>
+
+
+
+

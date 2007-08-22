@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<component-info>
+
+  <component>
+    <name>terminal-component</name>
+  </component>
+
+  <services>
+      <service> 
+          <service-ref type="net.osm.playground.BasicService"/>
+      </service> 
+  </services>
+
+</component-info>
+

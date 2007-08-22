@@ -1,0 +1,69 @@
+/**
+ */
+
+#ifndef _GENERIC_PSDL_
+#define _GENERIC_PSDL_
+#include <resource.psdl>
+
+#pragma prefix "osm.net"
+
+module generic {
+
+    //
+    // Generic 
+    //
+
+   /**
+    * Generic storage type.
+    * @see org.omg.CommunityFramework.GenericResource
+    */
+    abstract storagetype GenericStorage : session::resource::AbstractResourceStorage
+    {
+
+       /**
+        * The IDL identifier of valuetypes that can be assigned as the 
+        * as the value of the resource.
+        */
+        state string identifier;
+
+       /**
+        * The locked state of a GenericResource.
+        */
+        state boolean locked;
+
+       /**
+        * Qualifies the resource as a template source.
+        */
+        state boolean template;
+
+       /**
+        * The value contained by the GenericResource.
+        */
+	  state ValueBase value;
+    };
+
+   /**
+    * The factory for GenericStorage.
+    */
+
+    abstract storagehome GenericStorageHome of GenericStorage : session::resource::AbstractResourceStorageHome 
+    {
+    };
+
+    //
+    // GenericStorageBase
+    //
+
+    storagetype GenericStorageBase : session::resource::AbstractResourceStorageBase
+    implements GenericStorage 
+    {
+    };
+
+    storagehome GenericStorageHomeBase of GenericStorageBase
+    implements GenericStorageHome 
+    { 
+    };
+
+};
+
+#endif // _GENERIC_PSDL_

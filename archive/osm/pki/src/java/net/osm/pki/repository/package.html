@@ -1,0 +1,26 @@
+
+<body>
+<p>The <code>net.osm.pki.repository</code> package impements the OMG PKI Repository specifications enabling Principal discovery, pricipal publiscation, modification and deletion, and access to repository provider, implementation and repository policy information.
+</p>
+<p>The server provides support for the following functions:</p>
+<ul>
+  <li> access to repository provider information
+    <ul>
+     <li> product version</li>
+     <li> product vendor</li>
+     <li> spec version supported</li>
+     <li> product description</li>
+     <li> supported certificate types and encoding</li>
+     <li> supported CRL types and encoding</li>
+     <li> supported cross certificates</li>
+    </ul>
+  </li>
+  <li> publish a new PKI Principal to the repository</li>
+  <li> locate a PKI Principal by name</li>
+  <li> update an existing Principal entry</li>
+  <li> delete an existing Principal</li>
+</ul>
+<p>
+The platform uses the OMG PSS (Persistent State Service) as the storage engine behind the server.  This enables private management of the mapping of state to persistence independently of the server interfaces.  The implementation provides a destinct seperation of the functional concerns of a Principal directroy services as oposed to repository maintenance (Principal registration, updating and deletion).
+</p>
+</body>

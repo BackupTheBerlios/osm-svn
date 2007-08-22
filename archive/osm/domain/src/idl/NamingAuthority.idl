@@ -1,0 +1,222 @@
+
+//File: NamingAuthority.idl
+
+#ifndef _NAMING_AUTHORITY_IDL_
+#define _NAMING_AUTHORITY_IDL_
+#include <orb.idl>
+#pragma prefix "omg.org"
+
+/**
+* The NamingAuthority module provides a means of giving globally unique names to
+* name spaces and hence the names within those name spaces. The fundamental need is
+* the ability to compare two names for equality. If they are equal, they are known to
+* represent the same entity, concept, or thing. This is needed when independent entities
+* are generating names that may get compared for equality; however, the reverse is not
+* guaranteed to be true (that is, an entity may have several names).
+* The authority for the name space may derive from several different types of roots, the
+* choice of which depends upon the user requirements as each root has different qualities
+* of management and uniqueness. The various root types are defined below.
+*/
+
+module NamingAuthority {
+
+	/** 
+	* Identifies the root of the name space authority. An entity (e.g., person or organization)
+	* may be registered with multiple different roots (RegistrationAuthorities) and be able to
+	* assign names and other name spaces within each root. These may be used for the same
+	* or for different needs. For this reason, there is no guarantee of any equality in the
+	* different name spaces managed by an entity. There are currently no means available to
+	* determine whether a given authority in an ISO hierarchy is the same authority as one
+	* specified in a DNS hierarchy.
+	* <ul>
+	* <li> OTHER: This form of a naming authority should be used sparingly, and only in
+	* experimental or localized situations or special purposes. It is the responsibility of
+	* the implementing institution to guarantee uniqueness within the names themselves,
+	* and there is no uniqueness guarantee outside of the source institution. Services that
+	* define default naming authorities (and possibly also names) may also use the Other
+	* root to forego long AuthorityIds. In this case, the specification of the service
+	* must name AuthorityIds that may be expected with the Other root and still
+	* maintain name space integrity for that service.
+	* <li>ISO: International Standards Organization 1 . The ISO specifies a registration
+	* hierarchy identified by a series of named/numbered nodes. Many of the coding
+	* schemes used in the medical environment are or can be registered within the ISO
+	* naming tree. The ISO root form is one of the recommended forms when the naming
+	* authority is internationally recognized, such as international coding schemes, or
+	* when the authority is to be used across two or more different enterprises. ISO
+	* provides for the recording of a responsible person and address for each node in the
+	* authority hierarchy.
+	* <li>DNS: Domain Name Services 2 . Internet domains are recorded with a central, global
+	* registration authority. Subhierarchies within the domains are then maintained
+	* locally by the registered organization or person. The DNS form is recommended as
+	* an alternative to the ISO naming tree when the specific naming authority needs
+	* identity and uniqueness, but is not in an ISO registration. By using this common
+	* characteristic of many organizations it gives the ability to create globally unique
+	* name spaces and names without the need to register as an ISO name authority. It is
+	* up to the organization itself to maintain the integrity of the name space(s) (e.g., not
+	* reusing names or name spaces).
+	* <li>IDL: The OMG Interface Repository 3 . The CORBA Architecture specifies a
+	* means of identifying entities as being unique within the interface repository, via the
+	* use of a RepositoryId. CORBA repository ids may be in either the OMG IDL
+	* format, the DCE UUID format, or the LOCAL format. Within this specification, the
+	* "IDL" root refers only to the IDL format. The DCE format may be represented
+	* within the DCE root and the Local format within the Other root. The IDL authority
+	* may prove very useful when registering CORBA/IDL specific objects such as value
+	* sets, interface specifications, etc. It should be noted that OMG does not currently
+	* manage the repository name space in any rigorous fashion, and it is quite possible
+	* that two different developers may arrive at exactly the same repository ID for
+	* entirely different entities. For this reason, some people give the repository ID a
+	* prefix that consists of their reverse DNS that is "/" separated instead of "."
+	* separated. This root type may be very useful when the names within the name space
+	* are defined in IDL. For example, it could be the RepositoryId for an enumerated
+	* type or a module that has constant integers or strings defined for each name within
+	* the name space.
+	* <li>DCE:The Distributed Computing Environment 4 . While they don't actually register
+	* coding schemes or other entities, they do provide a means of generating a globally
+	* unique 128-bit ID, called a Universally Unique ID (UUID). This UUID may be
+	* used to guarantee the uniqueness of a name space in situations where it is not
+	* necessary for the identity of the authority to be known outside of the specific
+	* implementation.
+	* </ul>
+	*/
+	enum RegistrationAuthority {
+		OTHER,
+		ISO,
+		DNS,
+		IDL,
+		DCE 
+	};
+
+	/** 
+	* Identifies a specific name in the syntax and format specified by the corresponding
+	* registration authority. The various naming authorities tend to provide a fair amount of
+	* leeway as far as the actual format of the registered names. As there may be situations
+	* where the full semantics of a specific authority's name comparison will not be
+	* available to an application, we have chosen to select a specific subset of the syntax of
+	* each representation. The intention is to be able to determine whether two registered
+	* entities are identical, or not, solely through the use of string comparison. The specific
+	* name formats are described below:
+	* <ul>
+	* <li>OTHER: An arbitrary string, syntax undefined except locally by a specific service
+	* specification and/or by particular implementations and installations. The "/"
+	* character is illegal to use as it is reserved as a separator of components in the
+	* stringified version of QualifiedName.
+	* <li>ISO: The name should be represented using the NameForm of the
+	* ObjectIdentifierValue as specified in ISO/IEC Recommendation 8824-1. Each name
+	* component should be separated by a single space.
+	* Example: "joint-iso-ccitt specification characterString"
+	* <li>DNS: The domain name and path in the form mandated in RFC 1034. The path
+	* name is represented as a dot separated tree which traverses up the hierarchy. Since
+	* DNS names are not case-sensitive, only lower case letters should be used such that
+	* simple string comparisons can determine equality. However, it is permissible to use
+	* case insensitive comparisons as well.
+	* Example: "pidsserv.slc.mmm.com"
+	* <li>IDL: The OMG RepositoryId format specified in The Common Object Request
+	* Broker: Architecture and Specification, in the form: "<node>/<node>/…/<node>."
+	* The IDL: prefix and the version number suffix should NOT be used for the
+	* NamingEntity. The IDL: prefix is prepended to create the AuthorityIdStr.
+	* Example:"CosNaming/NamingContext/NotFoundReason" is the NamingEntity for:
+	* <pre>
+	* module CosNaming {
+	*	 …
+	* 	interface NamingContext {
+	* 		…
+	* 		enum NotFoundReason { … };
+	* 		…
+	* 	};
+	* };
+	* </pre>
+	* <li> • DCE: The UUID in the external form <nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn>,
+	* where <n> represents one of the digits 0-9 and the characters A-F.
+	* The alpha characters should all be upper case.
+	* Example: "6132A880-9A34-1182-A20A-AF30CF7A0000"
+	* </ul>
+	*/
+	typedef string NamingEntity;
+
+	/** 
+	* The combination of a Registration Authority and Naming Entity, which identifies a
+	* specific naming authority. In situations where a given naming entity may have more
+	* than one naming authority, it should be agreed upon in advance which of the specific
+	* names for the entity is to be used. This specification makes no guarantees about the
+	* ability to recognize, for example, that an authority in the ISO structure is identical to
+	* an authority within the IDL structure.
+	* The string version (AuthorityIdStr) is useful for situations where unique names are
+	* required in a string format. The string is created as <stringified
+	* RegistrationAuthority>:<NamingEntity>.
+	*/
+	struct AuthorityId {
+		RegistrationAuthority authority;
+		NamingEntity naming_entity;
+	};
+
+	/**
+	* @see AuthorityId
+	*/
+	typedef string AuthorityIdStr;
+
+	/** 
+	* A local name is a name within (relative to) a namespace. It is simply a string
+	* representation.
+	*/
+	typedef string LocalName;
+
+	/** 
+	* A QualifiedName is a globally unique name for an entity by the fact that it carries
+	* the naming AuthorityId of the name space and the LocalName within that name
+	* space.
+	*/
+	struct QualifiedName {
+		AuthorityId authority_id;
+		LocalName local_name;
+	};
+
+	/** 
+	* The QualifiedNameStr is a stringified version of the QualifiedName. The format
+	* of the string is <stringified RegistrationAuthority>:<NamingEntity>/<LocalName>. 
+	* Notice that even though the colon character "/" cannot be used within the name of 
+	* a NamingEntity it can be used within the LocalName. 
+	*/
+	typedef string QualifiedNameStr;
+
+	/** 
+	* The InvalidInput exception is raised when the input parameter for the
+	* TranslationLibrary interface operations is determined to be of an invalid format.
+	*/
+	exception InvalidInput {};
+
+	/** 
+	* This interface is meant to be a local library for translating between the structured
+	* version and stringified version of AuthorityIds and QualifiedNames.
+	* Each of the operations exposed under the interface take either a structured version 
+	* or stringified version of a type and return the opposite. The data content returned 
+	* is the same as that passed in. Only the representation of the data is changed.
+	*/
+	interface translation_library
+	{
+		AuthorityIdStr authority_to_str(
+			in AuthorityId authority 
+		)raises(
+			InvalidInput 
+		);
+
+		AuthorityId str_to_authority(
+			in AuthorityIdStr authority_str 
+		)raises(
+			InvalidInput 
+		);
+
+		QualifiedNameStr qualified_name_to_str(
+			in QualifiedName qualified_name 
+		)raises(
+			InvalidInput 
+		);
+
+		QualifiedName str_to_qualified_name(
+			in QualifiedNameStr qualified_name_str 
+		)raises(
+			InvalidInput 
+		);
+	};
+};
+
+#endif // _NAMING_AUTHORITY_IDL_

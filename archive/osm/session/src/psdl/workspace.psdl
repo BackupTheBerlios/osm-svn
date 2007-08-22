@@ -1,0 +1,63 @@
+/**
+ */
+
+#ifndef _SESSION_WORKSPACE_PSDL_
+#define _SESSION_WORKSPACE_PSDL_
+#include <resource.psdl>
+
+#pragma prefix "osm.net"
+
+module session 
+{
+  module workspace
+  {
+
+   /**
+    * WorkspaceStorage is the persistent storage object for instance of Workspace.
+    * It extends AbstractResourceStorage with the addition of a list of contained
+    * AbstractResources.
+    * @see org.omg.Session.Workspace
+    */
+    abstract storagetype WorkspaceStorage : resource::AbstractResourceStorage
+    {
+
+       /**
+        * LinkedList of references to AbstractResources that are collected by this Workspace.
+        */
+        readonly state list::LinkedList collects;
+
+       /**
+        * LinkedList of references to Users that have been granted access rights.
+        */
+        readonly state list::LinkedList accessed_by;
+    };
+
+   /**
+    * Storage home interface for the WorkspaceStorage storage type.
+    */
+    abstract storagehome WorkspaceStorageHome of WorkspaceStorage : resource::AbstractResourceStorageHome 
+    {
+    };
+
+    //
+    // WorkspaceStorageBase
+    //
+
+    storagetype WorkspaceStorageBase : resource::AbstractResourceStorageBase
+    implements WorkspaceStorage 
+    {
+        stores collects as ref<list::LinkedListBase>;
+        stores accessed_by as ref<list::LinkedListBase>;
+    };
+
+    storagehome WorkspaceStorageHomeBase of WorkspaceStorageBase 
+    implements WorkspaceStorageHome 
+    { 
+    };
+
+  };
+
+
+};
+
+#endif // _SESSION_WORKSPACE_PSDL_

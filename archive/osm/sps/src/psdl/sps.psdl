@@ -1,0 +1,199 @@
+ /**
+ */
+
+#ifndef _SPS_PSS_PSDL_
+#define _SPS_PSS_PSDL_
+#include <CosNotifyComm.idl>
+#include <CosNotification.idl>
+#pragma prefix "osm.net"
+
+module sps 
+{
+ 
+    // typedefs
+
+    typedef CORBA::OctetSeq ID;
+    typedef sequence<ID> IDs;
+    abstract storagetype SubscriberStorage;
+
+   /**
+    * A stroage type that holds the state of a single publisher
+    * with references to the short PIDs of <code>SubscriberStorage</code>
+    * instances it is managing.
+    */
+    abstract storagetype PublisherStorage
+    {
+       /**
+        * Sequence of short PIDs of <code>SubscriptionStorage</code>
+        * storage type instances representing the subscriptions managed
+        * by the publisher.
+        */
+        state IDs subscribers;
+
+       /**
+        * Check if the supplied consumer is associated under a subscription.
+        * @param spc a structured push consumer
+        * @return boolean TRUE if a subscription exists
+        */
+        boolean is_subscribed( in CosNotifyComm::StructuredPushConsumer spc );
+
+       /**
+        * Returns the subscriber matching a supplied consumer.
+        * @param spc a structured push consumer
+        * @return SubscriberStorage matchin subscription
+        */
+        SubscriberStorage get_subscriber( in CosNotifyComm::StructuredPushConsumer spc )
+        raises ( CosPersistentState::NotFound );
+ 
+       /**
+        * Add a structured push consumer to the set of subscribers.
+        * @param spc the structured push consumer
+        * @return SubscriberStorage a subscriber storage object
+        */
+        SubscriberStorage add_consumer( in CosNotifyComm::StructuredPushConsumer spc );
+
+       /**
+        * Add a subscription to the publisher.
+        * @param subscriber the <code>SubscriberStorage</code> to add to the 
+        *   set of subscriptions.
+        */
+        void add_subscriber( in SubscriberStorage subscriber );
+
+       /**
+        * Removes a subscription from the publisher.
+        * @param subscriber the <code>SubscriberStorage</code> to add to the 
+        *   set of subscriptions.
+        */
+        void remove_subscriber( in SubscriberStorage subscriber );
+
+       /**
+        * Method invoked by a container to request the forwarding of an 
+        * event to registered subscribers.
+        * @param event a structured event to be queued agaist subscribers
+        */
+        void post( in CosNotification::StructuredEvent event );
+
+    };
+
+   /**
+    * Storage type home interface for the <code>PublisherStorage</code>.
+    */
+    abstract storagehome PublisherStorageHome of PublisherStorage
+    {
+	  factory create( subscribers );
+    };
+
+   /**
+    * Storage type implementation for a event publisher that maintains 
+    * a set of subscribing event consumers via subscriptions.
+    */
+    storagetype PublisherStorageBase
+    implements PublisherStorage
+    {
+    };
+
+   /**
+    * Storage type home implementation for the <code>PublisherStorageHome</code>.
+    */
+    storagehome PublisherStorageHomeBase of PublisherStorageBase
+    implements PublisherStorageHome
+    { 
+    };
+
+   /**
+    * Storage type for for a persistent subscriber instance that 
+    * maintains a reference to the identifiable domain consumer, 
+    * a subscription containing subscribed event types, and a 
+    * queue of pending events.
+    */
+    abstract storagetype SubscriberStorage
+    {
+       /**
+        * The identifiable domain consumer to whom events are to be 
+        * delivered.
+        */
+        readonly state CosNotifyComm::StructuredPushConsumer consumer;
+
+       /**
+        * The subscription established by the subscriber that contains
+        * the set of event types the subscriber in interested in receiving.
+        */
+	  state CosNotification::EventTypeSeq subscription;
+
+       /**
+        * A sequence of undelivered events.
+        */
+        state IDs queue;
+
+       /**
+        * Internal state flag that declares the terminal status of the 
+        * event source.
+        */
+        state boolean terminal;
+
+       /**
+        * Returns true if the consumer is subscribed to the supplied 
+        * event type.
+        * @param type - the event type to test
+	  * @return boolean - true if the event type is included in the subscription
+        */
+        boolean is_subscribed
+	  ( 
+		in CosNotification::EventType type
+	  );
+
+	 /**
+        * Convinience operation to change events based on supplied 
+        * EventType sequences.
+        * @param added - event types to be added to the subscription
+        * @param removed - event types to be removed from the subscription
+        * @exception org.omg.CosNotifyComm.InvalidEventType if the supplied
+        *   event type is no supported by the implementation
+	  */
+	  void subscription_change
+        (
+		in CosNotification::EventTypeSeq added, 
+		in CosNotification::EventTypeSeq removed
+    	  ) 
+        raises 
+        (
+		CosNotifyComm::InvalidEventType
+	  );
+
+       /**
+        * Add a structured event to the event queue.
+        * @param event the structured event to be added to the event queue
+        */
+        void post( in CosNotification::StructuredEvent event );
+
+    };
+
+   /**
+    * Storage type home interface for the <code>SubscriberStorage</code>.
+    */
+    abstract storagehome SubscriberStorageHome of SubscriberStorage
+    {
+	  factory create( consumer, subscription, queue, terminal );
+    };
+
+   /**
+    * Storage type implementation for a persistent subscriber instance that 
+    * maintains a reference to the identifiable domain consumer, 
+    * a subscription containing subscribed event types, and a 
+    * queue of pending events.
+    */
+    storagetype SubscriberStorageBase
+    implements SubscriberStorage
+    {
+    };
+
+   /**
+    * Storage type home implementation for the <code>SubscriberStorage</code>.
+    */
+    storagehome SubscriberStorageHomeBase of SubscriberStorageBase
+    implements SubscriberStorageHome
+    { 
+    };
+};
+
+#endif // _SPS_PSS_PSDL_

@@ -1,0 +1,30 @@
+// File: CONV_FRAME.idl
+// From CORBA 2.3: Chapter 13, Interoperability Architecture
+
+#ifndef _CONV_FRAME_IDL
+#define _CONV_FRAME_IDL
+
+
+module CONV_FRAME {
+	typePrefix CONV_FRAME "omg.org";
+
+	typedef unsigned long CodeSetId;
+ typedef sequence<CodeSetId> CodeSetIdSeq;
+ 
+
+	struct CodeSetComponent {
+		CodeSetId               native_code_set;
+		CodeSetIdSeq            conversion_code_sets;
+	};
+	struct CodeSetComponentInfo {
+		CodeSetComponent        ForCharData;
+		CodeSetComponent        ForWcharData;
+	};
+
+	struct CodeSetContext {
+		CodeSetId               char_data;
+		CodeSetId               wchar_data;
+	};
+};
+
+#endif // _CONV_FRAME_IDL

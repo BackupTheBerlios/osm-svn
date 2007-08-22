@@ -1,0 +1,68 @@
+/**
+ */
+
+#ifndef _FINDER_PSDL_
+#define _FINDER_PSDL_
+#include <CosPersistentState.idl>
+
+#pragma prefix "osm.net"
+
+module finder 
+{
+
+    typedef CORBA::OctetSeq ID;
+    typedef sequence<ID> IDs;
+
+    abstract storagetype NamedStorage
+    {
+        state string name;
+        state ID parent;
+        state boolean container;
+        state ID value;
+    };
+
+    abstract storagehome NamedStorageHome of NamedStorage
+    {
+        key path( parent, name );
+    };
+
+    storagetype NamedStorageBase
+    implements NamedStorage
+    { 
+    };
+
+    storagetype NamedStorageHomeBase of NamedStorageBase
+    implements NamedStorageHome
+    { 
+    };
+
+    abstract storagetype TableStorage
+    {
+        state IDs entries;
+
+       /**
+        * Returns the target of the entry.
+        */
+	  CosPersistentState::StorageObject lookup( string name );
+
+    };
+
+    storagetype TableStorageBase
+    implements TableStorage
+    { 
+        void add( NamedStorage store );
+        void remove( string name );
+    };
+
+    abstract storagehome TableStorageHome of TableStorage
+    {
+    };
+
+    storagehome TableStorageHomeBase of TableStorageBase
+    implements TableStorageHome
+    {
+    };
+
+};
+
+#endif // _FINDER_PSDL_

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<%@ taglib uri="http://home.osm.net/xweb" prefix="osm" %>
+
+<HTML>
+
+<osm:header title="Home Page">
+  <link rel="stylesheet" type="text/css" href="css/xweb.css" title="index">    
+  <style>
+    .entry{
+	FONT: bold 18pt verdana; color: white;
+	MARGIN-BOTTOM: 6pt; MARGIN-TOP: 6pt; MARGIN-LEFT: 25pt; MARGIN-RIGHT: 25pt; 
+	LETTER-SPACING: -1px; 
+    }
+    A:link {color:DarkSeaGreen; }
+    A:visited {color:DarkSeaGreen; }
+    A:active {color:DarkSeaGreen; }
+    A:hover {color:CadetBlue; }
+  </style>
+</osm:header>
+
+<BODY scroll="no" style="background:DarkSlateGray; background-image: url(image/echo.gif); background-position: 24pt 24pt; 
+background-repeat: no-repeat;"> 
+  <TABLE border=0 cellPadding=0 cellSpacing=0 height="100%" width="100%">
+    <TBODY>
+      <TR>
+        <TD align=right vAlign=bottom>
+	    <p class="entry"><a href="main" style="text-decoration:none;">about osm</A></p>
+	    <p class="entry"><a href="navigator" style="text-decoration:none;">community home</A></p>
+ 	    <!--<p class="entry"><a href="registration/registration.jsp" style="text-decoration:none;">new member registration</A></p>-->
+          <P CLASS="home">
+	      <SCRIPT LANGUAGE="JAVASCRIPT">
+	      <!--
+	      document.writeln(location.hostname)
+	      //-->
+	      </SCRIPT>
+          </P>
+        </TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+</BODY>
+</HTML>

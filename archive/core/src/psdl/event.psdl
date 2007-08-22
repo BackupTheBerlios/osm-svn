@@ -1,0 +1,60 @@
+/**
+ */
+
+#ifndef _EVENT_PSS_PSDL_
+#define _EVENT_PSS_PSDL_
+#pragma prefix "osm.net"
+#include <list.psdl>
+#include <CosNotifyComm.idl>
+
+module event {
+
+
+   /**
+    * EventStorage is a container of a CosNotifyComm::StructuredEvent.  It is 
+    * referenced by instances of EventEntry which are themselves members of a 
+    * an event entry list maintained by a queue manager.
+    */
+    abstract storagetype EventStorage
+    {
+	 /**
+        * Unique key within the scope of the EventStorageHome for this instance.
+        */
+	  readonly state unsigned long long identifier;
+
+       /**
+        * The structured event value.
+        */
+	  readonly state CosNotification::StructuredEvent structured_event;
+    };
+
+   /**
+    * Storage home for all instance of the EventStorage type.
+    */
+
+    abstract storagehome EventStorageHome of EventStorage
+    {
+	  key identifier;
+	  factory create( identifier, structured_event );
+    };
+
+   /**
+    * Event storage type implementation.
+    */
+    storagetype EventStorageBase
+    implements EventStorage
+    { 
+    };
+
+   /**
+    * Event storage home implementation.
+    */
+    storagehome EventStorageHomeBase of EventStorageBase
+    implements EventStorageHome
+    { 
+    };
+
+
+};
+
+#endif // _EVENT_PSS_PIDL_

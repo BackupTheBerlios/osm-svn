@@ -1,0 +1,87 @@
+/**
+ */
+
+#ifndef _SESSION_TASK_PSDL_
+#define _SESSION_TASK_PSDL_
+#include <resource.psdl>
+
+#pragma prefix "osm.net"
+
+module session 
+{
+  module task
+  {
+
+    //
+    // Task 
+    //
+
+   /**
+    * Task storage type contains a textual description, task state value, 
+    * a link associating a Task to an owning User, a list containing 
+    * links to consumed resources, a list containing links to produced 
+    * resources and a link associating a Task to the Processor it is 
+    * coordinating.
+    * @see org.omg.Session.Task
+    */
+    abstract storagetype TaskStorage : resource::AbstractResourceStorage
+    {
+       /**
+        * Description of the task.
+        */
+        state string description;
+
+       /**
+        * Current asynchronous state of the task.
+        */
+	  state Session::task_state task_state;
+
+       /**
+        * User that owns this task.
+        */
+        state Session::OwnedBy owned_by;
+
+       /**
+        * List of consumed resources.
+        */
+	  state list::LinkedList consumes;
+
+       /**
+        * List of produced resources.
+        */
+	  state list::LinkedList produces;
+
+       /**
+        * Reference to the processor that this task is coordinating.
+        */
+        state Session::Link coordinates;
+    };
+
+   /**
+    * The factory for TaskStorage.
+    */
+    abstract storagehome TaskStorageHome of TaskStorage : resource::AbstractResourceStorageHome 
+    {
+    };
+
+    //
+    // TaskStorageBase
+    //
+
+    storagetype TaskStorageBase : resource::AbstractResourceStorageBase
+    implements TaskStorage 
+    {
+        stores consumes as ref<list::LinkedListBase>;
+        stores produces as ref<list::LinkedListBase>;
+    };
+
+    storagehome TaskStorageHomeBase of TaskStorageBase
+    implements TaskStorageHome 
+    { 
+    };
+
+  };  
+
+};
+
+#endif // _SESSION_USER_PSDL_
