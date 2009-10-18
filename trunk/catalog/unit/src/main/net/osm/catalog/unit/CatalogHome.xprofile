@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<!-- 
+Declaration of packaged defaults for the demo component.
+-->
+
+<profile xmlns="dpml:metro" lifestyle="singleton">
+  <context>
+    <map key="parameters">
+      <entry key="toplink.jdbc.url" value="jdbc:derby:osm-catalog-unit;create=true"/>
+      <entry key="toplink.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+      <entry key="toplink.logging.level" value="SEVERE"/>
+      <!--<entry key="toplink.ddl-generation" value="drop-and-create-tables"/>-->
+      <entry key="toplink.application-location" value="${dpml.prefs}/osm/catalog"/>
+    </map>
+  </context>
+</profile>
+

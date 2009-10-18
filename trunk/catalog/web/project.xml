@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-catalog-web" basedir="." xmlns="dpml:library">
+
+  <types>
+    <type id="jar"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include ref="osm/http/osm-http-express"/>
+      <include ref="osm-catalog-unint"/>
+    </runtime>
+    <test>
+      <include ref="dpml/metro/dpml-metro-part"/>
+      <include ref="org/apache/ant/ant-junit"/>
+    </test>
+  </dependencies>
+  
+  <filters>
+    <filter token="PERSISTENCE-UNIT-NAME" value="${project.name}"/>
+  </filters>
+  
+</project>

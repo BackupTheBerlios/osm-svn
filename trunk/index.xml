@@ -5,7 +5,7 @@
     <import uri="link:module:junit"/>
     <import uri="link:module:org/apache/ant"/>
     <import uri="link:module:dpml"/>
-    <import uri="artifact:module:org/mortbay/jetty#6.1.0"/>
+    <import uri="artifact:module:org/mortbay/jetty#6.1.5"/>
   </imports>
 
   <properties>
@@ -54,6 +54,7 @@
       
     <module file="http/module.xml"/>
     <module file="db/module.xml"/>
+    <module file="catalog/module.xml"/>
     
     <!--
     <project file="service/project.xml"/>

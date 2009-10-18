@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-catalog-unit" basedir="." xmlns="dpml:library">
+
+  <types>
+    <type id="jar"/>
+    <type id="part" source="etc/component.xml"/>
+    <type id="part" source="etc/test.xml" test="true" name="test"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include uri="artifact:jar:javax/persistence/persistence-api#1.0"/>
+      <include uri="artifact:jar:org/apache/derby/derby#10.2.2.0"/>
+      <include uri="artifact:jar:glassfish/toplink/toplink-essentials#2.0-B40"/>
+    </runtime>
+    <test>
+      <include ref="dpml/metro/dpml-metro-part"/>
+      <include ref="org/apache/ant/ant-junit"/>
+    </test>
+  </dependencies>
+  
+  <filters>
+    <filter token="PERSISTENCE-UNIT-NAME" value="${project.name}"/>
+  </filters>
+  
+</project>
