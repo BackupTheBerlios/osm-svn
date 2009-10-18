@@ -32,4 +32,11 @@ public interface ServerContext
     HttpsConnectionContext getHttps( HttpsConnectionContext context );
     
     NCSAContext getLog( NCSAContext context );
+    
+   /**
+    * Returns the close connection on stop policy.
+    * @param wait the application supplied default shoutdown wait period
+    * @return the resolved gracefull shutdown wait period
+    */ 
+    int getGracefulShutdown( int wait );
 }

@@ -8,12 +8,11 @@
   <dependencies>
     <runtime>
       <include ref="osm/http/osm-http-spi"/>
-      <include uri="artifact:jar:javax/servlet/servlet-api#2.5"/>
       <include ref="org/mortbay/jetty/jetty-util"/>
-      <include ref="org/mortbay/jetty/jsp-api-2.1"/>
-      <include ref="org/mortbay/jetty/jsp-2.1"/>
       <include ref="org/mortbay/jetty/jetty"/>
-      <include uri="artifact:jar:openjdk/javac/javac"/>
+      <include uri="artifact:jar:org/mortbay/jetty/jsp-2.1#6.1.2"/>
+      <include uri="artifact:jar:openjdk/javac/javac-spi"/>
+      <include uri="artifact:jar:openjdk/javac/javac-impl"/>
       <include ref="org/apache/ant/ant"/>
     </runtime>
     <test>
@@ -23,8 +22,9 @@
   
   <filters>
     <filter token="SERVLET-SPEC" value="artifact:jar:javax/servlet/servlet-api#2.5"/>
-    <feature token="JSP-API-SPEC" id="uri" type="jar" ref="org/mortbay/jetty/jsp-api-2.1"/>
-    <feature token="JSP-IMPL-SPEC" id="uri" type="jar" ref="org/mortbay/jetty/jsp-2.1"/>
+    <filter token="JSP-API-SPEC" value="artifact:jar:javax/servlet/jsp/jsp-api#2.1"/>
+    <filter token="JSP-IMPL-SPEC" value="artifact:jar:org/mortbay/jetty/jsp-2.1#6.1.2rc4"/>
+    <filter token="JAVAC-SPEC" value="artifact:jar:openjdk/javac/javac"/>
   </filters>
 
 </project>

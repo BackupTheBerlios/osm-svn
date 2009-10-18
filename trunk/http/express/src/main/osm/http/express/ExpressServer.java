@@ -100,6 +100,13 @@ public class ExpressServer extends org.mortbay.jetty.Server
         Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
         
         //
+        // configure the shutdown policy
+        //
+        
+        int grace = context.getGracefulShutdown( 0 );
+        super.setGracefulShutdown( grace );
+        
+        //
         // setup the thread pool
         //
         
@@ -187,6 +194,11 @@ public class ExpressServer extends org.mortbay.jetty.Server
     
     public ContextHandler getContextHandler( String path )
     {
+        return getContextHandler( path, false );
+    }
+    
+    public ContextHandler getContextHandler( String path, boolean create )
+    {
         ContextHandler[] handlers = m_parts.getContextHandlers();
         for( ContextHandler handler : handlers )
         {
@@ -212,6 +224,7 @@ public class ExpressServer extends org.mortbay.jetty.Server
     {
         getLogger().info( "starting" );
         super.doStart();
+        getLogger().info( "started" );
     }
     
    /**
@@ -220,7 +233,8 @@ public class ExpressServer extends org.mortbay.jetty.Server
     */
     protected void doStop() throws Exception
     {
-        getLogger().info( "stopping" );
+        getLogger().debug( "stopping" );
         super.doStop();
+        getLogger().info( "stopped" );
     }
 }

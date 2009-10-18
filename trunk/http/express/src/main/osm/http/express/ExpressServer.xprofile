@@ -2,6 +2,7 @@
 <profile xmlns="dpml:metro" lifestyle="singleton" collection="hard">
   
   <context>
+    <entry key="gracefulShutdown" value="0"/>
     <context key="threads">
       <entry key="min" value="10"/>
       <entry key="max" value="100"/>
@@ -14,16 +15,14 @@
     <context key="https">
       <entry key="port" value="8443"/>
       <entry key="maxIdleTime" value="30000"/>
-      <!--
       <entry key="keyStore" value="local:keystore:osm/http/sample"/>
       <entry key="keyStorePassword" value="password"/>
       <entry key="certificatePassword" value="password"/>
       <entry key="trustStore" value="local:keystore:osm/http/certs"/>
       <entry key="trustStorePassword" value="password"/>
-      -->
     </context>
     <context key="log">
-      <entry key="filename" value="$${dpml.data}/logs/http/request.log"/>
+      <entry key="filename" value="$${dpml.data}/logs/osm/http/request.log"/>
       <entry key="append" value="true"/>
       <entry key="extended" value="true"/>
     </context>

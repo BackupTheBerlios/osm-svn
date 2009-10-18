@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.ServiceLoader;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.Constants;
@@ -180,18 +181,35 @@ public class Jsr199JavaCompiler implements JavaCompiler
         String className = m_compilationContext.getFullClassName();
         return m_context.getBytecodeBirthTime( className );
     }
-
-    public JavacErrorDetail[] compile( 
-      String className, Node.Nodes pageNodes ) throws JasperException 
+    
+    private javax.tools.JavaCompiler getJavaCompiler()
     {
-        final String source = m_charArrayWriter.toString();
         javax.tools.JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+        if( null == javac )
+        {
+            ServiceLoader<javax.tools.JavaCompiler> loader = 
+              ServiceLoader.load( javax.tools.JavaCompiler.class );
+            javac = loader.iterator().next();
+        }
+        
         if( null == javac )
         {
             final String error = 
               "Java compiler not present in the system tool classloader.";
             throw new Error( error );
         }
+        else
+        {
+            return javac;
+        }
+    }
+
+    public JavacErrorDetail[] compile( 
+      String className, Node.Nodes pageNodes ) throws JasperException 
+    {
+        final String source = m_charArrayWriter.toString();
+        //javax.tools.JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+        javax.tools.JavaCompiler javac = getJavaCompiler();
         
         DiagnosticCollector<JavaFileObject> diagnostics =
             new DiagnosticCollector<JavaFileObject>();
@@ -366,6 +384,7 @@ public class Jsr199JavaCompiler implements JavaCompiler
         addSystemFile( files, "@SERVLET-SPEC@" );
         addSystemFile( files, "@JSP-API-SPEC@" );
         addSystemFile( files, "@JSP-IMPL-SPEC@" );
+        addSystemFile( files, "@JAVAC-SPEC@" );
         return files;
     }
     

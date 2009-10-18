@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<appliance xmlns="dpml:appliance">
+<appliance xmlns="dpml:station">
 
   <info name="http"/>
   
