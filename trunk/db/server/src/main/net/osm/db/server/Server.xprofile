@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<profile xmlns="dpml:metro" lifestyle="singleton" collection="hard">
+  
+  <context>
+    <entry key="host" value="localhost"/>
+    <entry key="port" value="1527"/>
+  </context>
+  
+</profile>

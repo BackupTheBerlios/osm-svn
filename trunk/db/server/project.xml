@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="osm-db-server" basedir="." xmlns="dpml:library">
+
+  <types>
+    <type id="jar"/>
+    <type id="part" source="etc/component.xml" alias="true"/>
+    <type id="part" source="etc/component.xml" name="test" test="true"/>
+  </types>
+
+  <dependencies>
+    <runtime>
+      <include uri="artifact:jar:org/apache/derby/derby#10.2.2.0"/>
+      <include uri="artifact:jar:org/apache/derby/derbynet#10.2.2.0"/>
+    </runtime>
+    <test>
+      <include ref="dpml/metro/dpml-metro-part"/>
+      <include ref="org/apache/ant/ant-junit"/>
+    </test>
+  </dependencies>
+
+</project>
