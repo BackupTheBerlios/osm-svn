@@ -3,6 +3,7 @@
 <project name="osm" default="install" basedir="." 
     xmlns:x="antlib:dpml.tools">
 
+
   <x:import uri="local:template:dpml/tools/standard"/>
 
   <target name="build" depends="standard.build,javadoc"/>
